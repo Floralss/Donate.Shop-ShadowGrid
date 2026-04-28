@@ -3,166 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy OS v4 Titan</title>
+    <title>Magniy OS v5 Elite</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --card: #121214; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --text: #fff; --sec: #8E8E93; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
+        :root { --bg: #000; --card: #111; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --gold: #FFD700; --text: #fff; --sec: #8E8E93; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; transition: 0.3s; }
+        
+        /* Глобальная Дискотека */
+        @keyframes discoBg { 
+            0% { background: #ff0000; } 20% { background: #00ff00; } 40% { background: #0000ff; } 
+            60% { background: #ffff00; } 80% { background: #ff00ff; } 100% { background: #ff0000; } 
+        }
+        .disco-active { animation: discoBg 1s infinite linear !important; }
+        .disco-active .main, .disco-active .sidebar { background: rgba(0,0,0,0.5) !important; backdrop-filter: blur(10px); }
 
-        /* Auth Screen */
-        #auth { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .auth-box { width: 90%; max-width: 380px; text-align: center; }
+        /* Анимация дрожания */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, 1px) rotate(0deg); }
+        }
+        .shake-item { animation: shake 0.5s infinite; border: 2px solid var(--gold) !important; }
 
         /* Layout */
-        #app { display: none; width: 100%; height: 100%; display: flex; }
-        .sidebar { width: 260px; background: #080808; border-right: 1px solid #1c1c1e; padding: 25px; display: flex; flex-direction: column; shrink: 0; }
-        .main { flex-grow: 1; padding: 30px; overflow-y: auto; background: var(--bg); position: relative; }
+        #app { display: none; height: 100vh; width: 100vw; }
+        .sidebar { width: 280px; background: #080808; border-right: 1px solid #1c1c1e; padding: 20px; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
+        .main { flex-grow: 1; padding: 25px; overflow-y: auto; position: relative; }
 
-        /* Nav */
-        .nav-link { padding: 14px 18px; border-radius: 12px; cursor: pointer; color: var(--sec); margin-bottom: 6px; display: flex; align-items: center; gap: 12px; transition: 0.2s; font-size: 14px; }
-        .nav-link:hover { background: #111; color: #fff; }
-        .nav-link.active { background: var(--accent); color: #fff; }
-        .nav-danger { border: 1px solid var(--danger); color: var(--danger) !important; margin-top: 10px; }
+        /* Sidebar Links */
+        .nav-link { padding: 12px 15px; border-radius: 12px; cursor: pointer; color: var(--sec); margin-bottom: 5px; display: flex; align-items: center; gap: 12px; transition: 0.2s; font-size: 14px; }
+        .nav-link:hover, .nav-link.active { background: var(--accent); color: #fff; }
+        .nav-danger { border: 1px solid var(--danger); color: var(--danger); }
 
-        /* Bank Cards */
-        .cards-scroll { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0 25px; scrollbar-width: none; }
-        .bank-card { min-width: 300px; height: 180px; border-radius: 20px; padding: 25px; position: relative; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        .card-uah { background: linear-gradient(135deg, #1a1a1a, #000); }
-        .card-usd { background: linear-gradient(135deg, #003366, #000); }
-        .card-eur { background: linear-gradient(135deg, #333, #111); }
-        .card-num { font-size: 18px; letter-spacing: 2px; font-family: monospace; font-weight: 700; margin: 15px 0; }
+        /* Cards & Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border: 1px solid #222; border-radius: 20px; padding: 20px; transition: 0.2s; }
         
-        /* Stats */
-        .bal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; }
-        .bal-box { background: var(--card); padding: 18px; border-radius: 16px; border: 1px solid #222; text-align: center; }
-        .bal-box b { display: block; font-size: 18px; color: var(--success); margin-top: 5px; }
+        /* Telegram 2.0 */
+        #chat-window { background: #080808; border-radius: 20px; border: 1px solid #222; height: 500px; display: flex; flex-direction: column; overflow: hidden; }
+        .msg-list { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 14px; position: relative; }
+        .msg.me { align-self: flex-end; background: var(--accent); }
+        .msg.him { align-self: flex-start; background: #222; }
 
-        /* General UI */
-        .btn { background: #fff; color: #000; border: none; padding: 15px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        /* UI elements */
+        .btn { background: #fff; color: #000; border: none; padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; display: block; margin-bottom: 10px; text-align: center; }
         .btn-blue { background: var(--accent); color: #fff; }
-        .btn-red { background: var(--danger); color: #fff; }
-        .input { width: 100%; background: #1c1c1e; border: 1px solid #2c2c2e; padding: 15px; border-radius: 14px; color: #fff; margin-bottom: 12px; outline: none; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .input { width: 100%; background: #1c1c1e; border: 1px solid #2c2c2e; padding: 14px; border-radius: 14px; color: #fff; margin-bottom: 10px; outline: none; }
         
+        .badge { background: var(--danger); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; position: absolute; top: -5px; right: -5px; }
+
+        /* Auth */
+        #auth { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { width: 90%; max-width: 380px; text-align: center; }
+
+        /* Mobile View */
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -100%; height: 100%; width: 80%; }
+            .sidebar.open { left: 0; }
+            .mobile-header { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #080808; border-bottom: 1px solid #222; }
+        }
+
         .page { display: none; } .page.active { display: block; }
         #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 30px; border-radius: 50px; z-index: 20000; transition: 0.4s; font-weight: 700; }
         #toast.on { transform: translateX(-50%) translateY(0); }
-
-        .avatar-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
     </style>
 </head>
 <body>
 
-<div id="toast">Уведомление</div>
+<div id="toast">...</div>
 
 <div id="auth">
     <div class="auth-box">
-        <h1 style="font-weight:900; font-size:42px; margin-bottom:30px; letter-spacing:-2px;">MAGNIY OS</h1>
+        <h1 style="font-weight:900; font-size:48px; letter-spacing:-3px; margin-bottom:20px;">MAGNIY OS</h1>
         <div id="auth-ui">
             <input id="l-in" class="input" placeholder="Логин">
             <input id="p-in" class="input" type="password" placeholder="Пароль">
             <button class="btn btn-blue" onclick="doLogin()">Войти</button>
-            <button class="btn" style="background:none; color:var(--sec)" onclick="showReg()">Регистрация</button>
+            <button class="btn" style="background:none; color:var(--sec)" onclick="showReg()">Нет аккаунта? Регистрация</button>
+            <hr style="border:0; border-top:1px solid #222; margin:20px 0;">
+            <p style="color:var(--sec); margin-bottom:10px;">Мульти-аккаунты:</p>
+            <div id="saved-accs"></div>
         </div>
     </div>
 </div>
 
 <div id="app">
-    <div class="sidebar">
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px;">
-            <img id="u-ava" class="avatar-img" src="">
-            <div>
-                <b id="u-name-side" style="display:block; font-size:14px;">...</b>
-                <span style="font-size:10px; color:var(--sec)">Online</span>
-            </div>
-        </div>
-        
-        <div class="nav-link active" onclick="sw('dash', this)">🏠 Главная</div>
-        <div class="nav-link" onclick="sw('cards', this)">💳 Карты и Счета</div>
-        <div class="nav-link" onclick="sw('exch', this)">💱 Обмен валют</div>
-        <div class="nav-link" onclick="sw('shop', this)">🛍️ Магазины</div>
-        <div class="nav-link" onclick="sw('prof', this)">⚙️ Мой Профиль</div>
-        <div id="adm-link" class="nav-link nav-danger" style="display:none;" onclick="sw('adm', this)">🛠️ АДМИН ПАНЕЛЬ</div>
-        
-        <button class="btn btn-red" style="margin-top:auto" onclick="logout()">🚪 Выйти из системы</button>
+    <div class="mobile-header">
+        <button onclick="document.querySelector('.sidebar').classList.toggle('open')" style="background:none; border:none; color:#fff; font-size:24px;">☰</button>
+        <b>Magniy Bank</b>
+        <div id="m-bal">0 ₴</div>
     </div>
 
-    <div class="main">
-        <div id="p-dash" class="page active">
-            <h2 id="u-greet">Загрузка...</h2><br>
-            <div class="bal-grid">
-                <div class="bal-box"><span>Гривны</span><b id="b-uah">0 ₴</b></div>
-                <div class="bal-box"><span>Доллары</span><b id="b-usd">0 $</b></div>
-                <div class="bal-box"><span>Евро</span><b id="b-eur">0 €</b></div>
+    <div style="display:flex; height:100vh;">
+        <div class="sidebar">
+            <div style="text-align:center; margin-bottom:30px;">
+                <img id="u-ava" src="" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--accent); object-fit:cover;">
+                <h3 id="u-name" style="margin-top:10px;">...</h3>
             </div>
-            <button class="btn btn-blue" onclick="work()">💰 Кликнуть (Заработать 5 ₴)</button>
             
-            <h3 style="margin:25px 0 10px;">Мое Имущество</h3>
-            <div id="assets-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px;"></div>
+            <div class="nav-link active" onclick="sw('dash', this)">🏠 Главная</div>
+            <div class="nav-link" onclick="sw('biz', this)">💼 Бизнесы & Улучшения</div>
+            <div class="nav-link" onclick="sw('cards', this)">💳 Мои Карты</div>
+            <div class="nav-link" onclick="sw('tg', this)">🕊️ Telegram 2.0</div>
+            <div class="nav-link" onclick="sw('game', this)">♠️ Казино Комнаты</div>
+            <div class="nav-link" onclick="sw('prof', this)">⚙️ Профиль</div>
+            
+            <div id="adm-nav" class="nav-link nav-danger" style="display:none;" onclick="sw('adm', this)">🛠️ АДМИНКА</div>
+            
+            <button class="btn btn-red" style="margin-top:auto; background:#111; color:red;" onclick="logout()">🚪 Выйти</button>
         </div>
 
-        <div id="p-cards" class="page">
-            <h2>Ваши карты</h2>
-            <div class="cards-scroll" id="cards-container"></div>
-            
-            <h3>Выпуск новых карт</h3><br>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn btn-blue" onclick="buyCard('USD')">Открыть Карту USD ($100)</button>
-                <button class="btn btn-blue" onclick="buyCard('EUR')">Открыть Карту EUR (€100)</button>
+        <div class="main">
+            <div id="p-dash" class="page active">
+                <div class="grid">
+                    <div class="card">
+                        <span>Баланс ₴</span>
+                        <h1 id="bal-uah" style="color:var(--success)">0 ₴</h1>
+                    </div>
+                    <div class="card">
+                        <span>Баланс $</span>
+                        <h1 id="bal-usd" style="color:var(--accent)">0 $</h1>
+                    </div>
+                </div>
+                <br>
+                <button class="btn btn-blue" onclick="clickWork()">💰 ЗАРАБОТАТЬ 5 ₴ (КЛИК)</button>
+                
+                <h2 style="margin-top:30px;">Моя Недвижимость & Авто</h2>
+                <div id="assets-list" class="grid" style="margin-top:15px;"></div>
             </div>
-            <p style="font-size:12px; color:var(--sec)">* Выпуск валютной карты стоит 100 единиц соответствующей валюты</p>
-        </div>
 
-        <div id="p-exch" class="page">
-            <h2>Обменник</h2><br>
-            <div class="bal-box" style="text-align:left">
-                <p>Курс: 1$ = 40₴ | 1€ = 45₴</p><br>
-                <input id="ex-val" class="input" type="number" placeholder="Сумма для обмена">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button class="btn btn-blue" onclick="doEx('uah','usd')">₴ в $</button>
-                    <button class="btn btn-blue" onclick="doEx('usd','uah')">$ в ₴</button>
-                    <button class="btn btn-blue" onclick="doEx('uah','eur')">₴ в €</button>
-                    <button class="btn btn-blue" onclick="doEx('eur','uah')">€ в ₴</button>
+            <div id="p-biz" class="page">
+                <h2>Ваши предприятия</h2><br>
+                <div id="biz-list" class="grid"></div>
+                <br><hr style="border-color:#222;"><br>
+                <h2>Купить новый бизнес</h2><br>
+                <div id="shop-biz" class="grid"></div>
+            </div>
+
+            <div id="p-tg" class="page">
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <input id="tg-target" class="input" style="margin:0" placeholder="Логин игрока...">
+                    <button class="btn btn-blue" style="width:120px; margin:0" onclick="openChat()">Найти</button>
+                </div>
+                <div id="chat-window">
+                    <div id="chat-header" style="padding:15px; background:#111; border-bottom:1px solid #222; display:flex; justify-content:space-between;">
+                        <b id="chat-title">Выберите контакт</b>
+                        <button class="btn-blue" style="padding:5px 10px; border-radius:8px; display:none" id="call-btn" onclick="startCall()">📞 Звонок</button>
+                    </div>
+                    <div id="tg-msgs" class="msg-list"></div>
+                    <div id="tg-offer" style="padding:10px; background:#1a1a00; border-top:1px solid #gold; display:none;">
+                        <p style="font-size:12px; margin-bottom:5px;">⚠️ Вам предложена Админка за 50,000,000 ₴!</p>
+                        <button class="btn btn-gold" style="padding:5px" onclick="acceptAdmin()">Подтвердить покупку</button>
+                    </div>
+                    <div style="padding:15px; display:flex; gap:10px;">
+                        <input id="tg-in" class="input" style="margin:0" placeholder="Напишите сообщение...">
+                        <button class="btn btn-blue" style="width:70px; margin:0" onclick="sendMsg()">➤</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="p-prof" class="page">
-            <h2>Настройки профиля</h2><br>
-            <div class="bal-box" style="text-align:left">
-                <p>Ваше имя:</p>
-                <input id="prof-name" class="input">
-                <p>Ссылка на аватарку:</p>
-                <input id="prof-ava" class="input" placeholder="https://...">
-                <button class="btn btn-blue" onclick="saveProf()">Сохранить изменения</button>
+            <div id="p-adm" class="page">
+                <h2>Управление OS</h2><br>
+                <div class="card">
+                    <input id="a-user" class="input" placeholder="Логин">
+                    <input id="a-val" class="input" type="number" placeholder="Сумма">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <button class="btn btn-blue" onclick="admGive('bal')">Дать ₴</button>
+                        <button class="btn btn-blue" onclick="admGive('usd')">Дать $</button>
+                        <button class="btn btn-gold" onclick="admPromo()">Предложить АДМИНКУ</button>
+                    </div>
+                    <button class="btn" style="background:purple; color:#fff" onclick="admDisco()">💥 ЗАПУСТИТЬ ДИСКОТЕКУ (ДЛЯ ВСЕХ)</button>
+                </div>
             </div>
-        </div>
 
-        <div id="p-shop" class="page">
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn btn-blue" onclick="renderShop('auto')">🏎️ Авто</button>
-                <button class="btn btn-blue" onclick="renderShop('home')">🏠 Дома</button>
-            </div>
-            <div id="shop-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:15px;"></div>
-        </div>
-
-        <div id="p-adm" class="page">
-            <h2 style="color:var(--danger)">Панель Администратора</h2><br>
-            <input id="a-target" class="input" placeholder="Логин игрока">
-            <input id="a-amount" class="input" type="number" placeholder="Сумма">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn btn-blue" onclick="admGive('bal')">Дать ₴</button>
-                <button class="btn btn-blue" onclick="admGive('usd')">Дать $</button>
-                <button class="btn btn-red" onclick="admBan()">ЗАБАНИТЬ</button>
+            <div id="p-prof" class="page">
+                <h2>Настройки аккаунта</h2><br>
+                <div class="card">
+                    <p>Имя профиля:</p>
+                    <input id="pr-name" class="input">
+                    <p>Аватарка (URL):</p>
+                    <input id="pr-ava" class="input">
+                    <p>Цвет интерфейса:</p>
+                    <input id="pr-col" type="color" class="input" style="height:50px">
+                    <button class="btn btn-blue" onclick="saveProf()">Сохранить</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// CONFIG
+// --- CORE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
   authDomain: "magniybank.firebaseapp.com",
@@ -175,22 +214,40 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-let user = localStorage.getItem('magniy_user');
+let session = localStorage.getItem('magniy_session');
 let uData = null;
+let curChat = null;
 
 const toast = (m) => { const t = document.getElementById('toast'); t.innerText=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); };
-const genNum = () => "4441 " + Array.from({length:3}, () => Math.floor(1000+Math.random()*8999)).join(' ');
-const genCvv = () => Math.floor(100+Math.random()*899);
 
-// AUTH
+// --- MULTI ACCOUNT ---
+function updateSavedAccs() {
+    let accs = JSON.parse(localStorage.getItem('magniy_accounts') || "[]");
+    let div = document.getElementById('saved-accs'); div.innerHTML = '';
+    accs.forEach(a => {
+        div.innerHTML += `<button class="btn" style="background:#111; color:#fff" onclick="fastLogin('${a.l}','${a.p}')">${a.l}</button>`;
+    });
+}
+updateSavedAccs();
+
+function fastLogin(l, p) {
+    document.getElementById('l-in').value = l;
+    document.getElementById('p-in').value = p;
+    doLogin();
+}
+
+// --- AUTH LOGIC ---
 function doLogin() {
     let l = document.getElementById('l-in').value.toLowerCase().trim();
     let p = document.getElementById('p-in').value;
     db.ref('users/'+l).once('value', s => {
         let d = s.val();
         if(d && d.pass === p) {
-            if(d.isBanned) return toast("БАН");
-            localStorage.setItem('magniy_user', l); location.reload();
+            localStorage.setItem('magniy_session', l);
+            let accs = JSON.parse(localStorage.getItem('magniy_accounts') || "[]");
+            if(!accs.find(x => x.l === l)) accs.push({l:l, p:p});
+            localStorage.setItem('magniy_accounts', JSON.stringify(accs));
+            location.reload();
         } else toast("Ошибка входа!");
     });
 }
@@ -199,7 +256,6 @@ function showReg() {
     document.getElementById('auth-ui').innerHTML = `
         <input id="rl" class="input" placeholder="Логин">
         <input id="rp" class="input" type="password" placeholder="Пароль">
-        <input id="rn" class="input" placeholder="Ваше Имя">
         <input id="rt" class="input" placeholder="Токен (admin99)">
         <button class="btn btn-blue" onclick="doReg()">Создать</button>
         <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
@@ -209,107 +265,167 @@ function showReg() {
 function doReg() {
     let l = document.getElementById('rl').value.toLowerCase().trim();
     let p = document.getElementById('rp').value;
-    let n = document.getElementById('rn').value || "Игрок";
     let t = document.getElementById('rt').value;
-
-    let mainCard = { num: genNum(), cvv: genCvv(), type: 'UAH' };
     db.ref('users/'+l).set({
-        login: l, pass: p, name: n, bal: 1000, usd: 0, eur: 0,
+        login: l, pass: p, name: l, bal: 1000, usd: 0,
         isAdmin: (t === "admin99"),
-        ava: "https://ui-avatars.com/api/?name="+n,
-        cards: [mainCard], assets: []
-    }).then(() => { localStorage.setItem('magniy_user', l); location.reload(); });
+        ava: "https://ui-avatars.com/api/?name="+l,
+        color: "#007AFF", businesses: [], assets: []
+    }).then(() => { localStorage.setItem('magniy_session', l); location.reload(); });
 }
 
-// MAIN LOGIC
-if(user) {
-    db.ref('users/'+user).on('value', s => {
+// --- GAME LOGIC ---
+const bizShop = [
+    {n: "Киоск", p: 5000, inc: 50}, {n: "Кофейня", p: 25000, inc: 300},
+    {n: "Автосервис", p: 150000, inc: 1200}, {n: "ТЦ", p: 1000000, inc: 10000},
+    {n: "Нефтевышка", p: 50000000, inc: 250000}
+];
+
+if(session) {
+    db.ref('users/'+session).on('value', s => {
         uData = s.val();
         if(!uData) return;
         document.getElementById('auth').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
+        document.getElementById('app').style.display = 'block';
         
-        // Header
-        document.getElementById('u-greet').innerText = "Привет, " + uData.name;
-        document.getElementById('u-name-side').innerText = uData.name;
+        document.getElementById('u-name').innerText = uData.name;
         document.getElementById('u-ava').src = uData.ava;
+        document.getElementById('bal-uah').innerText = uData.bal.toLocaleString() + " ₴";
+        document.getElementById('bal-usd').innerText = uData.usd.toLocaleString() + " $";
+        document.getElementById('m-bal').innerText = uData.bal.toLocaleString() + " ₴";
+
+        if(uData.isAdmin) document.getElementById('adm-nav').style.display = 'flex';
         
-        // Balances
-        document.getElementById('b-uah').innerText = uData.bal.toLocaleString() + " ₴";
-        document.getElementById('b-usd').innerText = uData.usd.toLocaleString() + " $";
-        document.getElementById('b-eur').innerText = uData.eur.toLocaleString() + " €";
-
-        if(uData.isAdmin) document.getElementById('adm-link').style.display = 'flex';
-
-        // Cards
-        let cCont = document.getElementById('cards-container'); cCont.innerHTML = '';
-        (uData.cards || []).forEach(c => {
-            cCont.innerHTML += `
-                <div class="bank-card card-${c.type.toLowerCase()}">
-                    <div style="width:40px; height:25px; background:gold; border-radius:4px;"></div>
-                    <div class="card-num">${c.num}</div>
-                    <div style="display:flex; justify-content:space-between; font-size:12px;">
-                        <span>${uData.name.toUpperCase()}</span>
-                        <span>CVV: ${c.cvv} | <b>${c.type}</b></span>
-                    </div>
-                </div>`;
+        // Render Biz
+        let bList = document.getElementById('biz-list'); bList.innerHTML = '';
+        (uData.businesses || []).forEach((b, i) => {
+            let isShake = b.lvl >= 5 ? 'shake-item' : '';
+            bList.innerHTML += `<div class="card ${isShake}">
+                <h3>${b.n}</h3>
+                <p>Уровень: ${b.lvl}</p>
+                <p>Доход: ${(b.inc * b.lvl).toLocaleString()} ₴/мин</p>
+                <button class="btn btn-blue" onclick="upBiz(${i})">Улучшить (${(b.p * (b.lvl+1)).toLocaleString()} ₴)</button>
+            </div>`;
         });
 
-        // Assets
-        let aList = document.getElementById('assets-list'); aList.innerHTML = '';
-        (uData.assets || []).forEach(a => aList.innerHTML += `<div class="bal-box"><b>${a}</b></div>`);
+        // Admin Offer
+        if(uData.adminOffer) document.getElementById('tg-offer').style.display = 'block';
+        else document.getElementById('tg-offer').style.display = 'none';
+    });
+
+    // Global Listener for Disco
+    db.ref('global/disco').on('value', s => {
+        if(s.val()) document.body.classList.add('disco-active');
+        else document.body.classList.remove('disco-active');
+    });
+
+    renderShop();
+}
+
+function clickWork() { db.ref('users/'+session+'/bal').transaction(c => (c||0) + 5); }
+
+function renderShop() {
+    let s = document.getElementById('shop-biz'); s.innerHTML = '';
+    bizShop.forEach(b => {
+        s.innerHTML += `<div class="card">
+            <b>${b.n}</b><br><small>${b.p.toLocaleString()} ₴</small>
+            <button class="btn btn-blue" style="margin-top:10px" onclick="buyBiz('${b.n}', ${b.p}, ${b.inc})">Купить</button>
+        </div>`;
     });
 }
 
-function work() { db.ref('users/'+user+'/bal').set(uData.bal + 5); }
-
-function buyCard(type) {
-    let price = 100;
-    if(type === 'USD' && uData.usd < price) return toast("Нужно 100$");
-    if(type === 'EUR' && uData.eur < price) return toast("Нужно 100€");
-    
-    let newCard = { num: genNum(), cvv: genCvv(), type: type };
-    let cards = uData.cards || [];
-    cards.push(newCard);
-    
-    let update = { cards: cards };
-    if(type === 'USD') update.usd = uData.usd - price;
-    if(type === 'EUR') update.eur = uData.eur - price;
-    
-    db.ref('users/'+user).update(update);
-    toast("Карта "+type+" открыта!");
+function buyBiz(n, p, inc) {
+    if(uData.bal < p) return toast("Мало денег!");
+    let b = uData.businesses || [];
+    b.push({n:n, p:p, inc:inc, lvl:1});
+    db.ref('users/'+session).update({ bal: uData.bal - p, businesses: b });
+    toast("Поздравляем с бизнесом!");
 }
 
-function doEx(f, t) {
-    let v = parseInt(document.getElementById('ex-val').value);
-    if(!v || v <= 0) return toast("Сумма?");
-    if(f === 'uah' && t === 'usd' && uData.bal >= v) db.ref('users/'+user).update({ bal: uData.bal-v, usd: uData.usd + Math.floor(v/40) });
-    else if(f === 'usd' && t === 'uah' && uData.usd >= v) db.ref('users/'+user).update({ usd: uData.usd-v, bal: uData.bal + (v*40) });
-    else toast("Мало денег!");
+function upBiz(i) {
+    let b = uData.businesses[i];
+    let price = b.p * (b.lvl + 1);
+    if(uData.bal < price) return toast("Мало денег!");
+    b.lvl++;
+    db.ref('users/'+session).update({ bal: uData.bal - price, businesses: uData.businesses });
+    toast("Уровень повышен!");
 }
 
-function saveProf() {
-    let n = document.getElementById('prof-name').value;
-    let a = document.getElementById('prof-ava').value;
-    db.ref('users/'+user).update({ name: n || uData.name, ava: a || uData.ava });
-    toast("Сохранено!");
+// --- TELEGRAM 2.0 ---
+function openChat() {
+    let target = document.getElementById('tg-target').value.toLowerCase();
+    if(!target) return;
+    db.ref('users/'+target).once('value', s => {
+        if(!s.exists()) return toast("Игрок не найден");
+        curChat = target;
+        document.getElementById('chat-title').innerText = "Диалог: " + s.val().name;
+        document.getElementById('call-btn').style.display = 'block';
+        listenMsgs();
+    });
 }
 
+function listenMsgs() {
+    let id = [session, curChat].sort().join('_');
+    db.ref('chats/'+id).limitToLast(20).on('value', s => {
+        let box = document.getElementById('tg-msgs'); box.innerHTML = '';
+        s.forEach(m => {
+            let d = m.val();
+            box.innerHTML += `<div class="msg ${d.f === session ? 'me' : 'him'}">${d.t}</div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+function sendMsg() {
+    let t = document.getElementById('tg-in').value;
+    if(!t || !curChat) return;
+    let id = [session, curChat].sort().join('_');
+    db.ref('chats/'+id).push({ f: session, t: t });
+    document.getElementById('tg-in').value = '';
+}
+
+// --- ADMIN ---
+function admPromo() {
+    let target = document.getElementById('a-user').value.toLowerCase();
+    db.ref('users/'+target).update({ adminOffer: true });
+    db.ref('chats/'+[session, target].sort().join('_')).push({ f: session, t: "Система: Вам предложено купить админку! Проверьте вкладку Telegram." });
+    toast("Предложение отправлено!");
+}
+
+function acceptAdmin() {
+    if(uData.bal < 50000000) return toast("Нужно 50,000,000 ₴! У вас есть 4 дня.");
+    db.ref('users/'+session).update({ bal: uData.bal - 50000000, isAdmin: true, adminOffer: false });
+    toast("ВЫ ТЕПЕРЬ АДМИНИСТРАТОР!");
+}
+
+function admDisco() {
+    db.ref('global/disco').set(true);
+    setTimeout(() => db.ref('global/disco').set(false), 15000);
+}
+
+function admGive(type) {
+    let t = document.getElementById('a-user').value.toLowerCase();
+    let v = parseInt(document.getElementById('a-val').value);
+    db.ref('users/'+t+'/'+type).transaction(c => (c||0) + v);
+    toast("Выдано");
+}
+
+function logout() { localStorage.removeItem('magniy_session'); location.reload(); }
 function sw(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
     document.getElementById('p-'+id).classList.add('active');
     el.classList.add('active');
+    document.querySelector('.sidebar').classList.remove('open');
 }
 
-function logout() { localStorage.removeItem('magniy_user'); location.reload(); }
-
-function admGive(type) {
-    let t = document.getElementById('a-target').value.toLowerCase();
-    let v = parseInt(document.getElementById('a-amount').value);
-    db.ref('users/'+t+'/'+type).transaction(c => (c||0) + v);
-    toast("Выдано");
-}
+// Income Timer
+setInterval(() => {
+    if(!uData || !uData.businesses) return;
+    let total = 0;
+    uData.businesses.forEach(b => total += (b.inc * b.lvl));
+    if(total > 0) db.ref('users/'+session+'/bal').transaction(c => (c||0) + Math.floor(total/10));
+}, 6000);
 </script>
 </body>
-</html>
+                            </html>
