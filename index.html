@@ -3,44 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy Bank Pro</title>
+    <title>Magniy Bank Classic Gold</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0b0b0c; --card: #161618; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --text: #FFFFFF; --sec: #8E8E93; }
+        :root { --bg: #050505; --card: #121214; --accent: #007AFF; --danger: #FF3B30; --text: #FFFFFF; --sec: #8E8E93; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); overflow: hidden; }
 
-        #app { display: none; height: 100vh; width: 100vw; display: flex; }
-        .sidebar { width: 260px; background: #000; border-right: 1px solid #222; display: flex; flex-direction: column; padding: 25px; shrink: 0; }
-        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        /* Авторизация */
+        #auth { display: flex; height: 100vh; align-items: center; justify-content: center; padding: 20px; z-index: 1000; position: relative; }
+        .auth-box { width: 100%; max-width: 360px; text-align: center; }
 
-        /* Дизайн карты */
-        .bank-card-visual { 
-            width: 100%; max-width: 350px; height: 200px; border-radius: 18px; position: relative;
-            background: linear-gradient(135deg, #222, #000); border: 1px solid #333;
-            padding: 25px; margin: 20px 0; transition: 0.6s; transform-style: preserve-3d; cursor: pointer;
+        /* Основной экран */
+        #app { display: none; height: 100vh; display: flex; }
+        .sidebar { width: 260px; background: #000; border-right: 1px solid #1c1c1e; padding: 25px; display: flex; flex-direction: column; shrink: 0; }
+        .main { flex-grow: 1; padding: 30px; overflow-y: auto; background: var(--bg); }
+
+        /* Карта */
+        .card-wrapper { perspective: 1000px; margin-bottom: 25px; }
+        .bank-card { 
+            width: 100%; max-width: 340px; height: 200px; position: relative; 
+            transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer;
         }
-        .card-front, .card-back { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-back { background: #111; transform: rotateY(180deg); justify-content: center; align-items: center; }
-        .bank-card-visual.flipped { transform: rotateY(180deg); }
+        .bank-card.flipped { transform: rotateY(180deg); }
+        .card-side { 
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
+            border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-f { background: linear-gradient(135deg, #1e1e1e, #000); }
+        .card-b { background: #111; transform: rotateY(180deg); justify-content: center; align-items: center; }
         
-        .chip { width: 40px; height: 30px; background: linear-gradient(135deg, #d4af37, #f9d71c); border-radius: 5px; margin-bottom: 10px; }
-        .card-num { font-size: 20px; letter-spacing: 3px; font-family: monospace; }
-        .cvv-line { background: #fff; color: #000; padding: 5px 15px; width: 100%; text-align: right; font-weight: 800; border-radius: 4px; }
+        .chip { width: 45px; height: 32px; background: linear-gradient(135deg, #f1c40f, #d4af37); border-radius: 6px; }
+        .card-num { font-size: 20px; letter-spacing: 2px; font-family: monospace; font-weight: 600; }
 
-        .btn { background: #fff; color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; margin-bottom: 10px; }
+        /* UI Элементы */
+        .btn { background: #fff; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; transition: 0.2s; }
         .btn-blue { background: var(--accent); color: #fff; }
         .btn-red { background: var(--danger); color: #fff; }
-        .input { width: 100%; background: #111; border: 1px solid #222; padding: 16px; border-radius: 14px; color: #fff; margin-bottom: 15px; outline: none; }
+        .input { width: 100%; background: #1c1c1e; border: 1px solid #2c2c2e; padding: 15px; border-radius: 12px; color: #fff; margin-bottom: 12px; outline: none; }
 
-        .mobile-tab { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; border-top: 1px solid #222; display: none; grid-template-columns: repeat(5, 1fr); z-index: 1000; }
-        @media (max-width: 768px) { .sidebar { display: none; } .mobile-tab { display: grid; } .main-content { padding: 20px 20px 100px; } }
-        .m-item { display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--sec); }
-        .page { display: none; } .page.active { display: block; }
-        
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 15px 30px; border-radius: 40px; z-index: 9999; transition: 0.4s; font-weight: 700; }
+        .nav-link { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--sec); margin-bottom: 5px; }
+        .nav-link.active { background: var(--card); color: #fff; font-weight: 600; border: 1px solid #222; }
+
+        /* Чат */
+        #chat-area { height: 250px; overflow-y: auto; background: #000; border: 1px solid #222; border-radius: 12px; padding: 15px; margin-bottom: 10px; }
+        .m { margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #111; padding-bottom: 4px; }
+        .m b { color: var(--accent); }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .mobile-nav { display: grid; position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #222; }
+            .main { padding: 20px 20px 100px; }
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; z-index: 2000; transition: 0.4s; font-weight: 700; }
         .toast.on { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
@@ -48,98 +69,90 @@
 
 <div id="toast" class="toast"></div>
 
-<div id="auth" style="display:flex; height:100vh; align-items:center; justify-content:center; padding:20px;">
-    <div style="width:100%; max-width:380px;">
-        <h1 style="text-align:center; margin-bottom:30px;">MAGNIY BANK</h1>
-        <div id="authContent">
-            <input id="li" class="input" placeholder="Логин">
-            <input id="pi" class="input" type="password" placeholder="Пароль">
-            <button class="btn btn-blue" onclick="login()">Войти</button>
-            <button class="btn" style="background:none; color:var(--sec)" onclick="regMode()">Регистрация</button>
-            <button class="btn" style="background:none; color:var(--danger); font-size:12px;" onclick="recoveryMode()">Забыл пароль / Восстановить</button>
+<div id="auth">
+    <div class="auth-box">
+        <h1 style="font-weight:900; letter-spacing:-1px; margin-bottom:30px;">MAGNIY BANK</h1>
+        <div id="auth-ui">
+            <input id="l-in" class="input" placeholder="Логин">
+            <input id="p-in" class="input" type="password" placeholder="Пароль">
+            <button class="btn btn-blue" onclick="doLogin()">Войти</button>
+            <button class="btn" style="background:none; color:var(--sec)" onclick="viewReg()">Регистрация</button>
+            <button class="btn" style="background:none; color:var(--danger); font-size:12px" onclick="viewRec()">Забыл пароль</button>
         </div>
     </div>
 </div>
 
 <div id="app">
     <div class="sidebar">
-        <h2 onclick="location.reload()">Magniy</h2><br>
-        <div class="nav-item active" onclick="showPage('dash', this)">🏠 Главная</div>
-        <div class="nav-item" onclick="showPage('chat', this)">💬 Чат</div>
-        <div class="nav-item" onclick="showPage('trans', this)">💸 Переводы</div>
-        <div class="nav-item" onclick="showPage('shop', this)">🛍️ Магазин</div>
-        <div class="nav-item" onclick="showPage('prof', this)">👤 Профиль</div>
-        <div id="admBtn" class="nav-item" style="display:none; color:var(--danger);" onclick="showPage('adm', this)">🛠️ Админка</div>
-        <button class="btn btn-red" style="margin-top:auto" onclick="logout()">Выйти</button>
+        <h2 style="margin-bottom:25px;">Magniy</h2>
+        <div class="nav-link active" onclick="sw('dash', this)">🏠 Главная</div>
+        <div class="nav-link" onclick="sw('chat', this)">💬 Чат</div>
+        <div class="nav-link" onclick="sw('send', this)">💸 Переводы</div>
+        <div id="adm-btn" class="nav-link" style="display:none; color:var(--danger)" onclick="sw('adm', this)">🛠️ Админка</div>
+        <button class="btn btn-red" style="margin-top:auto; background:#111" onclick="exit()">Выход</button>
     </div>
 
-    <div class="main-content">
-        <div id="pg-dash" class="page active">
-            <h1 id="uNameDisp">...</h1>
-            
-            <div class="bank-card-visual" onclick="this.classList.toggle('flipped')">
-                <div class="card-front">
-                    <div class="chip"></div>
-                    <div class="card-num" id="uCardNum">0000 0000 0000 0000</div>
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                        <div style="font-size:12px; opacity:0.7;">OWNER:<br><span id="uCardOwner" style="font-size:14px; color:#fff">NAME</span></div>
-                        <div style="font-size:12px; opacity:0.7;">EXPIRE:<br><span id="uCardDate" style="font-size:14px; color:#fff">00/00</span></div>
+    <div class="main">
+        <div id="p-dash" class="page active">
+            <h1 id="u-greet">Привет!</h1>
+            <div class="card-wrapper">
+                <div class="bank-card" id="main-card" onclick="this.classList.toggle('flipped')">
+                    <div class="card-side card-f">
+                        <div class="chip"></div>
+                        <div class="card-num" id="card-n">0000 0000 0000 0000</div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; opacity:0.8;">
+                            <span id="card-o">NAME</span>
+                            <span id="card-d">00/00</span>
+                        </div>
+                    </div>
+                    <div class="card-side card-b">
+                        <p style="font-size:10px; margin-bottom:5px; opacity:0.6">CVV CODE</p>
+                        <div style="background:#fff; color:#000; padding:5px 15px; font-weight:900; border-radius:4px;" id="card-c">000</div>
                     </div>
                 </div>
-                <div class="card-back">
-                    <p style="font-size:10px; margin-bottom:5px; opacity:0.7">SECURITY CODE (CVV)</p>
-                    <div class="cvv-line" id="uCardCVV">000</div>
-                </div>
-            </div>
-            <p style="text-align:center; font-size:12px; opacity:0.5; margin-bottom:20px;">Нажми на карту, чтобы перевернуть</p>
-
-            <div style="background:var(--card); padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #222">
-                <p style="opacity:0.6">Доступный баланс</p>
-                <h2 id="uBalDisp" style="font-size:32px">0 ₴</h2>
             </div>
 
-            <button class="btn btn-blue" onclick="clickMine()">💰 Заработать 1 ₴</button>
+            <div style="background:var(--card); padding:25px; border-radius:18px; border:1px solid #222; margin-bottom:20px;">
+                <p style="opacity:0.6; font-size:14px;">Баланс</p>
+                <h2 id="u-bal" style="font-size:38px;">0 ₴</h2>
+            </div>
+            <button class="btn btn-blue" onclick="clickWork()">💰 Кликнуть (+1 ₴)</button>
         </div>
 
-        <div id="pg-chat" class="page">
-            <h2>Чат банка</h2>
-            <div id="chatBox" style="height:350px; overflow-y:auto; background:#000; border:1px solid #222; border-radius:15px; padding:15px; margin:15px 0;"></div>
+        <div id="p-chat" class="page">
+            <h2>Чат Банка</h2>
+            <div id="chat-area"></div>
             <div style="display:flex; gap:10px">
-                <input id="chatMsg" class="input" placeholder="Ваше сообщение...">
+                <input id="msg-in" class="input" placeholder="Сообщение...">
                 <button class="btn btn-blue" style="width:80px" onclick="sendMsg()">📨</button>
             </div>
         </div>
 
-        <div id="pg-trans" class="page">
-            <h2>Перевод денег</h2>
-            <input id="tUser" class="input" placeholder="Логин получателя">
-            <input id="tSum" class="input" type="number" placeholder="Сумма">
-            <button class="btn btn-blue" onclick="transfer()">Отправить</button>
+        <div id="p-send" class="page">
+            <h2>Перевести ₴</h2>
+            <div style="background:var(--card); padding:20px; border-radius:15px;">
+                <input id="target-l" class="input" placeholder="Логин получателя">
+                <input id="target-s" class="input" type="number" placeholder="Сумма">
+                <button class="btn btn-blue" onclick="doSend()">Отправить</button>
+            </div>
         </div>
 
-        <div id="pg-prof" class="page">
-            <h2>Ваш профиль</h2>
-            <div id="profInfo" class="input">Загрузка...</div>
-            <button class="btn btn-red" onclick="logout()">Сменить аккаунт</button>
+        <div id="p-adm" class="page">
+            <h2>Панель Администратора</h2>
+            <div style="background:var(--card); padding:20px; border-radius:15px; border:1px solid var(--danger);">
+                <input id="adm-l" class="input" placeholder="Логин">
+                <input id="adm-v" class="input" type="number" placeholder="Сумма">
+                <div style="display:flex; gap:10px">
+                    <button class="btn btn-blue" onclick="admProc('add')">Выдать</button>
+                    <button class="btn btn-red" onclick="admProc('sub')">Забрать</button>
+                </div>
+            </div>
         </div>
-
-        <div id="pg-adm" class="page">
-            <h2>Админ-панель</h2>
-            <input id="aLog" class="input" placeholder="Логин">
-            <input id="aSum" class="input" placeholder="Сумма">
-            <button class="btn btn-blue" onclick="admDo('add')">Выдать ₴</button>
-        </div>
-    </div>
-
-    <div class="mobile-tab">
-        <div class="m-item" onclick="showPage('dash', this)">🏠</div>
-        <div class="m-item" onclick="showPage('chat', this)">💬</div>
-        <div class="m-item" onclick="showPage('trans', this)">💸</div>
-        <div class="m-item" onclick="showPage('prof', this)">👤</div>
     </div>
 </div>
 
 <script>
+// Настройки твоего проекта
 const firebaseConfig = {
   apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
   authDomain: "magniybank.firebaseapp.com",
@@ -152,132 +165,139 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-let curLog = localStorage.getItem('session');
-let user = null;
+let session = localStorage.getItem('user');
+let uData = null;
 
 const toast = (m) => { const t = document.getElementById('toast'); t.innerText=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); };
 
 // Вход
-function login() {
-    let l = document.getElementById('li').value.toLowerCase().trim();
-    let p = document.getElementById('pi').value;
+function doLogin() {
+    let l = document.getElementById('l-in').value.toLowerCase().trim();
+    let p = document.getElementById('p-in').value;
     db.ref('users/'+l).once('value', s => {
         let d = s.val();
         if(d && d.pass === p) {
-            localStorage.setItem('session', l); location.reload();
+            localStorage.setItem('user', l); location.reload();
         } else toast("Ошибка входа!");
     });
 }
 
-// Восстановление
-function recoveryMode() {
-    document.getElementById('authContent').innerHTML = `
-        <h3>Восстановление</h3><br>
-        <input id="recLog" class="input" placeholder="Логин">
-        <input id="recNum" class="input" placeholder="Номер карты">
-        <input id="recCvv" class="input" placeholder="CVV код">
-        <button class="btn btn-blue" onclick="doRecover()">Найти пароль</button>
-        <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
-    `;
-}
-
-function doRecover() {
-    let l = document.getElementById('recLog').value.toLowerCase().trim();
-    let n = document.getElementById('recNum').value.trim();
-    let c = document.getElementById('recCvv').value.trim();
-    db.ref('users/'+l).once('value', s => {
-        let d = s.val();
-        if(d && d.cardNum === n && d.cardCVV === c) {
-            alert("Ваш пароль: " + d.pass);
-            location.reload();
-        } else toast("Данные не совпадают!");
-    });
-}
-
-// Регистрация
-function regMode() {
-    document.getElementById('authContent').innerHTML = `
-        <input id="rl" class="input" placeholder="Логин">
+function viewReg() {
+    document.getElementById('auth-ui').innerHTML = `
+        <input id="rl" class="input" placeholder="Придумайте логин">
         <input id="rp" class="input" type="password" placeholder="Пароль">
-        <input id="rn" class="input" placeholder="Имя владельца (Eng)">
-        <button class="btn btn-blue" onclick="register()">Создать карту</button>
+        <input id="rn" class="input" placeholder="Имя на карту (ENG)">
+        <button class="btn btn-blue" onclick="doReg()">Создать аккаунт</button>
         <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
     `;
 }
 
-function register() {
+function doReg() {
     let l = document.getElementById('rl').value.toLowerCase().trim();
     let p = document.getElementById('rp').value;
-    let name = document.getElementById('rn').value || "CLIENT";
+    let n = document.getElementById('rn').value || "CLIENT";
     
-    // Генерация данных карты
-    let cardNum = "4441 " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999);
-    let cvv = "" + Math.floor(100+Math.random()*899);
-    let now = new Date();
-    let date = (now.getMonth()+1) + "/" + (now.getFullYear() + 4).toString().substr(-2);
+    // Генерация новой карты
+    let num = "4441 " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999);
+    let cvv = Math.floor(100+Math.random()*899).toString();
+    let exp = "04/30";
 
     db.ref('users/'+l).set({
-        login: l, pass: p, name: name, bal: 1000,
-        cardNum: cardNum, cardCVV: cvv, cardDate: date,
-        isAdmin: false, assets: []
-    }).then(() => { localStorage.setItem('session', l); location.reload(); });
+        login: l, pass: p, name: n, bal: 1000,
+        cardN: num, cardC: cvv, cardD: exp,
+        isAdmin: false
+    }).then(() => { localStorage.setItem('user', l); location.reload(); });
 }
 
-// Загрузка
-if(curLog) {
-    db.ref('users/'+curLog).on('value', s => {
-        user = s.val();
-        if(!user) return;
+function viewRec() {
+    document.getElementById('auth-ui').innerHTML = `
+        <input id="rl" class="input" placeholder="Логин">
+        <input id="rcn" class="input" placeholder="Номер карты">
+        <input id="rcc" class="input" placeholder="CVV">
+        <button class="btn btn-blue" onclick="doRec()">Найти пароль</button>
+        <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
+    `;
+}
+
+function doRec() {
+    let l = document.getElementById('rl').value.toLowerCase().trim();
+    let n = document.getElementById('rcn').value.trim();
+    let c = document.getElementById('rcc').value.trim();
+    db.ref('users/'+l).once('value', s => {
+        let d = s.val();
+        if(d && d.cardN === n && d.cardC === c) {
+            alert("Ваш пароль: " + d.pass); location.reload();
+        } else toast("Данные неверны!");
+    });
+}
+
+// Приложение
+if(session) {
+    db.ref('users/'+session).on('value', s => {
+        uData = s.val();
+        if(!uData) return;
         document.getElementById('auth').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
-        
-        document.getElementById('uNameDisp').innerText = "Привет, " + user.name;
-        document.getElementById('uBalDisp').innerText = user.bal.toLocaleString() + " ₴";
-        
-        // Карта
-        document.getElementById('uCardNum').innerText = user.cardNum;
-        document.getElementById('uCardOwner').innerText = user.name.toUpperCase();
-        document.getElementById('uCardDate').innerText = user.cardDate;
-        document.getElementById('uCardCVV').innerText = user.cardCVV;
-        
-        if(user.isAdmin) document.getElementById('admBtn').style.display = 'block';
+
+        document.getElementById('u-greet').innerText = "Привет, " + uData.name;
+        document.getElementById('u-bal').innerText = uData.bal.toLocaleString() + " ₴";
+        document.getElementById('card-n').innerText = uData.cardN;
+        document.getElementById('card-o').innerText = uData.name.toUpperCase();
+        document.getElementById('card-d').innerText = uData.cardD;
+        document.getElementById('card-c').innerText = uData.cardC;
+
+        if(uData.isAdmin) document.getElementById('adm-btn').style.display = 'block';
     });
 
-    db.ref('chat').limitToLast(20).on('value', s => {
-        let box = document.getElementById('chatBox');
-        box.innerHTML = '';
-        s.forEach(c => { box.innerHTML += `<div><b>${c.val().u}:</b> ${c.val().t}</div>`; });
+    db.ref('chat').limitToLast(15).on('value', s => {
+        let box = document.getElementById('chat-area'); box.innerHTML = '';
+        s.forEach(c => { box.innerHTML += `<div class="m"><b>${c.val().u}:</b> ${c.val().t}</div>`; });
         box.scrollTop = box.scrollHeight;
     });
 }
 
-function clickMine() { db.ref('users/'+curLog+'/bal').set(user.bal + 1); }
+function clickWork() { db.ref('users/'+session+'/bal').set(uData.bal + 1); }
+
 function sendMsg() {
-    let t = document.getElementById('chatMsg').value;
-    if(t) db.ref('chat').push({ u: user.name, t: t });
-    document.getElementById('chatMsg').value = '';
+    let t = document.getElementById('msg-in').value;
+    if(t) db.ref('chat').push({ u: uData.name, t: t });
+    document.getElementById('msg-in').value = '';
 }
 
-function showPage(id, el) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('pg-'+id).classList.add('active');
-}
-
-function logout() { localStorage.removeItem('session'); location.reload(); }
-
-function transfer() {
-    let to = document.getElementById('tUser').value.toLowerCase().trim();
-    let sum = parseInt(document.getElementById('tSum').value);
-    if(user.bal >= sum) {
+function doSend() {
+    let to = document.getElementById('target-l').value.toLowerCase().trim();
+    let sum = parseInt(document.getElementById('target-s').value);
+    if(uData.bal >= sum && sum > 0) {
         db.ref('users/'+to).once('value', s => {
             if(s.exists()) {
-                db.ref('users/'+curLog+'/bal').set(user.bal - sum);
+                db.ref('users/'+session+'/bal').set(uData.bal - sum);
                 db.ref('users/'+to+'/bal').set(s.val().bal + sum);
-                toast("Успешно!");
-            }
+                toast("Переведено!");
+            } else toast("Игрок не найден");
         });
     }
 }
+
+function admProc(type) {
+    let l = document.getElementById('adm-l').value.toLowerCase().trim();
+    let v = parseInt(document.getElementById('adm-v').value);
+    let r = db.ref('users/'+l);
+    r.once('value', s => {
+        if(!s.exists()) return toast("Нет такого игрока");
+        let b = s.val().bal;
+        r.update({ bal: type === 'add' ? b + v : Math.max(0, b - v) });
+        toast("Успешно");
+    });
+}
+
+function sw(id, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+    document.getElementById('p-'+id).classList.add('active');
+    el.classList.add('active');
+}
+
+function exit() { localStorage.removeItem('user'); location.reload(); }
 </script>
 </body>
-</html>
+                    </html>
