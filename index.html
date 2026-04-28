@@ -3,134 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BroBank Online</title>
+<title>BroBank Elite & Life</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* СТИЛИ */
+:root{--gold:#C9A84C;--gold2:#E8C96A;--dark:#080810;--dark2:#0E0E1A;--dark3:#161625;--surface:#1E1E30;--text:#F0F0FF;--muted:#8080A8;--green:#2ECC71;--red:#E74C3C;--blue:#3498DB}
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--gold:#C9A84C;--gold2:#E8C96A;--dark:#080810;--dark2:#0E0E1A;--dark3:#161625;--surface:#1E1E30;--text:#F0F0FF;--muted:#8080A8;--green:#2ECC71;--red:#E74C3C}
 body{font-family:'Sora',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden}
-#auth{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(201,168,76,.1) 0%,transparent 60%),var(--dark)}
-.abox{background:var(--dark2);border:1px solid rgba(201,168,76,.2);border-radius:24px;padding:40px;width:420px;max-width:94vw}
-.atabs{display:flex;gap:4px;background:var(--dark3);border-radius:10px;padding:4px;margin-bottom:24px}
-.atab{flex:1;padding:9px;text-align:center;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);transition:all .2s}
+
+/* Стили авторизации (кратко) */
+#auth{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--dark)}
+.abox{background:var(--dark2);border:1px solid rgba(201,168,76,.2);border-radius:24px;padding:30px;width:400px}
+.atabs{display:flex;gap:4px;background:var(--dark3);border-radius:10px;padding:4px;margin-bottom:20px}
+.atab{flex:1;padding:8px;text-align:center;cursor:pointer;font-size:13px;border-radius:7px;color:var(--muted)}
 .atab.on{background:var(--surface);color:var(--gold)}
-.f{margin-bottom:14px}.f label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
-.f input, .sel{width:100%;background:var(--dark3);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none}
-.btn{width:100%;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;transition:all .2s; margin-top: 10px}
+
+/* Основной макет */
+#app{display:none;display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sb{background:var(--dark2);border-right:1px solid rgba(255,255,255,.05);padding:20px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+.main{padding:30px;overflow-y:auto}
+
+/* Навигация */
+.nav-it{padding:12px 15px;margin-bottom:5px;border-radius:10px;cursor:pointer;color:var(--muted);transition:.2s;display:flex;align-items:center;gap:10px}
+.nav-it:hover, .nav-it.on{background:rgba(201,168,76,.1);color:var(--gold)}
+
+/* Карточки и Сетки */
+.grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:20px}
+.card{background:var(--dark2);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:20px;position:relative}
+.bcard{height:160px;display:flex;flex-direction:column;justify-content:space-between;border-radius:20px;padding:25px;margin-bottom:15px;box-shadow:0 10px 20px rgba(0,0,0,.3)}
+.c-ua{background:linear-gradient(135deg,#1a1a2e,#16213e)}.c-us{background:linear-gradient(135deg,#0d3b1e,#0a2412)}.c-eu{background:linear-gradient(135deg,#1e1e30,#2c3e50)}
+
+/* Специфические элементы */
+.badge{padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase}
+.b-inc{background:rgba(46,204,113,.1);color:var(--green)}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:10px;transition:.2s}
 .btn-g{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000}
-#app{display:none;min-height:100vh}.layout{display:flex;min-height:100vh}
-.sb{width:250px;background:var(--dark2);border-right:1px solid rgba(255,255,255,.05);position:fixed;height:100vh}
-.sb-user{padding:20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:12px}
-.sb-av{width:45px;height:45px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;background:var(--gold);color:#000}
-.nav-it{padding:12px 20px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:10px}
-.nav-it.on{color:var(--gold);background:rgba(201,168,76,0.1)}
-.main{margin-left:250px;flex:1;padding:30px}
-.page{display:none}.page.on{display:block}
-.bcard{background:linear-gradient(135deg,#1a1a2e, #16213e); border-radius:16px; padding:20px; margin-bottom:15px; position:relative; cursor:pointer; border:1px solid rgba(255,255,255,0.05)}
-.bcard:active{transform:scale(0.98)}
-.cnum{font-family:'JetBrains Mono'; font-size:14px; letter-spacing:2px; opacity:0.6; margin-top:10px}
-.cbal{font-size:22px; font-weight:800; margin-top:5px}
-.copy-hint{font-size:10px; color:var(--gold); margin-top:5px}
-.tx-list{background:var(--dark2); border-radius:16px; overflow:hidden}
-.tx-item{padding:15px 20px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between}
-.am-in{color:var(--green)}.am-out{color:var(--red)}
-.toast{position:fixed; top:20px; right:20px; background:var(--surface); border:1px solid var(--gold); padding:12px 20px; border-radius:10px; transform:translateX(150%); transition:0.3s; z-index:10000}
+.btn-o{background:rgba(255,255,255,0.05);color:#fff;border:1px solid rgba(255,255,255,0.1)}
+.f input{width:100%;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;color:#fff;margin-top:5px}
+.toast{position:fixed;top:20px;right:20px;background:var(--surface);padding:15px 25px;border-radius:12px;border-left:4px solid var(--gold);transform:translateX(150%);transition:.3s;z-index:9999}
 .toast.show{transform:translateX(0)}
-.adm-box{background:var(--dark2); padding:20px; border-radius:16px; border:1px solid var(--red); margin-top:20px}
+
+/* Кликер */
+.click-area{text-align:center;padding:40px;background:radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%)}
+#coin{width:150px;height:150px;background:var(--gold);border-radius:50%;margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:50px;cursor:pointer;user-select:none;transition:.1s;box-shadow:0 0 30px rgba(201,168,76,0.3)}
+#coin:active{transform:scale(0.9)}
+
+.page{display:none}.page.on{display:block}
 </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
+<div id="toast" class="toast"></div>
 
 <div id="auth">
-  <div class="abox">
-    <div style="text-align:center; margin-bottom:30px">
-        <div style="font-size:40px">🏦</div>
-        <h1 style="background:linear-gradient(var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">BroBank</h1>
+    <div class="abox">
+        <h2 style="text-align:center;color:var(--gold);margin-bottom:20px">BroBank 2024</h2>
+        <div class="atabs">
+            <div class="atab on" id="t-l" onclick="swA('l')">Вход</div>
+            <div class="atab" id="t-r" onclick="swA('r')">Регистрация</div>
+        </div>
+        <div id="f-l">
+            <div class="f"><input id="ll" placeholder="Логин"></div>
+            <div class="f"><input id="lp" type="password" placeholder="Пароль"></div>
+            <button class="btn btn-g" onclick="doL()">Войти в систему</button>
+        </div>
+        <div id="f-r" style="display:none">
+            <div class="f"><input id="rn" placeholder="Имя игрока"></div>
+            <div class="f"><input id="rl" placeholder="Логин (eng)"></div>
+            <div class="f"><input id="rp" type="password" placeholder="Пароль"></div>
+            <div class="f"><input id="ra" type="password" placeholder="Ключ админа"></div>
+            <button class="btn btn-g" onclick="doR()">Создать персонажа</button>
+        </div>
     </div>
-    <div class="atabs">
-      <div class="atab on" id="t-login" onclick="switchTab('login')">Вход</div>
-      <div class="atab" id="t-reg" onclick="switchTab('reg')">Регистрация</div>
-    </div>
-    <div id="fl">
-      <div class="f"><label>Логин</label><input id="ll" type="text" placeholder="Ваш ник"/></div>
-      <div class="f"><label>Пароль</label><input id="lp" type="password" placeholder="••••••••"/></div>
-      <button class="btn btn-g" onclick="doLogin()">Войти</button>
-    </div>
-    <div id="fr" style="display:none">
-      <div class="f"><label>Имя</label><input id="rn" type="text" placeholder="Имя игрока"/></div>
-      <div class="f"><label>Логин</label><input id="rl" type="text" placeholder="Ник (латиница)"/></div>
-      <div class="f"><label>Пароль</label><input id="rp" type="password" placeholder="Мин. 4 знака"/></div>
-      <div class="f"><label>Ключ админа</label><input id="ra" type="password" placeholder="Если есть"/></div>
-      <button class="btn btn-g" onclick="doRegister()">Создать аккаунт</button>
-    </div>
-  </div>
 </div>
 
 <div id="app">
-  <div class="layout">
     <div class="sb">
-      <div class="sb-user">
-        <div class="sb-av" id="sbav">??</div>
-        <div>
-            <div id="sbn" style="font-weight:700">User</div>
-            <div id="sbb" style="font-size:12px; color:var(--green)">0 ₴</div>
+        <div style="font-weight:800;font-size:22px;color:var(--gold);margin-bottom:30px">BRO BANK</div>
+        <div id="uinfo" style="margin-bottom:25px">
+            <div id="un" style="font-weight:700;font-size:18px">...</div>
+            <div id="ub" style="color:var(--green);font-size:14px">0.00 ₴</div>
         </div>
-      </div>
-      <div class="sb-nav">
-        <div class="nav-it on" id="n-dash" onclick="go('dash')">🏠 Главная</div>
-        <div class="nav-it" id="n-transfer" onclick="go('transfer')">💸 Перевод</div>
-        <div class="nav-it" id="n-cards" onclick="go('cards')">➕ Новый счёт</div>
-        <div class="nav-it adm" id="n-admin" style="display:none" onclick="go('admin')">👑 Админ-панель</div>
-      </div>
-      <div style="position:absolute; bottom:20px; width:100%; padding:0 20px">
-          <button class="btn" style="background:rgba(231,76,60,0.1); color:var(--red)" onclick="location.reload()">Выйти</button>
-      </div>
+        <div class="nav">
+            <div class="nav-it on" onclick="pg('dash')">💳 Счета</div>
+            <div class="nav-it" onclick="pg('earn')">⛏️ Заработок</div>
+            <div class="nav-it" onclick="pg('market')">🏙️ Имущество</div>
+            <div class="nav-it" onclick="pg('biz')">💼 Мой бизнес</div>
+            <div class="nav-it" onclick="pg('conv')">💱 Обменник</div>
+            <div class="nav-it adm" style="display:none;color:var(--red)" onclick="pg('adm')">⚡ Админ</div>
+        </div>
     </div>
 
     <div class="main">
-      <div class="page on" id="p-dash">
-        <h2 style="margin-bottom:20px">Мои карты</h2>
-        <div id="cardList"></div>
-        <h3 style="margin: 25px 0 15px">История операций</h3>
-        <div class="tx-list" id="txList"></div>
-      </div>
+        <div class="page on" id="p-dash">
+            <div style="display:flex;justify-content:space-between;margin-bottom:20px">
+                <h2>Ваши счета</h2>
+                <button class="btn btn-g" style="width:auto;margin:0" onclick="openCard()">+ Открыть валютный счёт</button>
+            </div>
+            <div class="grid" id="cardList"></div>
+            <h3 style="margin:30px 0 15px">Перевод игроку</h3>
+            <div class="card" style="max-width:500px">
+                <div class="f"><input id="tr-num" placeholder="Номер карты получателя"></div>
+                <div class="f"><input id="tr-amt" type="number" placeholder="Сумма"></div>
+                <button class="btn btn-g" onclick="transfer()">Перевести</button>
+            </div>
+        </div>
 
-      <div class="page" id="p-transfer">
-        <h2>Перевод по номеру карты</h2>
-        <div class="adm-box" style="border-color:var(--gold); background:var(--dark3)">
-            <div class="f"><label>Номер карты получателя</label><input id="t-num" type="text" placeholder="4444 0000 ..."/></div>
-            <div class="f"><label>Сумма</label><input id="t-amt" type="number" placeholder="0.00"/></div>
-            <button class="btn btn-g" onclick="doTransfer()">Отправить деньги</button>
+        <div class="page" id="p-earn">
+            <div class="click-area">
+                <h2>Майнинг ферма</h2>
+                <div id="coin">⛏️</div>
+                <p>Кликни, чтобы заработать</p>
+                <h3 id="click-val" style="margin-top:10px">0.001 ₴ / клик</h3>
+            </div>
+            <h3 style="margin-top:30px">Улучшения</h3>
+            <div class="grid" id="upgList"></div>
         </div>
-      </div>
 
-      <div class="page" id="p-cards">
-        <h2>Открыть новый счёт</h2>
-        <p style="color:var(--muted); margin-bottom:20px">Выберите тип карты для открытия</p>
-        <div class="bcard" style="background:linear-gradient(135deg,#000, #333)" onclick="openNewAcc('Black')">
-            <div style="font-weight:700">BroBlack</div>
-            <div style="font-size:12px; opacity:0.7">Повседневная карта</div>
+        <div class="page" id="p-market">
+            <div style="display:flex;gap:10px;margin-bottom:20px">
+                <button class="btn btn-o" onclick="renderMarket('house')">🏠 Дома</button>
+                <button class="btn btn-o" onclick="renderMarket('car')">🏎️ Машины</button>
+                <button class="btn btn-o" onclick="renderMarket('biz')">🏪 Бизнесы</button>
+            </div>
+            <div class="grid" id="marketList"></div>
         </div>
-        <div class="bcard" style="background:linear-gradient(135deg,#C9A84C, #8A6E2F)" onclick="openNewAcc('Gold')">
-            <div style="font-weight:700; color:#000">BroGold</div>
-            <div style="font-size:12px; color:#000; opacity:0.7">Премиальное обслуживание</div>
-        </div>
-      </div>
 
-      <div class="page" id="p-admin">
-        <h2 style="color:var(--red)">Админ-центр</h2>
-        <div class="adm-box">
-            <div class="f"><label>Логин игрока</label><input id="a-user" type="text" placeholder="Ник игрока"/></div>
-            <div class="f"><label>Сумма (со знаком минус, чтобы забрать)</label><input id="a-amt" type="number" placeholder="1000"/></div>
-            <div class="f"><label>Причина</label><input id="a-note" type="text" placeholder="Бонус от сервера"/></div>
-            <button class="btn" style="background:var(--red); color:#fff" onclick="adminAction()">Выполнить операцию</button>
+        <div class="page" id="p-biz">
+            <h2>Ваше имущество</h2>
+            <div class="grid" id="myAssets" style="margin-top:20px"></div>
         </div>
-      </div>
+
+        <div class="page" id="p-conv">
+            <h2>Обмен Валют</h2>
+            <div class="card" style="margin-top:20px;max-width:400px">
+                <p style="margin-bottom:10px">Курс: 1$ = 40₴ | 1€ = 43₴</p>
+                <div class="f">
+                    <label>Отдать</label>
+                    <select id="conv-from" class="btn btn-o"><option value="UAH">Гривны (₴)</option><option value="USD">Доллары ($)</option></select>
+                </div>
+                <div class="f"><input id="conv-amt" type="number" placeholder="Сумма"></div>
+                <div class="f">
+                    <label>Получить</label>
+                    <select id="conv-to" class="btn btn-o"><option value="USD">Доллары ($)</option><option value="EUR">Евро (€)</option></select>
+                </div>
+                <button class="btn btn-g" onclick="exchange()">Обменять сейчас</button>
+            </div>
+        </div>
+
+        <div class="page" id="p-adm">
+            <h2>Панель управления миром</h2>
+            <div class="grid" style="margin-top:20px">
+                <div class="card" style="border-color:var(--red)">
+                    <h4>Управление деньгами</h4>
+                    <input id="ad-u" class="btn btn-o" style="text-align:left" placeholder="Логин">
+                    <input id="ad-a" class="btn btn-o" style="text-align:left" placeholder="Сумма (+/-)">
+                    <button class="btn btn-g" onclick="adM()">Применить</button>
+                </div>
+                <div class="card" style="border-color:var(--red)">
+                    <h4>Выдать имущество</h4>
+                    <input id="ad-u2" class="btn btn-o" style="text-align:left" placeholder="Логин">
+                    <select id="ad-type" class="btn btn-o"><option value="house">Дом</option><option value="car">Машина</option><option value="biz">Бизнес</option></select>
+                    <input id="ad-name" class="btn btn-o" style="text-align:left" placeholder="Название">
+                    <button class="btn btn-g" onclick="adGive()">Выдать бесплатно</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script type="importmap">
@@ -155,196 +193,242 @@ const firebaseConfig = {
   measurementId: "G-1W0FP9YX6G"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const fApp = initializeApp(firebaseConfig);
+const db = getDatabase(fApp);
 
-// Состояние
-let currentUser = null;
+let user = null;
+let uid = null;
 
-// Глобальные функции
-window.switchTab = (t) => {
-    document.getElementById('fl').style.display = t === 'login' ? '' : 'none';
-    document.getElementById('fr').style.display = t === 'reg' ? '' : 'none';
-    document.getElementById('t-login').className = 'atab' + (t === 'login' ? ' on' : '');
-    document.getElementById('t-reg').className = 'atab' + (t === 'reg' ? ' on' : '');
+const rates = { USD: 40, EUR: 43, UAH: 1 };
+
+// Инициализация
+window.swA = (t) => {
+    document.getElementById('f-l').style.display = t=='l'?'block':'none';
+    document.getElementById('f-r').style.display = t=='r'?'block':'none';
+    document.getElementById('t-l').className = 'atab '+(t=='l'?'on':'');
+    document.getElementById('t-r').className = 'atab '+(t=='r'?'on':'');
 };
 
-window.go = (id) => {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-    document.querySelectorAll('.nav-it').forEach(n => n.classList.remove('on'));
-    document.getElementById('p-' + id).classList.add('on');
-    document.getElementById('n-' + id).classList.add('on');
+window.pg = (id) => {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+    document.querySelectorAll('.nav-it').forEach(n=>n.classList.remove('on'));
+    document.getElementById('p-'+id).classList.add('on');
+    event.currentTarget.classList.add('on');
 };
 
 const toast = (m) => {
     const t = document.getElementById('toast');
-    t.textContent = m; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
+    t.innerText = m; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3000);
 };
 
-const mkCardNum = () => {
-    let n = "4444";
-    for(let i=0; i<3; i++) n += " " + Math.floor(1000 + Math.random() * 9000);
-    return n;
-};
-
-// Копирование
-window.copyNum = (num) => {
-    navigator.clipboard.writeText(num.replace(/\s/g, ''));
-    toast("Номер карты скопирован!");
-};
-
-// Вход
-window.doLogin = async () => {
-    const l = document.getElementById('ll').value.trim().toLowerCase();
+// Auth
+window.doL = async () => {
+    const l = document.getElementById('ll').value.toLowerCase();
     const p = document.getElementById('lp').value;
-    const s = await get(ref(db, 'users/' + l));
-    if(s.exists() && s.val().pass === p) {
-        initApp(l);
-    } else {
-        toast("Неверный логин или пароль");
-    }
+    const s = await get(ref(db, 'users/'+l));
+    if(s.exists() && s.val().pass == p) start(l);
+    else toast("❌ Ошибка входа");
 };
 
-// Рега
-window.doRegister = async () => {
-    const n = document.getElementById('rn').value.trim();
-    const l = document.getElementById('rl').value.trim().toLowerCase();
+window.doR = async () => {
+    const l = document.getElementById('rl').value.toLowerCase();
     const p = document.getElementById('rp').value;
+    const n = document.getElementById('rn').value;
     const ak = document.getElementById('ra').value;
-
-    if(!n || !l || p.length < 4) return toast("Заполните все данные");
-    const s = await get(ref(db, 'users/' + l));
-    if(s.exists()) return toast("Логин уже занят");
-
-    const newUser = {
-        name: n, login: l, pass: p,
-        isAdmin: ak === "brothers2024",
-        cards: [{ number: mkCardNum(), balance: 1000, type: 'Black' }]
-    };
-
-    await set(ref(db, 'users/' + l), newUser);
-    await set(ref(db, 'cardIndex/' + newUser.cards[0].number.replace(/\s/g, '')), l);
-    await push(ref(db, 'history/' + l), { msg: "Бонус за регистрацию", amt: 1000, type: 'in', date: Date.now() });
     
-    initApp(l);
+    if(l.length < 3) return;
+    const s = await get(ref(db, 'users/'+l));
+    if(s.exists()) return toast("❌ Логин занят");
+
+    const data = {
+        name: n, pass: p, login: l, isAdmin: ak == "admin2024",
+        cards: [{num: mkCard(), bal: 500, type: 'UAH'}],
+        upgrades: { power: 0.001, level: 1 },
+        assets: []
+    };
+    await set(ref(db, 'users/'+l), data);
+    await set(ref(db, 'idx/'+data.cards[0].num), l);
+    start(l);
 };
 
-function initApp(uid) {
-    currentUser = uid;
+function mkCard() { return "4444 " + Math.floor(1000+Math.random()*9000) + " " + Math.floor(1000+Math.random()*9000) + " " + Math.floor(1000+Math.random()*9000); }
+
+function start(id) {
+    uid = id;
     document.getElementById('auth').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+    document.getElementById('app').style.display = 'grid';
 
-    onValue(ref(db, 'users/' + uid), (s) => {
-        const u = s.val();
-        if(!u) return;
-        document.getElementById('sbn').textContent = u.name;
-        document.getElementById('sbav').textContent = u.name[0].toUpperCase();
-        
-        const total = u.cards.reduce((sum, c) => sum + c.balance, 0);
-        document.getElementById('sbb').textContent = total.toLocaleString() + " ₴";
-
-        const cardHtml = u.cards.map(c => `
-            <div class="bcard" onclick="copyNum('${c.number}')">
-                <div style="display:flex; justify-content:space-between">
-                    <span style="font-size:12px; opacity:0.6">${c.type} Card</span>
-                    <span style="font-size:12px">Visa</span>
-                </div>
-                <div class="cbal">${c.balance.toLocaleString()} ₴</div>
-                <div class="cnum">${c.number}</div>
-                <div class="copy-hint">Нажмите, чтобы скопировать номер</div>
-            </div>
-        `).join('');
-        document.getElementById('cardList').innerHTML = cardHtml;
-
-        if(u.isAdmin) document.querySelectorAll('.adm').forEach(e => e.style.display = 'flex');
+    onValue(ref(db, 'users/'+uid), s => {
+        user = s.val();
+        render();
     });
 
-    onValue(ref(db, 'history/' + uid), (s) => {
-        const data = s.val();
-        if(!data) return;
-        const items = Object.values(data).reverse();
-        document.getElementById('txList').innerHTML = items.map(t => `
-            <div class="tx-item">
-                <div>
-                    <div style="font-weight:600">${t.msg}</div>
-                    <div style="font-size:10px; color:var(--muted)">${new Date(t.date).toLocaleString()}</div>
-                </div>
-                <div class="am-${t.type}">${t.type==='in'?'+':'-'}${t.amt} ₴</div>
-            </div>
-        `).join('');
-    });
+    // Пассивный доход (раз в 10 сек для теста, можно сделать час)
+    setInterval(() => {
+        if(user && user.assets) {
+            let income = 0;
+            user.assets.forEach(a => { if(a.income) income += a.income; });
+            if(income > 0) {
+                user.cards[0].bal += income / 360; // Доход капает по чуть-чуть
+                update(ref(db, 'users/'+uid), { cards: user.cards });
+            }
+        }
+    }, 10000);
 }
 
-// Перевод по номеру
-window.doTransfer = async () => {
-    const num = document.getElementById('t-num').value.replace(/\s/g, '');
-    const amt = parseFloat(document.getElementById('t-amt').value);
+function render() {
+    document.getElementById('un').innerText = user.name + (user.isAdmin ? " 👑" : "");
+    document.getElementById('ub').innerText = user.cards[0].bal.toFixed(2) + " ₴";
+    if(user.isAdmin) document.querySelector('.adm').style.display = 'flex';
 
-    if(!num || !amt || amt <= 0) return toast("Введите корректные данные");
+    // Рендер карт
+    document.getElementById('cardList').innerHTML = user.cards.map((c, i) => `
+        <div class="bcard c-${c.type.toLowerCase()}">
+            <div style="display:flex;justify-content:space-between"><span>${c.type} Card</span><b>VISA</b></div>
+            <div style="font-size:24px;font-weight:800">${c.bal.toFixed(2)} ${c.type == 'UAH' ? '₴' : c.type == 'USD' ? '$' : '€'}</div>
+            <div style="font-family:monospace;letter-spacing:2px;opacity:0.7">${c.num}</div>
+        </div>
+    `).join('');
 
-    // Ищем владельца карты
-    const idx = await get(ref(db, 'cardIndex/' + num));
-    if(!idx.exists()) return toast("Карта не найдена");
-    const targetUid = idx.val();
+    // Рендер кликера
+    document.getElementById('click-val').innerText = user.upgrades.power.toFixed(3) + " ₴ / клик";
+    const upgs = [
+        {n: 'Видеокарта GT 710', p: 200, i: 0.002},
+        {n: 'Ферма RTX 3060', p: 5000, i: 0.05},
+        {n: 'ASIC Miner S19', p: 50000, i: 1.5}
+    ];
+    document.getElementById('upgList').innerHTML = upgs.map(u => `
+        <div class="card">
+            <h4>${u.n}</h4>
+            <p>Доход: +${u.i} ₴</p>
+            <button class="btn btn-g" onclick="buyUpg(${u.p}, ${u.i})">Купить за ${u.p} ₴</button>
+        </div>
+    `).join('');
 
-    if(targetUid === currentUser) return toast("Нельзя переводить себе");
+    // Мое имущество
+    document.getElementById('myAssets').innerHTML = (user.assets || []).map((a, i) => `
+        <div class="card">
+            <span class="badge b-inc">${a.type}</span>
+            <h4 style="margin-top:10px">${a.name}</h4>
+            ${a.income ? `<p style="color:var(--green)">Доход: ${a.income} ₴/час</p>` : ''}
+            <button class="btn btn-o" onclick="sellAsset(${i})">Выставить на продажу</button>
+        </div>
+    `).join('');
+}
 
-    const senderS = await get(ref(db, 'users/' + currentUser));
-    const sender = senderS.val();
-
-    if(sender.cards[0].balance < amt) return toast("Недостаточно денег");
-
-    // Снимаем у нас
-    sender.cards[0].balance -= amt;
-    await update(ref(db, 'users/' + currentUser), { cards: sender.cards });
-    await push(ref(db, 'history/' + currentUser), { msg: `Перевод на карту •${num.slice(-4)}`, amt, type: 'out', date: Date.now() });
-
-    // Добавляем им
-    const targetS = await get(ref(db, 'users/' + targetUid));
-    const target = targetS.val();
-    target.cards[0].balance += amt;
-    await update(ref(db, 'users/' + targetUid), { cards: target.cards });
-    await push(ref(db, 'history/' + targetUid), { msg: `Входящий перевод от ${sender.name}`, amt, type: 'in', date: Date.now() });
-
-    toast("Перевод выполнен!");
-    document.getElementById('t-amt').value = '';
+// Кликер
+document.getElementById('coin').onclick = () => {
+    user.cards[0].bal += user.upgrades.power;
+    update(ref(db, 'users/'+uid), { cards: user.cards });
 };
 
-// Открытие счета
-window.openNewAcc = async (type) => {
-    const s = await get(ref(db, 'users/' + currentUser));
-    const u = s.val();
-    const newNum = mkCardNum();
-    u.cards.push({ number: newNum, balance: 0, type: type });
-    await update(ref(db, 'users/' + currentUser), { cards: u.cards });
-    await set(ref(db, 'cardIndex/' + newNum.replace(/\s/g, '')), currentUser);
-    toast("Новый счёт открыт!");
-    go('dash');
+window.buyUpg = (cost, power) => {
+    if(user.cards[0].bal < cost) return toast("Недостаточно денег");
+    user.cards[0].bal -= cost;
+    user.upgrades.power += power;
+    update(ref(db, 'users/'+uid), { cards: user.cards, upgrades: user.upgrades });
+    toast("Улучшение куплено!");
+};
+
+// Рынок
+const marketItems = {
+    house: [{n: 'Квартира-студия', p: 50000, d: '25 м²'}, {n: 'Вилла на берегу', p: 1500000, d: '400 м²'}],
+    car: [{n: 'ZAZ Lanos', p: 3000, d: '1.5 MT'}, {n: 'Tesla Model S', p: 80000, d: 'Plaid'}],
+    biz: [{n: 'Шаурмичная', p: 15000, i: 500}, {n: 'Ночной клуб', p: 500000, i: 15000}]
+};
+
+window.renderMarket = (type) => {
+    document.getElementById('marketList').innerHTML = marketItems[type].map(item => `
+        <div class="card">
+            <h4>${item.n}</h4>
+            <p>${item.d || 'Доход: '+item.i+' ₴/час'}</p>
+            <button class="btn btn-g" onclick="buyAsset('${type}', '${item.n}', ${item.p}, ${item.i||0})">Купить за ${item.p} ₴</button>
+        </div>
+    `).join('');
+};
+
+window.buyAsset = async (type, name, price, inc) => {
+    if(user.cards[0].bal < price) return toast("Мало денег на основной карте");
+    user.cards[0].bal -= price;
+    if(!user.assets) user.assets = [];
+    user.assets.push({type, name, income: inc, date: Date.now()});
+    await update(ref(db, 'users/'+uid), { cards: user.cards, assets: user.assets });
+    toast("Поздравляем с покупкой!");
+};
+
+// Обменник
+window.exchange = () => {
+    const from = document.getElementById('conv-from').value;
+    const to = document.getElementById('conv-to').value;
+    const amt = parseFloat(document.getElementById('conv-amt').value);
+    
+    const cFrom = user.cards.find(c => c.type == from);
+    const cTo = user.cards.find(c => c.type == to);
+
+    if(!cFrom || !cTo || cFrom.bal < amt) return toast("Нет такой карты или денег");
+
+    const res = (amt * rates[from]) / rates[to];
+    cFrom.bal -= amt;
+    cTo.bal += res;
+    update(ref(db, 'users/'+uid), { cards: user.cards });
+    toast("Обмен завершен!");
+};
+
+window.openCard = () => {
+    const type = prompt("Какую карту открыть? (USD / EUR)");
+    if(type != 'USD' && type != 'EUR') return;
+    user.cards.push({num: mkCard(), bal: 0, type: type});
+    update(ref(db, 'users/'+uid), { cards: user.cards });
+    toast("Карта открыта");
+};
+
+// Перевод
+window.transfer = async () => {
+    const num = document.getElementById('tr-num').value.trim();
+    const amt = parseFloat(document.getElementById('tr-amt').value);
+    const sIdx = await get(ref(db, 'idx/'+num));
+    if(!sIdx.exists()) return toast("Карта не найдена");
+    
+    const targetUid = sIdx.val();
+    const sTarget = await get(ref(db, 'users/'+targetUid));
+    const target = sTarget.val();
+
+    if(user.cards[0].bal < amt) return toast("Недостаточно средств");
+
+    user.cards[0].bal -= amt;
+    const tCard = target.cards.find(c => c.num == num);
+    tCard.bal += amt;
+
+    await update(ref(db, 'users/'+uid), { cards: user.cards });
+    await update(ref(db, 'users/'+targetUid), { cards: target.cards });
+    toast("Перевод выполнен!");
 };
 
 // Админка
-window.adminAction = async () => {
-    const uid = document.getElementById('a-user').value.trim().toLowerCase();
-    const amt = parseFloat(document.getElementById('a-amt').value);
-    const note = document.getElementById('a-note').value || "Корректировка баланса";
-
-    const s = await get(ref(db, 'users/' + uid));
-    if(!s.exists()) return toast("Игрок не найден");
-
-    const u = s.val();
-    u.cards[0].balance += amt;
-    
-    await update(ref(db, 'users/' + uid), { cards: u.cards });
-    await push(ref(db, 'history/' + uid), { 
-        msg: note, 
-        amt: Math.abs(amt), 
-        type: amt > 0 ? 'in' : 'out', 
-        date: Date.now() 
-    });
-
-    toast("Готово!");
+window.adM = async () => {
+    const target = document.getElementById('ad-u').value;
+    const val = parseFloat(document.getElementById('ad-a').value);
+    const s = await get(ref(db, 'users/'+target));
+    if(!s.exists()) return;
+    const data = s.val();
+    data.cards[0].bal += val;
+    update(ref(db, 'users/'+target), { cards: data.cards });
+    toast("Баланс изменен");
 };
+
+window.adGive = async () => {
+    const target = document.getElementById('ad-u2').value;
+    const type = document.getElementById('ad-type').value;
+    const name = document.getElementById('ad-name').value;
+    const s = await get(ref(db, 'users/'+target));
+    const data = s.val();
+    if(!data.assets) data.assets = [];
+    data.assets.push({type, name, income: type=='biz'?5000:0});
+    update(ref(db, 'users/'+target), { assets: data.assets });
+    toast("Имущество выдано");
+};
+
 </script>
 </body>
 </html>
