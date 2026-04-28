@@ -3,164 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy Bank Ultimate</title>
+    <title>Magniy Bank Pro</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #050505; --card: #121214; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --text: #FFFFFF; --sec: #8E8E93; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        :root { --bg: #0b0b0c; --card: #161618; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --text: #FFFFFF; --sec: #8E8E93; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow: hidden; }
 
-        .btn { background: #fff; color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; margin-bottom: 8px; }
+        #app { display: none; height: 100vh; width: 100vw; display: flex; }
+        .sidebar { width: 260px; background: #000; border-right: 1px solid #222; display: flex; flex-direction: column; padding: 25px; shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+
+        /* Дизайн карты */
+        .bank-card-visual { 
+            width: 100%; max-width: 350px; height: 200px; border-radius: 18px; position: relative;
+            background: linear-gradient(135deg, #222, #000); border: 1px solid #333;
+            padding: 25px; margin: 20px 0; transition: 0.6s; transform-style: preserve-3d; cursor: pointer;
+        }
+        .card-front, .card-back { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-back { background: #111; transform: rotateY(180deg); justify-content: center; align-items: center; }
+        .bank-card-visual.flipped { transform: rotateY(180deg); }
+        
+        .chip { width: 40px; height: 30px; background: linear-gradient(135deg, #d4af37, #f9d71c); border-radius: 5px; margin-bottom: 10px; }
+        .card-num { font-size: 20px; letter-spacing: 3px; font-family: monospace; }
+        .cvv-line { background: #fff; color: #000; padding: 5px 15px; width: 100%; text-align: right; font-weight: 800; border-radius: 4px; }
+
+        .btn { background: #fff; color: #000; border: none; padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; margin-bottom: 10px; }
         .btn-blue { background: var(--accent); color: #fff; }
         .btn-red { background: var(--danger); color: #fff; }
-        .btn-green { background: var(--success); color: #fff; }
-        .input { width: 100%; background: #1c1c1e; border: 1px solid #2c2c2e; padding: 14px; border-radius: 12px; color: #fff; margin-bottom: 12px; outline: none; }
+        .input { width: 100%; background: #111; border: 1px solid #222; padding: 16px; border-radius: 14px; color: #fff; margin-bottom: 15px; outline: none; }
 
-        #app { display: none; min-height: 100vh; }
-        .sidebar { width: 250px; background: #000; border-right: 1px solid #1c1c1e; padding: 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; z-index: 100; }
-        .content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
-        .nav-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--sec); margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
-        .nav-item.active { background: var(--card); color: #fff; font-weight: 600; }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .content { margin-left: 0; width: 100%; padding-bottom: 100px; }
-            .mobile-nav { display: grid; }
-        }
-
-        .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: none; grid-template-columns: repeat(6, 1fr); border-top: 1px solid #1c1c1e; height: 70px; z-index: 100; }
-        .m-item { display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--sec); }
-        .m-item.active { color: var(--accent); }
-
-        .item-card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #1c1c1e; margin-bottom: 15px; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; z-index: 2000; transition: 0.4s; font-weight: 600; }
+        .mobile-tab { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; border-top: 1px solid #222; display: none; grid-template-columns: repeat(5, 1fr); z-index: 1000; }
+        @media (max-width: 768px) { .sidebar { display: none; } .mobile-tab { display: grid; } .main-content { padding: 20px 20px 100px; } }
+        .m-item { display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--sec); }
+        .page { display: none; } .page.active { display: block; }
+        
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 15px 30px; border-radius: 40px; z-index: 9999; transition: 0.4s; font-weight: 700; }
         .toast.on { transform: translateX(-50%) translateY(0); }
-
-        /* Чат */
-        #chatBox { height: 300px; overflow-y: auto; background: #000; border-radius: 12px; padding: 15px; border: 1px solid #222; margin-bottom: 10px; }
-        .msg { margin-bottom: 8px; font-size: 14px; }
-        .msg b { color: var(--accent); }
     </style>
 </head>
 <body>
 
 <div id="toast" class="toast"></div>
 
-<div id="auth" style="display:flex; align-items:center; justify-content:center; height:100vh; padding:20px;">
-    <div style="width:100%; max-width:350px; text-align:center;">
-        <h1 style="margin-bottom:30px; font-weight: 800;">MAGNIY BANK</h1>
-        <div id="authFields">
+<div id="auth" style="display:flex; height:100vh; align-items:center; justify-content:center; padding:20px;">
+    <div style="width:100%; max-width:380px;">
+        <h1 style="text-align:center; margin-bottom:30px;">MAGNIY BANK</h1>
+        <div id="authContent">
             <input id="li" class="input" placeholder="Логин">
             <input id="pi" class="input" type="password" placeholder="Пароль">
             <button class="btn btn-blue" onclick="login()">Войти</button>
-            <button class="btn" style="background:none; color:#fff" onclick="regView()">Создать аккаунт</button>
+            <button class="btn" style="background:none; color:var(--sec)" onclick="regMode()">Регистрация</button>
+            <button class="btn" style="background:none; color:var(--danger); font-size:12px;" onclick="recoveryMode()">Забыл пароль / Восстановить</button>
         </div>
     </div>
 </div>
 
 <div id="app">
     <div class="sidebar">
-        <h2 style="margin-bottom:20px;">Magniy</h2>
-        <div class="nav-item active" onclick="showPg('dash', this)">🏠 Главная</div>
-        <div class="nav-item" onclick="showPg('chat', this)">💬 Чат</div>
-        <div class="nav-item" onclick="showPg('trans', this)">💸 Перевод</div>
-        <div class="nav-item" onclick="showPg('market', this)">🛍️ Магазин</div>
-        <div class="nav-item" onclick="showPg('games', this)">🎰 Казино</div>
-        <div class="nav-item" onclick="showPg('profile', this)">👤 Профиль</div>
-        <div id="admLink" class="nav-item" style="display:none; color:var(--danger)" onclick="showPg('adm', this)">🛠️ Админ-Панель</div>
-        <button class="btn btn-red" style="margin-top:auto" onclick="logout()">Выход</button>
+        <h2 onclick="location.reload()">Magniy</h2><br>
+        <div class="nav-item active" onclick="showPage('dash', this)">🏠 Главная</div>
+        <div class="nav-item" onclick="showPage('chat', this)">💬 Чат</div>
+        <div class="nav-item" onclick="showPage('trans', this)">💸 Переводы</div>
+        <div class="nav-item" onclick="showPage('shop', this)">🛍️ Магазин</div>
+        <div class="nav-item" onclick="showPage('prof', this)">👤 Профиль</div>
+        <div id="admBtn" class="nav-item" style="display:none; color:var(--danger);" onclick="showPage('adm', this)">🛠️ Админка</div>
+        <button class="btn btn-red" style="margin-top:auto" onclick="logout()">Выйти</button>
     </div>
 
-    <div class="mobile-nav">
-        <div class="m-item active" onclick="showPg('dash', this)">🏠</div>
-        <div class="m-item" onclick="showPg('chat', this)">💬</div>
-        <div class="m-item" onclick="showPg('market', this)">🛍️</div>
-        <div class="m-item" onclick="showPg('games', this)">🎰</div>
-        <div class="m-item" onclick="showPg('profile', this)">👤</div>
-        <div id="admMobile" class="m-item" style="display:none; color:var(--danger)" onclick="showPg('adm', this)">🛠️</div>
-    </div>
-
-    <div class="content">
+    <div class="main-content">
         <div id="pg-dash" class="page active">
-            <h1 id="uName">...</h1>
-            <div style="background: linear-gradient(135deg, #1a1a1a, #000); border-radius: 20px; padding: 25px; margin: 20px 0; border: 1px solid #333;">
-                <p style="opacity:0.6">Баланс</p>
-                <div id="uBal" style="font-size:36px; font-weight:800;">0 ₴</div>
-                <p id="uCard" style="font-family:monospace; margin-top:10px;">4441 ....</p>
-            </div>
+            <h1 id="uNameDisp">...</h1>
             
-            <div id="buyAdminBlock" class="item-card" style="display:none; border: 1px solid var(--success);">
-                <h3 style="color:var(--success)">Стань Модератором!</h3>
-                <p style="font-size:12px; margin-bottom:10px;">Доступ к банам, штрафам и админ-чату за 5,000,000 ₴</p>
-                <button class="btn btn-green" onclick="buyAdmin()">Купить Админку</button>
+            <div class="bank-card-visual" onclick="this.classList.toggle('flipped')">
+                <div class="card-front">
+                    <div class="chip"></div>
+                    <div class="card-num" id="uCardNum">0000 0000 0000 0000</div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div style="font-size:12px; opacity:0.7;">OWNER:<br><span id="uCardOwner" style="font-size:14px; color:#fff">NAME</span></div>
+                        <div style="font-size:12px; opacity:0.7;">EXPIRE:<br><span id="uCardDate" style="font-size:14px; color:#fff">00/00</span></div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <p style="font-size:10px; margin-bottom:5px; opacity:0.7">SECURITY CODE (CVV)</p>
+                    <div class="cvv-line" id="uCardCVV">000</div>
+                </div>
+            </div>
+            <p style="text-align:center; font-size:12px; opacity:0.5; margin-bottom:20px;">Нажми на карту, чтобы перевернуть</p>
+
+            <div style="background:var(--card); padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #222">
+                <p style="opacity:0.6">Доступный баланс</p>
+                <h2 id="uBalDisp" style="font-size:32px">0 ₴</h2>
             </div>
 
-            <button class="btn btn-blue" onclick="clickMoney()">💰 Кликнуть (+1 ₴)</button>
-            <h3 style="margin-top:20px">Моё имущество</h3>
-            <div id="uAssets" style="margin-top:10px" class="grid"></div>
+            <button class="btn btn-blue" onclick="clickMine()">💰 Заработать 1 ₴</button>
         </div>
 
         <div id="pg-chat" class="page">
-            <h2>Глобальный Чат</h2>
-            <div id="chatBox"></div>
+            <h2>Чат банка</h2>
+            <div id="chatBox" style="height:350px; overflow-y:auto; background:#000; border:1px solid #222; border-radius:15px; padding:15px; margin:15px 0;"></div>
             <div style="display:flex; gap:10px">
-                <input id="chatInp" class="input" placeholder="Сообщение...">
-                <button class="btn btn-blue" style="width:100px" onclick="sendChat()">📨</button>
+                <input id="chatMsg" class="input" placeholder="Ваше сообщение...">
+                <button class="btn btn-blue" style="width:80px" onclick="sendMsg()">📨</button>
             </div>
         </div>
 
         <div id="pg-trans" class="page">
-            <h2>Перевод средств</h2>
-            <div class="item-card">
-                <input id="trLog" class="input" placeholder="Логин получателя">
-                <input id="trSum" class="input" type="number" placeholder="Сумма">
-                <button class="btn btn-blue" onclick="doTransfer()">Перевести</button>
-            </div>
+            <h2>Перевод денег</h2>
+            <input id="tUser" class="input" placeholder="Логин получателя">
+            <input id="tSum" class="input" type="number" placeholder="Сумма">
+            <button class="btn btn-blue" onclick="transfer()">Отправить</button>
         </div>
 
-        <div id="pg-market" class="page">
-            <div style="display:flex; gap:5px; margin-bottom:20px">
-                <button class="btn" onclick="renderShop('biz')">Бизнес</button>
-                <button class="btn" onclick="renderShop('car')">Авто</button>
-                <button class="btn" onclick="renderShop('home')">Дома</button>
-            </div>
-            <div id="shopGrid" class="grid"></div>
-        </div>
-
-        <div id="pg-profile" class="page">
-            <h2>Профиль</h2>
-            <div class="item-card">
-                <p>Аватар (URL):</p>
-                <input id="avUrl" class="input" placeholder="http://...">
-                <p>Имя:</p>
-                <input id="newNick" class="input" placeholder="Никнейм">
-                <button class="btn btn-blue" onclick="updateProfile()">Обновить</button>
-            </div>
-            <button class="btn" onclick="logout()">🚪 Сменить аккаунт</button>
+        <div id="pg-prof" class="page">
+            <h2>Ваш профиль</h2>
+            <div id="profInfo" class="input">Загрузка...</div>
+            <button class="btn btn-red" onclick="logout()">Сменить аккаунт</button>
         </div>
 
         <div id="pg-adm" class="page">
-            <h2 id="admTitle">Панель Управления</h2>
-            <div class="grid" style="margin-top:20px">
-                <div class="item-card" id="admMoneyBlock">
-                    <h3>Деньги</h3>
-                    <input id="aLog" class="input" placeholder="Логин">
-                    <input id="aSum" class="input" type="number" placeholder="Сумма">
-                    <button class="btn btn-blue" onclick="admAction('add')">Выдать</button>
-                    <button class="btn btn-red" onclick="admAction('sub')">Забрать</button>
-                </div>
-                <div class="item-card">
-                    <h3>Санкции</h3>
-                    <input id="aLog2" class="input" placeholder="Логин">
-                    <input id="aFine" class="input" type="number" placeholder="Штраф">
-                    <button class="btn btn-red" onclick="admAction('fine')">Штраф</button>
-                    <button class="btn btn-red" style="background: #000;" onclick="admAction('ban')">БАН</button>
-                    <button class="btn btn-blue" onclick="admAction('unban')">Разбан</button>
-                </div>
-            </div>
+            <h2>Админ-панель</h2>
+            <input id="aLog" class="input" placeholder="Логин">
+            <input id="aSum" class="input" placeholder="Сумма">
+            <button class="btn btn-blue" onclick="admDo('add')">Выдать ₴</button>
         </div>
+    </div>
+
+    <div class="mobile-tab">
+        <div class="m-item" onclick="showPage('dash', this)">🏠</div>
+        <div class="m-item" onclick="showPage('chat', this)">💬</div>
+        <div class="m-item" onclick="showPage('trans', this)">💸</div>
+        <div class="m-item" onclick="showPage('prof', this)">👤</div>
     </div>
 </div>
 
@@ -178,155 +153,131 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 let curLog = localStorage.getItem('session');
-let userData = null;
+let user = null;
 
 const toast = (m) => { const t = document.getElementById('toast'); t.innerText=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); };
 
-// Auth
+// Вход
 function login() {
     let l = document.getElementById('li').value.toLowerCase().trim();
     let p = document.getElementById('pi').value;
-    db.ref('users/' + l).once('value', s => {
+    db.ref('users/'+l).once('value', s => {
         let d = s.val();
         if(d && d.pass === p) {
-            if(d.isBanned) return toast("АККАУНТ ЗАБЛОКИРОВАН");
             localStorage.setItem('session', l); location.reload();
-        } else toast("Неверный логин/пароль");
+        } else toast("Ошибка входа!");
     });
 }
 
-function regView() {
-    document.getElementById('authFields').innerHTML = `
-        <input id="rl" class="input" placeholder="Логин">
-        <input id="rp" class="input" type="password" placeholder="Пароль">
-        <button class="btn btn-blue" onclick="doReg()">Создать</button>
+// Восстановление
+function recoveryMode() {
+    document.getElementById('authContent').innerHTML = `
+        <h3>Восстановление</h3><br>
+        <input id="recLog" class="input" placeholder="Логин">
+        <input id="recNum" class="input" placeholder="Номер карты">
+        <input id="recCvv" class="input" placeholder="CVV код">
+        <button class="btn btn-blue" onclick="doRecover()">Найти пароль</button>
         <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
     `;
 }
 
-function doReg() {
+function doRecover() {
+    let l = document.getElementById('recLog').value.toLowerCase().trim();
+    let n = document.getElementById('recNum').value.trim();
+    let c = document.getElementById('recCvv').value.trim();
+    db.ref('users/'+l).once('value', s => {
+        let d = s.val();
+        if(d && d.cardNum === n && d.cardCVV === c) {
+            alert("Ваш пароль: " + d.pass);
+            location.reload();
+        } else toast("Данные не совпадают!");
+    });
+}
+
+// Регистрация
+function regMode() {
+    document.getElementById('authContent').innerHTML = `
+        <input id="rl" class="input" placeholder="Логин">
+        <input id="rp" class="input" type="password" placeholder="Пароль">
+        <input id="rn" class="input" placeholder="Имя владельца (Eng)">
+        <button class="btn btn-blue" onclick="register()">Создать карту</button>
+        <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
+    `;
+}
+
+function register() {
     let l = document.getElementById('rl').value.toLowerCase().trim();
     let p = document.getElementById('rp').value;
-    if(!l || !p) return;
+    let name = document.getElementById('rn').value || "CLIENT";
+    
+    // Генерация данных карты
+    let cardNum = "4441 " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999);
+    let cvv = "" + Math.floor(100+Math.random()*899);
+    let now = new Date();
+    let date = (now.getMonth()+1) + "/" + (now.getFullYear() + 4).toString().substr(-2);
+
     db.ref('users/'+l).set({
-        login: l, pass: p, name: 'Игрок '+l, bal: 5000,
-        isAdmin: false, isJuniorAdmin: false,
-        card: '4441 ' + Math.floor(1000+Math.random()*8999),
-        assets: [], isBanned: false
+        login: l, pass: p, name: name, bal: 1000,
+        cardNum: cardNum, cardCVV: cvv, cardDate: date,
+        isAdmin: false, assets: []
     }).then(() => { localStorage.setItem('session', l); location.reload(); });
 }
 
-// Data Loop
+// Загрузка
 if(curLog) {
-    db.ref('users/' + curLog).on('value', s => {
-        userData = s.val();
-        if(!userData) return;
+    db.ref('users/'+curLog).on('value', s => {
+        user = s.val();
+        if(!user) return;
         document.getElementById('auth').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        document.getElementById('uName').innerText = userData.name;
-        document.getElementById('uBal').innerText = userData.bal.toLocaleString() + ' ₴';
-        document.getElementById('uCard').innerText = userData.card;
+        document.getElementById('app').style.display = 'flex';
         
-        // Показ админки
-        if(userData.isAdmin || userData.isJuniorAdmin) {
-            document.getElementById('admLink').style.display = 'flex';
-            document.getElementById('admMobile').style.display = 'flex';
-            document.getElementById('buyAdminBlock').style.display = 'none';
-            // Если младший админ — скрываем выдачу денег
-            if(userData.isJuniorAdmin && !userData.isAdmin) {
-                document.getElementById('admMoneyBlock').style.display = 'none';
-                document.getElementById('admTitle').innerText = "Панель Модератора";
-            }
-        } else {
-            document.getElementById('buyAdminBlock').style.display = 'block';
-        }
-        renderMyAssets();
+        document.getElementById('uNameDisp').innerText = "Привет, " + user.name;
+        document.getElementById('uBalDisp').innerText = user.bal.toLocaleString() + " ₴";
+        
+        // Карта
+        document.getElementById('uCardNum').innerText = user.cardNum;
+        document.getElementById('uCardOwner').innerText = user.name.toUpperCase();
+        document.getElementById('uCardDate').innerText = user.cardDate;
+        document.getElementById('uCardCVV').innerText = user.cardCVV;
+        
+        if(user.isAdmin) document.getElementById('admBtn').style.display = 'block';
     });
 
-    // Чат Онлайн
     db.ref('chat').limitToLast(20).on('value', s => {
         let box = document.getElementById('chatBox');
-        let data = s.val();
         box.innerHTML = '';
-        for(let id in data) {
-            box.innerHTML += `<div class="msg"><b>${data[id].user}:</b> ${data[id].text}</div>`;
-        }
+        s.forEach(c => { box.innerHTML += `<div><b>${c.val().u}:</b> ${c.val().t}</div>`; });
         box.scrollTop = box.scrollHeight;
     });
 }
 
-function sendChat() {
-    let t = document.getElementById('chatInp').value;
-    if(!t) return;
-    db.ref('chat').push({ user: userData.name, text: t });
-    document.getElementById('chatInp').value = '';
+function clickMine() { db.ref('users/'+curLog+'/bal').set(user.bal + 1); }
+function sendMsg() {
+    let t = document.getElementById('chatMsg').value;
+    if(t) db.ref('chat').push({ u: user.name, t: t });
+    document.getElementById('chatMsg').value = '';
 }
 
-function buyAdmin() {
-    if(userData.bal < 5000000) return toast("Нужно 5,000,000 ₴");
-    if(confirm("Купить статус Модератора за 5 млн?")) {
-        db.ref('users/'+curLog).update({
-            bal: userData.bal - 5000000,
-            isJuniorAdmin: true
-        });
-        toast("Вы стали Модератором!");
-    }
-}
-
-function clickMoney() { db.ref('users/'+curLog+'/bal').set(userData.bal + 1); }
-
-function doTransfer() {
-    let to = document.getElementById('trLog').value.toLowerCase().trim();
-    let sum = parseInt(document.getElementById('trSum').value);
-    if(userData.bal < sum || sum <= 0) return toast("Недостаточно ₴");
-    db.ref('users/'+to).once('value', s => {
-        if(!s.exists()) return toast("Игрок не найден");
-        db.ref('users/'+curLog+'/bal').set(userData.bal - sum);
-        db.ref('users/'+to+'/bal').set(s.val().bal + sum);
-        toast("Переведено!");
-    });
-}
-
-function admAction(type) {
-    let target = (type === 'add' || type === 'sub') ? document.getElementById('aLog').value : document.getElementById('aLog2').value;
-    target = target.toLowerCase().trim();
-    let val = parseInt(document.getElementById('aSum').value) || parseInt(document.getElementById('aFine').value);
-    let ref = db.ref('users/'+target);
-    
-    ref.once('value', s => {
-        if(!s.exists()) return toast("Нет такого игрока");
-        let d = s.val();
-        if(type === 'add') ref.update({ bal: d.bal + val });
-        if(type === 'sub') ref.update({ bal: Math.max(0, d.bal - val) });
-        if(type === 'fine') ref.update({ bal: Math.max(0, d.bal - val) });
-        if(type === 'ban') ref.update({ isBanned: true });
-        if(type === 'unban') ref.update({ isBanned: false });
-        toast("Успешно");
-    });
-}
-
-function showPg(id, el) {
+function showPage(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item, .m-item').forEach(n => n.classList.remove('active'));
     document.getElementById('pg-'+id).classList.add('active');
-    el.classList.add('active');
-}
-
-function renderMyAssets() {
-    let box = document.getElementById('uAssets');
-    if(!userData.assets) return box.innerHTML = 'Пусто';
-    box.innerHTML = userData.assets.map(a => `<div class="item-card"><h4>${a.n}</h4><p>${a.ic}</p></div>`).join('');
-}
-
-function updateProfile() {
-    let av = document.getElementById('avUrl').value;
-    let ni = document.getElementById('newNick').value;
-    if(av) db.ref('users/'+curLog+'/avatar').set(av);
-    if(ni) db.ref('users/'+curLog+'/name').set(ni);
-    toast("Данные обновлены");
 }
 
 function logout() { localStorage.removeItem('session'); location.reload(); }
+
+function transfer() {
+    let to = document.getElementById('tUser').value.toLowerCase().trim();
+    let sum = parseInt(document.getElementById('tSum').value);
+    if(user.bal >= sum) {
+        db.ref('users/'+to).once('value', s => {
+            if(s.exists()) {
+                db.ref('users/'+curLog+'/bal').set(user.bal - sum);
+                db.ref('users/'+to+'/bal').set(s.val().bal + sum);
+                toast("Успешно!");
+            }
+        });
+    }
+}
 </script>
 </body>
-</html>
+                </html>
