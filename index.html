@@ -3,116 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy OS v13 Network</title>
+    <title>Magniy OS v14 Supreme</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #000; --card: #151517; --accent: #007AFF; --text: #fff; --sec: #8e8e93; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --bg: #000; --card: #161618; --accent: #007AFF; --text: #fff; --sec: #8e8e93; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* Navigation */
-        .nav { display: flex; background: #0a0a0a; border-bottom: 1px solid #222; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
-        .nav-item { padding: 15px 20px; cursor: pointer; color: var(--sec); white-space: nowrap; font-weight: 600; font-size: 13px; }
-        .nav-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+        /* NAV */
+        .nav { display: flex; background: #0a0a0a; border-bottom: 1px solid #222; overflow-x: auto; scrollbar-width: none; }
+        .nav-item { padding: 16px; cursor: pointer; color: var(--sec); white-space: nowrap; font-weight: 700; font-size: 13px; }
+        .nav-item.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
 
-        .main { flex-grow: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
-        .card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #222; }
+        .main { flex-grow: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
+        .card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #262626; }
         
-        /* UI Elements */
-        .btn { border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 5px; transition: 0.2s; }
+        .btn { border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 6px; }
         .btn-accent { background: var(--accent); color: #fff; }
         .input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 12px; color: #fff; margin-bottom: 8px; outline: none; }
 
-        /* Telegram-style Chat */
-        #chat-list { height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #000; border-radius: 15px; border: 1px solid #222; }
-        .message { max-width: 85%; padding: 10px 14px; border-radius: 18px; position: relative; font-size: 14px; line-height: 1.4; }
-        .msg-other { background: #262628; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .msg-mine { background: var(--accent); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg-name { display: block; font-size: 11px; font-weight: 800; margin-bottom: 3px; opacity: 0.8; cursor: pointer; }
+        /* AUTH & MULTI-ACC */
+        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; overflow-y: auto; }
+        .acc-chip { background: #1a1a1a; padding: 10px; border-radius: 10px; margin-top: 5px; cursor: pointer; border: 1px solid #333; display: block; width: 100%; color: var(--accent); }
+
+        /* CHAT */
+        #chat-list { height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #080808; border-radius: 15px; }
+        .msg { padding: 10px; border-radius: 14px; max-width: 80%; font-size: 14px; }
+        .msg-m { background: var(--accent); align-self: flex-end; }
+        .msg-o { background: #262628; align-self: flex-start; }
 
         .page { display: none; } .page.active { display: block; }
-        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="auth-screen">
-    <div style="width: 300px; text-align: center;">
-        <h1 style="margin-bottom: 20px;">MAGNIY <span style="color:var(--accent)">OS</span></h1>
+    <div style="width: 300px; text-align: center; padding: 20px;">
+        <h1 style="font-size: 35px; letter-spacing: -1px;">MAGNIY <span id="logo-c" style="color:var(--accent)">OS</span></h1><br>
         <input id="l-in" class="input" placeholder="Логин">
         <input id="p-in" class="input" type="password" placeholder="Пароль">
-        <input id="a-code" class="input" placeholder="Код админа (если есть)">
+        <input id="a-code" class="input" placeholder="Код (для админки)">
         <button class="btn btn-accent" onclick="auth()">ВОЙТИ / СОЗДАТЬ</button>
+        <div id="acc-list" style="margin-top: 20px;"></div>
     </div>
 </div>
 
 <div class="nav">
     <div class="nav-item active" onclick="sw('dash', this)">🏠</div>
-    <div class="nav-item" onclick="sw('shop', this)">🛒 Магазин</div>
+    <div class="nav-item" onclick="sw('shop', this)">🛍️ Гос</div>
     <div class="nav-item" onclick="sw('trade', this)">🤝 Трейд</div>
     <div class="nav-item" onclick="sw('chat', this)">💬 Чат</div>
-    <div class="nav-item" onclick="sw('prof', this)">⚙️ Профиль</div>
-    <div id="adm-nav" class="nav-item" style="color:red; display:none;" onclick="sw('adm', this)">🛠 Админ</div>
+    <div class="nav-item" onclick="sw('prof', this)">⚙️</div>
+    <div id="adm-nav" class="nav-item" style="color:red; display:none;" onclick="sw('adm', this)">🛠</div>
+    <div class="nav-item" onclick="exitAcc()" style="color:#ff3b30">🚪 Выход</div>
 </div>
 
-<div class="main" id="main-content">
-    
+<div class="main">
     <div id="p-dash" class="page active">
-        <div class="card" style="display:flex; align-items:center; gap:15px;">
-            <img id="u-ava" src="" style="width:60px; height:60px; border-radius:50%; background:#333;">
-            <div>
-                <h2 id="u-nick">...</h2>
-                <p id="u-bal" style="color:var(--accent)">0 ₴</p>
-            </div>
+        <div class="card" style="text-align: center;">
+            <img id="u-ava" src="" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--accent); margin-bottom: 10px;">
+            <h2 id="u-nick">...</h2>
+            <h1 id="u-bal" style="margin:10px 0; color:var(--accent)">0 ₴</h1>
+            <button class="btn btn-accent" onclick="work()">РАБОТАТЬ (+100 ₴)</button>
         </div>
-        <h3>Мои вещи:</h3>
-        <div id="my-inv" style="margin-top:10px;"></div>
+        <h3>Моё имущество:</h3>
+        <div id="inv-container" style="margin-top:10px"></div>
     </div>
 
     <div id="p-shop" class="page">
-        <div id="shop-items"></div>
+        <h3>🚗 Автосалон</h3><div id="s-car" class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;"></div>
+        <h3>🏠 Недвижимость</h3><div id="s-house" class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;"></div>
+        <h3>💼 Бизнес</h3><div id="s-biz" class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
     </div>
 
     <div id="p-trade" class="page">
         <div class="card">
-            <h3>Выставить на продажу</h3>
-            <select id="tr-select" class="input"></select>
-            <input id="tr-price" class="input" type="number" placeholder="Цена">
-            <button class="btn btn-accent" onclick="postTrade()">Выставить</button>
+            <h3>Продать своё</h3>
+            <select id="tr-obj" class="input"></select>
+            <input id="tr-pr" class="input" type="number" placeholder="Цена">
+            <button class="btn btn-accent" onclick="postToTrade()">Выставить на рынок</button>
         </div>
-        <div id="trade-list"></div>
+        <div id="trade-board"></div>
     </div>
 
     <div id="p-chat" class="page">
         <div id="chat-list"></div>
-        <div style="display:flex; gap:8px; margin-top:10px;">
+        <div style="display:flex; gap:5px; margin-top:10px;">
             <input id="m-in" class="input" style="margin:0" placeholder="Сообщение...">
-            <button class="btn btn-accent" style="width:70px; margin:0" onclick="sendMsg()">></button>
+            <button class="btn btn-accent" style="width:60px; margin:0" onclick="sendMsg()">></button>
         </div>
     </div>
 
     <div id="p-prof" class="page">
         <div class="card">
-            <h3>Настройки аккаунта</h3><br>
-            <input id="st-nick" class="input" placeholder="Новый ник">
-            <input id="st-ava" class="input" placeholder="URL аватарки">
-            <label>Цвет интерфейса:</label>
-            <input type="color" id="st-color" class="input" style="height:50px">
-            <button class="btn btn-accent" onclick="saveProf()">Сохранить</button>
+            <h3>Настройки</h3><br>
+            <input id="st-n" class="input" placeholder="Никнейм">
+            <input id="st-a" class="input" placeholder="URL Аватарки">
+            <p>Цвет системы:</p>
+            <input type="color" id="st-c" class="input" style="height:50px" oninput="updateTheme(this.value)">
+            <button class="btn btn-accent" onclick="saveProf()">СОХРАНИТЬ</button>
         </div>
     </div>
 
     <div id="p-adm" class="page">
         <div class="card">
-            <h3>Админ-панель</h3><br>
-            <input id="ad-user" class="input" placeholder="Логин игрока">
-            <input id="ad-val" class="input" type="number" placeholder="Сумма">
-            <button class="btn btn-accent" onclick="admAction('give')">Дать денег</button>
-            <button class="btn btn-accent" style="background:red" onclick="admAction('ban')">БАН</button>
+            <h3>Admin Panel</h3>
+            <input id="ad-u" class="input" placeholder="Логин игрока">
+            <input id="ad-v" class="input" type="number" placeholder="Сумма">
+            <button class="btn btn-accent" onclick="adm('give')">Выдать деньги</button>
+            <button class="btn" style="background:red; color:white" onclick="adm('ban')">БАН</button>
         </div>
     </div>
-
 </div>
 
 <script>
@@ -127,14 +129,15 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-let user = localStorage.getItem('mag13_u');
+
+let user = localStorage.getItem('mag_active_u');
 let uData = null;
 
-const SHOP_DATA = [
-    {n:"Велосипед", p:2000, t:"car"}, {n:"BMW M5", p:200000, t:"car"},
-    {n:"Квартира", p:100000, t:"house"}, {n:"Вилла", p:1500000, t:"house"},
-    {n:"Кафе", p:50000, t:"biz", i:1000}, {n:"Завод", p:2000000, t:"biz", i:20000}
-];
+const SHOP_DB = {
+    car: [{n:"Zaporozhets", p:1000}, {n:"Lada", p:5000}, {n:"BMW M5", p:150000}, {n:"Gelenvagen", p:400000}, {n:"Ferrari", p:1200000}],
+    house: [{n:"Гараж", p:8000}, {n:"Квартира", p:60000}, {n:"Дача", p:120000}, {n:"Особняк", p:800000}, {n:"Остров", p:10000000}],
+    biz: [{n:"Ларек", p:25000, i:1000}, {n:"Мойка", p:100000, i:4000}, {n:"ТЦ", p:2000000, i:50000}]
+};
 
 function auth() {
     let l = document.getElementById('l-in').value.toLowerCase().trim();
@@ -143,14 +146,28 @@ function auth() {
     if(!l || !p) return;
     db.ref('users/'+l).once('value', s => {
         if(!s.exists()) {
-            db.ref('users/'+l).set({
-                login:l, pass:p, bal:10000, nick:l, ava:'', theme:'#007AFF',
-                inv:[], isAdmin: (code === 'MAG777')
-            });
+            db.ref('users/'+l).set({login:l, pass:p, bal:5000, nick:l, ava:'', theme:'#007AFF', inv:[], isAdmin:(code==='MAG777')});
         }
-        localStorage.setItem('mag13_u', l); location.reload();
+        let accs = JSON.parse(localStorage.getItem('mag_accs') || '[]');
+        if(!accs.includes(l)) accs.push(l);
+        localStorage.setItem('mag_accs', JSON.stringify(accs));
+        localStorage.setItem('mag_active_u', l);
+        location.reload();
     });
 }
+
+function renderAccs() {
+    let list = document.getElementById('acc-list');
+    let accs = JSON.parse(localStorage.getItem('mag_accs') || '[]');
+    if(accs.length > 0) list.innerHTML = '<p style="color:gray; font-size:12px;">Ваши аккаунты:</p>';
+    accs.forEach(a => {
+        list.innerHTML += `<div class="acc-chip" onclick="switchAcc('${a}')">${a}</div>`;
+    });
+}
+renderAccs();
+
+function switchAcc(a) { localStorage.setItem('mag_active_u', a); location.reload(); }
+function exitAcc() { localStorage.removeItem('mag_active_u'); location.reload(); }
 
 if(user) {
     db.ref('users/'+user).on('value', s => {
@@ -158,90 +175,76 @@ if(user) {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('u-nick').innerText = uData.nick;
         document.getElementById('u-bal').innerText = uData.bal.toLocaleString() + " ₴";
-        document.getElementById('u-ava').src = uData.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-        
-        // Тема
-        document.documentElement.style.setProperty('--accent', uData.theme);
+        document.getElementById('u-ava').src = uData.ava || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+        updateTheme(uData.theme || '#007AFF');
         if(uData.isAdmin) document.getElementById('adm-nav').style.display = 'block';
 
-        // Инвентарь для трейда
-        let sel = document.getElementById('tr-select'); sel.innerHTML = '';
-        let inv = document.getElementById('my-inv'); inv.innerHTML = '';
+        let sel = document.getElementById('tr-obj'); sel.innerHTML = '';
+        let inv = document.getElementById('inv-container'); inv.innerHTML = '';
         (uData.inv || []).forEach((item, i) => {
             sel.innerHTML += `<option value="${i}">${item.n}</option>`;
             inv.innerHTML += `<div class="card">📦 ${item.n}</div>`;
         });
     });
 
-    // Слушатель Трейда
     db.ref('global_trade').on('value', s => {
-        let list = document.getElementById('trade-list'); list.innerHTML = '<h3 style="margin:10px 0">Рынок игроков</h3>';
+        let board = document.getElementById('trade-board'); board.innerHTML = '<h3 style="margin-top:15px">Рынок игроков</h3>';
         s.forEach(child => {
             let d = child.val();
-            list.innerHTML += `<div class="card"><b>${d.n}</b><br>Продавец: ${d.seller_nick}<br>Цена: ${d.p}₴<br>
-            <button class="btn btn-accent" onclick="buyTrade('${child.key}')">Купить</button></div>`;
+            board.innerHTML += `<div class="card"><b>${d.n}</b><br><small>Продавец: ${d.sn}</small><br><b>${d.p} ₴</b>
+            <button class="btn btn-accent" onclick="buyTrade('${child.key}')">КУПИТЬ</button></div>`;
         });
     });
 
-    // Слушатель Чата
-    db.ref('chat').limitToLast(30).on('value', s => {
+    db.ref('chat').limitToLast(20).on('value', s => {
         let box = document.getElementById('chat-list'); box.innerHTML = '';
         s.forEach(m => {
             let d = m.val();
-            let isMine = d.from === uData.nick;
-            box.innerHTML += `<div class="message ${isMine?'msg-mine':'msg-other'}">
-                <span class="msg-name" onclick="alert('Игрок: ${d.from}')">${d.from}</span>${d.text}</div>`;
+            box.innerHTML += `<div class="msg ${d.f===uData.nick?'msg-m':'msg-o'}"><b>${d.f}:</b><br>${d.t}</div>`;
         });
         box.scrollTop = box.scrollHeight;
     });
 }
 
-function postTrade() {
-    let idx = document.getElementById('tr-select').value;
-    let price = parseInt(document.getElementById('tr-price').value);
-    if(idx === "" || !price) return;
-    
+function updateTheme(color) {
+    document.documentElement.style.setProperty('--accent', color);
+    document.getElementById('logo-c').style.color = color;
+}
+
+function saveProf() {
+    let n = document.getElementById('st-n').value || uData.nick;
+    let a = document.getElementById('st-a').value || uData.ava;
+    let c = document.getElementById('st-c').value;
+    db.ref('users/'+user).update({nick: n, ava: a, theme: c});
+    alert("Сохранено!");
+}
+
+function buyShop(t, i) {
+    let item = SHOP_DB[t][i];
+    if(uData.bal < item.p) return alert("Мало денег!");
+    let inv = uData.inv || []; inv.push(item);
+    db.ref('users/'+user).update({ bal: uData.bal - item.p, inv: inv });
+}
+
+function postToTrade() {
+    let idx = document.getElementById('tr-obj').value;
+    let price = parseInt(document.getElementById('tr-pr').value);
+    if(idx==="" || !price) return;
     let item = uData.inv[idx];
-    let newInv = [...uData.inv];
-    newInv.splice(idx, 1);
-    
+    let newInv = [...uData.inv]; newInv.splice(idx, 1);
     db.ref('users/'+user).update({ inv: newInv });
-    db.ref('global_trade').push({
-        n: item.n, p: price, seller: user, seller_nick: uData.nick, raw: item
-    });
+    db.ref('global_trade').push({ n: item.n, p: price, s: user, sn: uData.nick, raw: item });
 }
 
 function buyTrade(id) {
     db.ref('global_trade/'+id).once('value', s => {
         let d = s.val();
-        if(uData.bal < d.p) return alert("Мало денег");
-        let newInv = uData.inv || []; newInv.push(d.raw);
-        db.ref('users/'+user).update({ bal: uData.bal - d.p, inv: newInv });
-        db.ref('users/'+d.seller+'/bal').transaction(c => (c||0) + d.p);
+        if(uData.bal < d.p) return alert("Мало денег!");
+        let inv = uData.inv || []; inv.push(d.raw);
+        db.ref('users/'+user).update({ bal: uData.bal - d.p, inv: inv });
+        db.ref('users/'+d.s+'/bal').transaction(c => (c||0) + d.p);
         db.ref('global_trade/'+id).remove();
     });
-}
-
-function sendMsg() {
-    let t = document.getElementById('m-in').value;
-    if(!t) return;
-    db.ref('chat').push({from: uData.nick, text: t});
-    document.getElementById('m-in').value = '';
-}
-
-function saveProf() {
-    let n = document.getElementById('st-nick').value || uData.nick;
-    let a = document.getElementById('st-ava').value || uData.ava;
-    let c = document.getElementById('st-color').value;
-    db.ref('users/'+user).update({nick: n, ava: a, theme: c});
-    alert("Настройки обновлены!");
-}
-
-function admAction(type) {
-    let target = document.getElementById('ad-user').value.toLowerCase();
-    let val = parseInt(document.getElementById('ad-val').value);
-    if(type === 'give') db.ref('users/'+target+'/bal').transaction(c => (c||0) + val);
-    alert("Готово");
 }
 
 function sw(id, el) {
@@ -252,18 +255,26 @@ function sw(id, el) {
 }
 
 function renderShop() {
-    let container = document.getElementById('shop-items'); container.innerHTML = '<h3>Гос. Магазин</h3><br>';
-    SHOP_DATA.forEach((i, idx) => {
-        container.innerHTML += `<div class="card"><b>${i.n}</b> - ${i.p}₴<button class="btn btn-accent" onclick="buyShop(${idx})">Купить</button></div>`;
+    ['car','house','biz'].forEach(t => {
+        let container = document.getElementById('s-'+t); container.innerHTML = '';
+        SHOP_DB[t].forEach((item, i) => {
+            container.innerHTML += `<div class="card" style="font-size:12px; padding:10px;"><b>${item.n}</b><br>${item.p}₴<button class="btn btn-accent" style="padding:4px;" onclick="buyShop('${t}', ${i})">Купить</button></div>`;
+        });
     });
 }
 
-function buyShop(idx) {
-    let i = SHOP_DATA[idx];
-    if(uData.bal < i.p) return alert("Мало денег");
-    let inv = uData.inv || []; inv.push(i);
-    db.ref('users/'+user).update({ bal: uData.bal - i.p, inv: inv });
+function work() { db.ref('users/'+user+'/bal').transaction(c => (c||0) + 100); }
+function sendMsg() {
+    let t = document.getElementById('m-in').value; if(!t) return;
+    db.ref('chat').push({f: uData.nick, t: t}); document.getElementById('m-in').value = '';
+}
+function adm(type) {
+    let t = document.getElementById('ad-u').value.toLowerCase();
+    let v = parseInt(document.getElementById('ad-v').value);
+    if(type === 'give') db.ref('users/'+t+'/bal').transaction(c => (c||0) + v);
+    if(type === 'ban') db.ref('users/'+t).update({isBanned: true});
+    alert("Выполнено!");
 }
 </script>
 </body>
-    </html>
+</html>
