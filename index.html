@@ -3,170 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy OS v9 OMEGA</title>
+    <title>Magniy OS v10 Empire</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #000; --panel: #111; --accent: #007AFF; --text: #fff; --sec: #888; --gold: #FFD700; --green: #34C759; --red: #FF3B30; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
+        :root { --bg: #050505; --card: #121214; --accent: #007AFF; --text: #fff; --sec: #8E8E93; --gold: #FFD700; --danger: #FF3B30; --success: #34C759; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        
+
+        /* Ban Screen */
+        #ban-screen { position: fixed; inset: 0; background: rgba(255,0,0,0.9); z-index: 99999; display: none; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px); }
+
         /* Layout */
-        .header { height: 60px; background: var(--panel); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #222; }
-        .nav { display: flex; background: #080808; overflow-x: auto; border-bottom: 1px solid #222; scrollbar-width: none; }
-        .nav-btn { padding: 15px 20px; cursor: pointer; color: var(--sec); white-space: nowrap; font-weight: 600; font-size: 13px; }
-        .nav-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
-        
-        .main { flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-        
-        /* Cards */
-        .card { background: var(--panel); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #222; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-        .stat-box { background: #1a1a1a; padding: 12px; border-radius: 12px; text-align: center; }
-        .stat-box span { font-size: 10px; color: var(--sec); display: block; }
-        .stat-box b { font-size: 16px; color: var(--green); }
+        .nav { display: flex; background: #000; border-bottom: 1px solid #222; overflow-x: auto; scrollbar-width: none; }
+        .nav-item { padding: 15px 20px; cursor: pointer; color: var(--sec); white-space: nowrap; font-weight: 600; font-size: 13px; }
+        .nav-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+        .main { flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; }
 
-        /* Buttons & Inputs */
-        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; transition: 0.2s; }
+        /* Cards & Shop */
+        .card { background: var(--card); border-radius: 18px; padding: 18px; margin-bottom: 15px; border: 1px solid #222; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .shop-item { background: #1c1c1e; padding: 12px; border-radius: 12px; border: 1px solid #333; text-align: center; }
+        .shop-item b { display: block; margin-bottom: 5px; font-size: 14px; }
+        .shop-item span { color: var(--gold); font-size: 12px; }
+
+        /* Buttons */
+        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; margin-top: 8px; }
         .btn-blue { background: var(--accent); color: #fff; }
-        .btn-gold { background: var(--gold); color: #000; }
-        .input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 8px; outline: none; }
+        .btn-red { background: var(--danger); color: #fff; }
+        .input { width: 100%; background: #1c1c1e; border: 1px solid #2c2c2e; padding: 12px; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; }
 
-        /* Disco Effect */
-        @keyframes disco { 0% { background: #500; } 50% { background: #050; } 100% { background: #005; } }
-        .disco-on { animation: disco 0.3s infinite linear !important; }
-
-        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .page { display: none; } .page.active { display: block; }
-        .notif-dot { width: 8px; height: 8px; background: red; border-radius: 50%; display: inline-block; }
     </style>
 </head>
 <body>
 
-<div id="auth-screen">
-    <div style="width: 100%; max-width: 320px; text-align: center;">
-        <h1 style="font-size: 35px; margin-bottom: 25px;">MAGNIY <span style="color:var(--accent)">OS</span></h1>
-        <input id="l-in" class="input" placeholder="Логин">
-        <input id="p-in" class="input" type="password" placeholder="Пароль">
-        <button class="btn btn-blue" onclick="auth()">ВОЙТИ / СОЗДАТЬ</button>
-        <div id="saved-accs" style="margin-top: 20px;"></div>
+<div id="ban-screen">
+    <div>
+        <h1 style="font-size: 50px;">🚫 ВЫ ЗАБАНЕНЫ</h1>
+        <p>Ваш доступ к Magniy OS ограничен администрацией.</p>
     </div>
 </div>
 
-<div class="header">
-    <b style="font-size: 20px;">Magniy <span id="u-status" style="font-size: 10px; color: var(--accent);">USER</span></b>
-    <div id="notif-bell" onclick="showPage('notifs')" style="cursor:pointer">🔔 <span id="n-count"></span></div>
+<div id="auth-screen">
+    <div style="width: 100%; max-width: 320px; text-align: center;">
+        <h1 style="margin-bottom: 20px;">MAGNIY EMPIRE</h1>
+        <input id="l-in" class="input" placeholder="Логин">
+        <input id="p-in" class="input" type="password" placeholder="Пароль">
+        <button class="btn btn-blue" onclick="auth()">ВОЙТИ / РЕГИСТРАЦИЯ</button>
+    </div>
 </div>
 
 <div class="nav">
-    <div class="nav-btn active" onclick="sw('dash', this)">Главная</div>
-    <div class="nav-btn" onclick="sw('bank', this)">Банк</div>
-    <div class="nav-btn" onclick="sw('crypto', this)">Биржа</div>
-    <div class="nav-btn" onclick="sw('market', this)">Рынок</div>
-    <div class="nav-btn" onclick="sw('casino', this)">Казино</div>
-    <div class="nav-btn" onclick="sw('biz', this)">Бизнес</div>
-    <div id="adm-link" class="nav-btn" style="color:red; display:none;" onclick="sw('adm', this)">АДМИН</div>
+    <div class="nav-item active" onclick="sw('dash', this)">🏠 Главная</div>
+    <div class="nav-item" onclick="sw('shop', this)">🛒 Магазин</div>
+    <div class="nav-item" onclick="sw('inv', this)">📦 Имущество</div>
+    <div class="nav-item" onclick="sw('bank', this)">💳 Банк</div>
+    <div id="adm-link" class="nav-item" style="color:red; display:none;" onclick="sw('adm', this)">🛠 Админ</div>
+    <div class="nav-item" onclick="exit()">🚪 Выход</div>
 </div>
 
-<div class="main" id="main-area">
-    
+<div class="main">
     <div id="p-dash" class="page active">
-        <div class="grid">
-            <div class="stat-box"><span>Гривны</span><b id="w-uah">0</b></div>
-            <div class="stat-box"><span>Доллары</span><b id="w-usd" style="color:var(--accent)">0</b></div>
-            <div class="stat-box"><span>Евро</span><b id="w-eur" style="color:#fff">0</b></div>
+        <div class="card" style="text-align: center;">
+            <p style="color: var(--sec);">Общий баланс</p>
+            <h1 id="b-uah">0 ₴</h1>
+            <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                <span>$ <b id="b-usd">0</b></span>
+                <span>€ <b id="b-eur">0</b></span>
+            </div>
+            <button class="btn btn-blue" onclick="work()" style="margin-top: 20px;">💰 РАБОТАТЬ (+20 ₴)</button>
         </div>
-        <br>
-        <div class="card" onclick="clickMoney()" style="text-align:center; padding: 40px; border: 2px dashed var(--accent); cursor:pointer;">
-            <h1 style="font-size: 40px;">💰</h1>
-            <p>КЛИКНИ И ЗАРАБОТАЙ 10 ₴</p>
-        </div>
+    </div>
+
+    <div id="p-shop" class="page">
+        <h3>🚗 Автосалон</h3>
+        <div class="shop-grid" id="shop-cars"></div><br>
+        <h3>🏠 Недвижимость</h3>
+        <div class="shop-grid" id="shop-houses"></div><br>
+        <h3>💼 Бизнесы</h3>
+        <div class="shop-grid" id="shop-biz"></div>
+    </div>
+
+    <div id="p-inv" class="page">
+        <h3>Мои вещи</h3><br>
+        <div id="inventory-list"></div>
     </div>
 
     <div id="p-bank" class="page">
         <div class="card">
-            <h3>Обмен валют</h3><br>
-            <input id="ex-sum" class="input" type="number" placeholder="Сумма в ₴">
-            <button class="btn btn-blue" onclick="exchange('usd')">Купить Доллары (1$ = 40₴)</button>
-            <button class="btn btn-blue" onclick="exchange('eur')">Купить Евро (1€ = 45₴)</button>
+            <h3>Обменник</h3><br>
+            <input id="ex-val" class="input" type="number" placeholder="Сумма в ₴">
+            <button class="btn btn-blue" onclick="exchange('usd')">Купить $ (40₴)</button>
+            <button class="btn btn-blue" onclick="exchange('eur')">Купить € (45₴)</button>
         </div>
-    </div>
-
-    <div id="p-crypto" class="page">
-        <div class="card">
-            <h2 style="color:var(--gold)">Bitcoin (BTC)</h2>
-            <h1 id="btc-price">$ 0</h1>
-            <p>В кошельке: <b id="u-btc">0</b> BTC</p>
-            <button class="btn btn-gold" onclick="tradeCrypto('buy')">Купить 1 BTC (за $)</button>
-            <button class="btn" onclick="tradeCrypto('sell')">Продать всё (в $)</button>
-        </div>
-    </div>
-
-    <div id="p-market" class="page">
-        <h3>Торговая площадка</h3><br>
-        <div class="card">
-            <input id="m-item" class="input" placeholder="Название товара">
-            <input id="m-price" class="input" type="number" placeholder="Цена в ₴">
-            <button class="btn btn-blue" onclick="listMarket()">Выставить на продажу</button>
-        </div>
-        <div id="market-list"></div>
-    </div>
-
-    <div id="p-casino" class="page">
-        <div class="card" style="text-align:center">
-            <h2>КАЗИНО 21</h2><br>
-            <p>Ваши очки: <b id="c-pts">0</b></p>
-            <input id="c-bet" class="input" type="number" placeholder="Ставка ₴">
-            <div style="display:flex; gap:5px;">
-                <button class="btn btn-blue" onclick="cStart()">Играть</button>
-                <button class="btn btn-gold" onclick="cHit()">Еще</button>
-                <button class="btn" onclick="cStand()">Стоп</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="p-biz" class="page">
-        <div id="biz-shop" class="grid"></div>
-        <br><h3>Моя империя:</h3>
-        <div id="my-biz"></div>
-    </div>
-
-    <div id="p-notifs" class="page">
-        <h3>Центр уведомлений</h3><br>
-        <div id="n-list"></div>
     </div>
 
     <div id="p-adm" class="page">
         <div class="card">
-            <h3>Управление</h3><br>
-            <input id="a-user" class="input" placeholder="Логин">
-            <input id="a-val" class="input" type="number" placeholder="Сумма">
-            <button class="btn btn-blue" onclick="adm('give')">Дать денег</button>
-            <button class="btn" style="background:red" onclick="adm('fine')">Штраф</button>
-            <button class="btn btn-gold" onclick="adm('promo')">Предложить Админку</button>
-            <button class="btn" style="background:purple" onclick="db.ref('global/disco').set(true)">Включить ДИСКОТЕКУ</button>
-            <button class="btn" style="background:#333" onclick="db.ref('global/disco').set(false)">Выключить</button>
+            <h3>Управление игроками</h3><br>
+            <input id="a-user" class="input" placeholder="Логин игрока">
+            <input id="a-sum" class="input" type="number" placeholder="Сумма">
+            <button class="btn btn-blue" onclick="admDo('give')">Выдать ₴</button>
+            <button class="btn btn-red" onclick="admDo('ban')">ЗАБАНИТЬ</button>
+            <button class="btn btn-blue" style="background:var(--success)" onclick="admDo('unban')">РАЗБАНИТЬ</button>
         </div>
     </div>
 </div>
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
-  authDomain: "magniybank.firebaseapp.com",
-  databaseURL: "https://magniybank-default-rtdb.firebaseio.com",
-  projectId: "magniybank",
-  storageBucket: "magniybank.firebasestorage.app",
-  messagingSenderId: "1006815080708",
-  appId: "1:1006815080708:web:e9c3afd0a15d8abbe46051"
+    apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
+    authDomain: "magniybank.firebaseapp.com",
+    databaseURL: "https://magniybank-default-rtdb.firebaseio.com",
+    projectId: "magniybank",
+    storageBucket: "magniybank.firebasestorage.app",
+    messagingSenderId: "1006815080708",
+    appId: "1:1006815080708:web:e9c3afd0a15d8abbe46051"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-let session = localStorage.getItem('mag_omega');
+let user = localStorage.getItem('mag_emp_u');
 let uData = null;
-let btcPrice = 64000;
+
+const items = {
+    cars: [{n:"Lada", p:5000}, {n:"BMW M5", p:150000}, {n:"Tesla S", p:300000}],
+    houses: [{n:"Квартира", p:80000}, {n:"Вилла", p:1000000}, {n:"Пентхаус", p:5000, cur:'eur'}],
+    biz: [{n:"Ларек", p:30000, i:200}, {n:"Заправка", p:200000, i:1500}, {n:"Казино", p:5000000, i:25000}]
+};
 
 function auth() {
     let l = document.getElementById('l-in').value.toLowerCase().trim();
@@ -174,123 +140,97 @@ function auth() {
     if(!l || !p) return;
     db.ref('users/'+l).once('value', s => {
         if(s.exists() && s.val().pass !== p) return alert("Ошибка");
-        if(!s.exists()) db.ref('users/'+l).set({login:l, pass:p, bal:1000, usd:0, eur:0, btc:0, biz:[], name:l});
-        localStorage.setItem('mag_omega', l);
+        if(!s.exists()) db.ref('users/'+l).set({login:l, pass:p, bal:5000, usd:0, eur:0, inv:[], isBanned:false});
+        localStorage.setItem('mag_emp_u', l);
         location.reload();
     });
 }
 
-if(session) {
-    db.ref('users/'+session).on('value', s => {
+if(user) {
+    db.ref('users/'+user).on('value', s => {
         uData = s.val();
         if(!uData) return;
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('w-uah').innerText = (uData.bal||0).toLocaleString() + " ₴";
-        document.getElementById('w-usd').innerText = (uData.usd||0).toLocaleString() + " $";
-        document.getElementById('w-eur').innerText = (uData.eur||0).toLocaleString() + " €";
-        document.getElementById('u-btc').innerText = (uData.btc||0);
+        if(uData.isBanned) { document.getElementById('ban-screen').style.display = 'flex'; return; }
         
-        if(uData.isAdmin) {
-            document.getElementById('adm-link').style.display = 'block';
-            document.getElementById('u-status').innerText = "ADMIN";
-        }
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('b-uah').innerText = (uData.bal||0).toLocaleString() + " ₴";
+        document.getElementById('b-usd').innerText = (uData.usd||0).toLocaleString();
+        document.getElementById('b-eur').innerText = (uData.eur||0).toLocaleString();
+        
+        if(uData.isAdmin) document.getElementById('adm-link').style.display = 'block';
 
-        // Рендер маркета
-        db.ref('market').on('value', ms => {
-            let ml = document.getElementById('market-list'); ml.innerHTML = '';
-            ms.forEach(item => {
-                let d = item.val();
-                ml.innerHTML += `<div class="card"><b>${d.name}</b> - ${d.price}₴ <button class="btn btn-blue" onclick="buyMarket('${item.key}', ${d.price})">Купить</button></div>`;
-            });
-        });
-
-        // Уведомления
-        let nl = document.getElementById('n-list'); nl.innerHTML = '';
-        if(uData.notifs) {
-            Object.keys(uData.notifs).forEach(k => {
-                let n = uData.notifs[k];
-                nl.innerHTML += `<div class="card">${n} <button class="btn" onclick="delN('${k}')">Ок</button></div>`;
-            });
-        }
-    });
-
-    // Дискотека
-    db.ref('global/disco').on('value', s => {
-        if(s.val()) document.getElementById('main-area').classList.add('disco-on');
-        else document.getElementById('main-area').classList.remove('disco-on');
+        renderShop();
+        renderInv();
     });
 }
 
-function clickMoney() { db.ref('users/'+session+'/bal').transaction(c => (c||0) + 10); }
+function renderShop() {
+    const r = (id, type) => {
+        let el = document.getElementById(id); el.innerHTML = '';
+        items[type].forEach(i => {
+            el.innerHTML += `<div class="shop-item"><b>${i.n}</b><span>${i.p} ${i.cur||'₴'}</span><button class="btn btn-blue" onclick="buy('${type}', '${i.n}', ${i.p}, '${i.cur||'bal'}')">Купить</button></div>`;
+        });
+    };
+    r('shop-cars', 'cars'); r('shop-houses', 'houses'); r('shop-biz', 'biz');
+}
+
+function buy(type, name, price, cur) {
+    let wallet = (cur === 'bal' ? uData.bal : uData[cur]);
+    if(wallet < price) return alert("Недостаточно средств!");
+    let newInv = uData.inv || [];
+    newInv.push({n: name, type: type});
+    let updateData = { inv: newInv };
+    if(cur === 'bal') updateData.bal = uData.bal - price;
+    else updateData[cur] = uData[cur] - price;
+    db.ref('users/'+user).update(updateData);
+    alert("Поздравляем с покупкой!");
+}
+
+function renderInv() {
+    let el = document.getElementById('inventory-list'); el.innerHTML = '';
+    (uData.inv || []).forEach(i => {
+        el.innerHTML += `<div class="card">📦 ${i.n} (${i.type})</div>`;
+    });
+}
+
+function work() { db.ref('users/'+user+'/bal').transaction(c => (c||0) + 20); }
 
 function exchange(to) {
-    let sum = parseInt(document.getElementById('ex-sum').value);
-    if(!sum || uData.bal < sum) return alert("Мало ₴");
+    let v = parseInt(document.getElementById('ex-val').value);
+    if(!v || uData.bal < v) return;
     let rate = (to === 'usd' ? 40 : 45);
-    db.ref('users/'+session).update({ bal: uData.bal - sum, [to]: (uData[to]||0) + Math.floor(sum/rate) });
+    db.ref('users/'+user).update({ bal: uData.bal - v, [to]: (uData[to]||0) + Math.floor(v/rate) });
 }
 
-function tradeCrypto(type) {
-    if(type === 'buy') {
-        if(uData.usd < btcPrice) return alert("Нужно $" + btcPrice);
-        db.ref('users/'+session).update({ usd: uData.usd - btcPrice, btc: (uData.btc||0) + 1 });
-    } else {
-        if(!uData.btc) return;
-        db.ref('users/'+session).update({ usd: uData.usd + (uData.btc * btcPrice), btc: 0 });
-    }
-}
-
-function listMarket() {
-    let n = document.getElementById('m-item').value;
-    let p = document.getElementById('m-price').value;
-    if(n && p) db.ref('market').push({ name: n, price: parseInt(p), owner: session });
-}
-
-function buyMarket(id, pr) {
-    if(uData.bal < pr) return alert("Мало ₴");
-    db.ref('users/'+session+'/bal').transaction(c => c - pr);
-    db.ref('market/'+id).remove();
-    alert("Куплено!");
-}
-
-let pts = 0;
-function cStart() { pts = Math.floor(Math.random()*10)+2; document.getElementById('c-pts').innerText = pts; }
-function cHit() { 
-    pts += Math.floor(Math.random()*10)+2; 
-    document.getElementById('c-pts').innerText = pts;
-    if(pts > 21) { alert("Перебор!"); pts = 0; }
-}
-function cStand() {
-    let bet = parseInt(document.getElementById('c-bet').value);
-    if(pts > 17) { db.ref('users/'+session+'/bal').transaction(c => c + bet); alert("Win!"); }
-    else { db.ref('users/'+session+'/bal').transaction(c => c - bet); alert("Loss"); }
-    pts = 0;
-}
-
-function adm(type) {
+function admDo(type) {
     let t = document.getElementById('a-user').value.toLowerCase();
-    let v = parseInt(document.getElementById('a-val').value);
+    let v = parseInt(document.getElementById('a-sum').value);
     if(type === 'give') db.ref('users/'+t+'/bal').transaction(c => (c||0) + v);
-    if(type === 'fine') {
-        db.ref('users/'+t+'/bal').transaction(c => (c||0) - v);
-        db.ref('users/'+t+'/notifs').push("🛑 ШТРАФ: -" + v + "₴");
-    }
-    if(type === 'promo') db.ref('users/'+t).update({isAdmin: true});
+    if(type === 'ban') db.ref('users/'+t).update({isBanned: true});
+    if(type === 'unban') db.ref('users/'+t).update({isBanned: false});
+    alert("Готово!");
 }
 
 function sw(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('p-'+id).classList.add('active');
     el.classList.add('active');
 }
+function exit() { localStorage.clear(); location.reload(); }
 
+// Доход от бизнесов раз в 1 минуту
 setInterval(() => {
-    btcPrice += Math.floor(Math.random()*200) - 100;
-    if(document.getElementById('btc-price')) document.getElementById('btc-price').innerText = "$ " + btcPrice.toLocaleString();
-}, 4000);
-
-function delN(k) { db.ref('users/'+session+'/notifs/'+k).remove(); }
+    if(!uData || !uData.inv) return;
+    let income = 0;
+    uData.inv.forEach(i => {
+        if(i.type === 'biz') {
+            let b = items.biz.find(x => x.n === i.n);
+            if(b) income += b.i;
+        }
+    });
+    if(income > 0) db.ref('users/'+user+'/bal').transaction(c => (c||0) + income);
+}, 60000);
 </script>
 </body>
-</html>
+    </html>
