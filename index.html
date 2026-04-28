@@ -212,7 +212,6 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
 </head>
 <body>
 
-<!-- BANNED -->
 <div id="banned-screen">
   <div style="font-size:56px;">🚫</div>
   <h2 style="font-family:'Unbounded',sans-serif;color:var(--red);font-size:22px;">ЗАБЛОКИРОВАНО</h2>
@@ -220,7 +219,6 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
   <button class="btn btn-g" style="max-width:180px;margin-top:8px;" onclick="exitAcc()">ВЫЙТИ</button>
 </div>
 
-<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-wrap">
     <div class="auth-logo">MAGNIY <span>OS</span></div>
@@ -233,10 +231,8 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
   </div>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="main" id="main-scroll">
 
-  <!-- HOME -->
   <div id="p-home" class="page active">
     <div class="bal-card" id="bal-card">
       <div class="bal-tag">Баланс рахунку</div>
@@ -270,7 +266,6 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
     <div style="height:14px"></div>
   </div>
 
-  <!-- SHOP -->
   <div id="p-shop" class="page">
     <div class="sec-lbl" style="margin-top:6px">🚗 Автосалон</div>
     <div id="s-car" class="shop-grid"></div>
@@ -281,7 +276,6 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
     <div style="height:14px"></div>
   </div>
 
-  <!-- TRADE -->
   <div id="p-trade" class="page">
     <div class="trade-post-card">
       <div class="adm-title">ВИСТАВИТИ НА ПРОДАЖ</div>
@@ -294,19 +288,16 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
     <div style="height:14px"></div>
   </div>
 
-  <!-- CHAT — flex layout -->
   <div id="p-chat" class="page" style="display:none;flex-direction:column;height:calc(100dvh - 112px);">
     <div class="chat-box" id="chat-list"></div>
   </div>
 
-  <!-- INBOX -->
   <div id="p-inbox" class="page">
     <div class="sec-lbl" style="margin-top:6px">Повідомлення</div>
     <div id="inbox-list"></div>
     <div style="height:14px"></div>
   </div>
 
-  <!-- PROFILE -->
   <div id="p-prof" class="page">
     <div class="prof-head">
       <div class="prof-ava-wrap">
@@ -316,6 +307,14 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
       <div class="prof-name" id="prof-nick">...</div>
       <div class="prof-role" id="prof-role-lbl">Гравець</div>
     </div>
+    
+    <div class="adm-action" style="background: rgba(79,142,247,0.05); border-color: rgba(79,142,247,0.2);">
+      <div class="adm-title" style="color:var(--accent);">👥 МУЛЬТИ-АККАУНТ</div>
+      <div id="prof-acc-list" style="margin-bottom:12px;"></div>
+      <button class="btn btn-g" onclick="exitAcc()">ДОДАТИ / ЗМІНИТИ АККАУНТ</button>
+      <button class="btn btn-r" style="margin-top:8px;" onclick="logoutCurrent()">ВИЙТИ З ЦЬОГО АККАУНТА</button>
+    </div>
+
     <div class="adm-action">
       <div class="adm-title">РЕДАГУВАТИ ПРОФІЛЬ</div>
       <input id="st-n" class="inp" placeholder="Нікнейм">
@@ -328,11 +327,9 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
     <div style="height:14px"></div>
   </div>
 
-  <!-- ADMIN -->
   <div id="p-adm" class="page">
     <div class="sec-lbl" style="margin-top:6px">Панель адміністратора</div>
 
-    <!-- Give money (creator only) -->
     <div class="adm-action" id="adm-give-block">
       <div class="adm-title">💰 ВИДАТИ ГРОШІ</div>
       <input id="ad-u-give" class="inp" placeholder="Логін гравця">
@@ -340,7 +337,6 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
       <button class="btn btn-p" onclick="adm('give')">ВИДАТИ</button>
     </div>
 
-    <!-- Fine -->
     <div class="adm-action">
       <div class="adm-title">💸 ШТРАФ</div>
       <input id="ad-u-fine" class="inp" placeholder="Логін гравця">
@@ -349,14 +345,12 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
       <button class="btn" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.3);margin-top:4px;" onclick="adm('fine')">ВИПИСАТИ ШТРАФ</button>
     </div>
 
-    <!-- Send admin offer -->
     <div class="adm-action" id="adm-offer-block">
       <div class="adm-title">⚡ ЗАПРОПОНУВАТИ АДМІНКУ</div>
       <input id="ad-u-offer" class="inp" placeholder="Логін гравця">
       <button class="btn" style="background:rgba(79,142,247,0.12);color:var(--accent);border:1px solid rgba(79,142,247,0.3);" onclick="adm('offer')">ВІДПРАВИТИ ПРОПОЗИЦІЮ (500M ₴)</button>
     </div>
 
-    <!-- Ban / Unban -->
     <div class="adm-action">
       <div class="adm-title">🚫 БАН / РОЗБАН</div>
       <input id="ad-u-ban" class="inp" placeholder="Логін гравця">
@@ -369,13 +363,11 @@ h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
 
 </div>
 
-<!-- CHAT BAR (only visible on chat page) -->
 <div class="chat-bar" id="chat-bar" style="display:none;">
   <input id="m-in" class="inp" style="margin:0;flex:1;" placeholder="Повідомлення...">
   <button class="chat-send" onclick="sendMsg()">➤</button>
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="bnav" id="bnav">
   <div class="bnav-item active" id="nav-home" onclick="sw('home',0)">
     <span class="ico">🏠</span>ГОЛОВНА
@@ -469,6 +461,8 @@ function auth(){
     location.reload();
   });
 }
+
+// Рендерим аккаунты в окне логина
 function renderAccs(){
   let list=document.getElementById('acc-list');
   let accs=JSON.parse(localStorage.getItem('mag_accs')||'[]');
@@ -478,14 +472,40 @@ function renderAccs(){
     list.innerHTML+=`<div class="acc-chip" onclick="switchAcc('${a}')"><div class="acc-dot"></div><span class="acc-name">${a}</span></div>`;
   });
 }
+
+// Рендерим аккаунты в профиле (мультиаккаунт)
+function renderProfileAccs(){
+  let list=document.getElementById('prof-acc-list');
+  if(!list) return;
+  let accs=JSON.parse(localStorage.getItem('mag_accs')||'[]');
+  list.innerHTML = '';
+  accs.forEach(a => {
+    let isActive = (a === user);
+    list.innerHTML += `
+      <div class="acc-chip" onclick="switchAcc('${a}')" style="${isActive ? 'border-color:var(--accent); background:rgba(79,142,247,0.1);' : ''}">
+        <div class="acc-dot" style="${isActive ? '' : 'background:var(--muted);'}"></div>
+        <span class="acc-name" style="${isActive ? 'font-weight:800;' : ''}">${a} ${isActive ? '(активний)' : ''}</span>
+      </div>`;
+  });
+}
+
 renderAccs();
+
 function switchAcc(a){localStorage.setItem('mag_active_u',a);location.reload();}
 function exitAcc(){localStorage.removeItem('mag_active_u');location.reload();}
+
+// Полный выход (удаление из списка сохраненных)
+function logoutCurrent(){
+  if(!confirm('Вийти з цього аккаунта та видалити його зі списку швидкого доступу?')) return;
+  let accs=JSON.parse(localStorage.getItem('mag_accs')||'[]');
+  accs = accs.filter(a => a !== user);
+  localStorage.setItem('mag_accs', JSON.stringify(accs));
+  exitAcc();
+}
 
 // ── APPLY THEME ──
 function applyTheme(c){
   document.documentElement.style.setProperty('--accent',c);
-  // Calculate darker variant
   document.documentElement.style.setProperty('--accent-d',c);
   localStorage.setItem('mag_theme_'+user,c);
 }
@@ -504,7 +524,6 @@ if(user){
     document.getElementById('auth-screen').style.display='none';
     applyTheme(uData.theme||'#4f8ef7');
 
-    // Balance & user info
     document.getElementById('u-bal').textContent=Number(uData.bal).toLocaleString('uk')+' ₴';
     let ava=uData.ava||'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
     document.getElementById('u-ava').src=ava;
@@ -516,30 +535,25 @@ if(user){
     document.getElementById('u-role').textContent=roleText;
     document.getElementById('prof-role-lbl').textContent=roleText;
 
-    // Crown
     let showCrown=uData.isCreator;
     document.getElementById('u-crown').style.display=showCrown?'block':'none';
     document.getElementById('prof-crown').style.display=showCrown?'block':'none';
 
-    // Admin nav
     if(uData.isAdmin||uData.isCreator){
       document.getElementById('nav-adm').style.display='flex';
-      // Creator-only block (give money / offer admin)
       document.getElementById('adm-give-block').style.display=uData.isCreator?'block':'none';
       document.getElementById('adm-offer-block').style.display=uData.isCreator?'block':'none';
     }
 
-    // Profile fields
     document.getElementById('st-n').value=uData.nick;
     document.getElementById('st-a').value=uData.ava||'';
     document.getElementById('st-c').value=uData.theme||'#4f8ef7';
     initSwatches();
-
     renderInv();
     renderTradeSelect();
+    renderProfileAccs();
   });
 
-  // Trade board
   db.ref('global_trade').on('value',s=>{
     let board=document.getElementById('trade-board');
     board.innerHTML='';
@@ -560,7 +574,6 @@ if(user){
     if(!count)board.innerHTML='<div style="color:var(--muted2);text-align:center;padding:24px;font-size:13px;">Ринок порожній</div>';
   });
 
-  // Chat
   db.ref('chat').limitToLast(40).on('value',s=>{
     if(!uData)return;
     let box=document.getElementById('chat-list');
@@ -578,7 +591,6 @@ if(user){
     if(wasBottom)box.scrollTop=box.scrollHeight;
   });
 
-  // Inbox / notifications
   db.ref('notifications/'+user).on('value',s=>{
     let list=document.getElementById('inbox-list');
     list.innerHTML='';
@@ -592,7 +604,6 @@ if(user){
     items.forEach(d=>{
       if(!d.read)unread++;
       let extra='';
-      // Admin offer notification with confirm/decline
       if(d.type==='admin_offer'&&!d.responded){
         extra=`<div class="notif-action">
           <button class="notif-confirm" onclick="respondAdminOffer('${d.key}','accept')">✅ ПІДТВЕРДИТИ</button>
@@ -609,12 +620,10 @@ if(user){
           <div class="notif-time">${d.time||''}</div>
           ${extra}
         </div>`;
-      // Mark as read after 2s
       if(!d.read){
         setTimeout(()=>db.ref('notifications/'+user+'/'+d.key+'/read').set(true),2000);
       }
     });
-    // Badge
     let badge=document.getElementById('bell-badge');
     if(unread>0){badge.textContent=unread;badge.classList.add('show');}
     else{badge.classList.remove('show');}
@@ -630,6 +639,7 @@ function pushNotif(targetUser, notif){
 // ── SWATCHES ──
 function initSwatches(){
   let wrap=document.getElementById('color-swatches');
+  if(!wrap) return;
   wrap.innerHTML='';
   COLORS.forEach(c=>{
     let d=document.createElement('div');
@@ -648,6 +658,7 @@ function initSwatches(){
 // ── INV RENDER ──
 function renderInv(){
   let c=document.getElementById('inv-container');
+  if(!c) return;
   c.innerHTML='';
   if(!uData)return;
   let inv=uData.inv||{};
@@ -670,6 +681,7 @@ function renderInv(){
 // ── TRADE SELECT ──
 function renderTradeSelect(){
   let sel=document.getElementById('tr-obj');
+  if(!sel) return;
   sel.innerHTML='';
   let inv=(uData&&uData.inv)||{};
   let keys=Object.keys(inv);
@@ -684,7 +696,6 @@ function renderTradeSelect(){
 let curPage='home';
 const navMap={home:0,chat:1,trade:2,shop:3,inbox:4,prof:5,adm:6};
 function sw(id, navIdx){
-  // Hide all pages
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
   document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('active'));
 
@@ -697,16 +708,14 @@ function sw(id, navIdx){
     pg.classList.add('active');
   }
 
-  // Nav highlight
   let navEl=document.getElementById('nav-'+id);
   if(navEl)navEl.classList.add('active');
 
-  // Chat bar visibility
   document.getElementById('chat-bar').style.display=(id==='chat')?'flex':'none';
-  document.getElementById('main-scroll').style.paddingBottom=(id==='chat')?'0':'0';
 
   if(id==='shop')renderShop();
   if(id==='trade')renderTradeSelect();
+  if(id==='prof')renderProfileAccs();
 }
 
 // ── SHOP ──
@@ -791,10 +800,9 @@ function respondAdminOffer(key, action){
     db.ref('users/'+user).update({bal:uData.bal-ADMIN_PRICE,isAdmin:true});
     db.ref('notifications/'+user+'/'+key).update({responded:true,read:true});
     toast('Адмінку отримано! ⚡');
-    // Notify creator
     db.ref('users').orderByChild('isCreator').equalTo(true).once('value',s=>{
       s.forEach(c=>{
-        pushNotif(c.key,{ico:'⚡',title:'Куплено адмінку',body:`${uData.nick} придбав адміністраторські права`,type:'info'});
+        pushNotif(c.key,{ico:'⚡',title:'Куплено адмінку',body:`${uData.nick} придбав администраторські права`,type:'info'});
       });
     });
   } else {
@@ -815,8 +823,6 @@ function saveProf(){
   let c=document.getElementById('st-c').value;
   db.ref('users/'+user).update({nick:n,ava:a,theme:c}).then(()=>{
     applyTheme(c);
-    document.getElementById('prof-ava').src=a||'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-    document.getElementById('u-ava').src=a||'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
     toast('Збережено ✓');
   });
 }
