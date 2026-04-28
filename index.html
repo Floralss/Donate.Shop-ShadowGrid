@@ -3,381 +3,418 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BroBank Ultimate Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>BroBank: Cyber Revolution</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #050505; --card: #121214; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --text: #FFFFFF; --sec: #8E8E93; }
+        :root { 
+            --bg: #030305; --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #00f2ff; --purple: #7000ff; --danger: #ff0055; --success: #00ff88; --text: #e0e0e0;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; background-image: radial-gradient(circle at 50% 50%, #0a0a1a 0%, #030305 100%); min-height: 100vh; }
+        
+        h1, h2, .logo { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* UI Helpers */
-        .btn { background: #fff; color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn-blue { background: var(--accent); color: #fff; }
-        .btn-red { background: var(--danger); color: #fff; }
-        .input { width: 100%; background: #1c1c1e; border: 1px solid #2c2c2e; padding: 14px; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; z-index: 1000; transition: 0.4s; font-weight: 600; }
-        .toast.on { transform: translateX(-50%) translateY(0); }
+        /* Glassmorphism Components */
+        .glass { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 20px; }
+        .btn { border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 12px; }
+        .btn-neon { background: transparent; border: 1px solid var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
+        .btn-neon:hover { background: var(--accent); color: #000; box-shadow: 0 0 25px var(--accent); }
+        .input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); padding: 14px; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; transition: 0.3s; }
+        .input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); }
 
-        /* Layout */
-        #app { display: none; min-height: 100vh; }
-        .sidebar { background: #000; border-right: 1px solid #1c1c1e; padding: 25px; display: flex; flex-direction: column; width: 260px; height: 100vh; position: sticky; top: 0; }
-        .content { flex: 1; padding: 20px; padding-bottom: 100px; }
-        .nav-item { padding: 14px; border-radius: 12px; cursor: pointer; color: var(--sec); margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
-        .nav-item.active { background: var(--card); color: #fff; }
-        .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: none; grid-template-columns: repeat(5, 1fr); border-top: 1px solid #1c1c1e; height: 70px; z-index: 99; }
-        @media (max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: grid; } }
+        /* Navigation */
+        .sidebar { width: 280px; height: 100vh; position: fixed; left: 0; top: 0; padding: 30px; display: flex; flex-direction: column; border-right: 1px solid var(--glass-border); z-index: 100; }
+        .nav-link { padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; display: flex; align-items: center; gap: 15px; color: var(--sec); }
+        .nav-link.active { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent); }
+        
+        .mobile-nav { position: fixed; bottom: 15px; left: 15px; right: 15px; height: 65px; display: none; grid-template-columns: repeat(5, 1fr); gap: 10px; z-index: 1000; }
 
-        /* Cards & Assets */
-        .bank-card { background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); border-radius: 20px; padding: 25px; border: 1px solid #333; position: relative; margin-bottom: 20px; }
-        .bank-card.blocked { border-color: var(--danger); opacity: 0.7; }
-        .card-bal { font-size: 32px; font-weight: 800; margin: 10px 0; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-        .item-card { background: var(--card); border-radius: 18px; padding: 20px; border: 1px solid #1c1c1e; position: relative; }
-        .badge { position: absolute; top: 10px; right: 10px; font-size: 10px; padding: 3px 8px; border-radius: 5px; background: var(--accent); }
+        /* Pages */
+        .content { margin-left: 280px; padding: 40px; }
+        .page { display: none; animation: fadeIn 0.5s ease; }
+        .page.active { display: block; }
 
-        /* Clicker */
-        .click-area { text-align: center; padding: 30px; background: var(--card); border-radius: 20px; margin-bottom: 20px; }
-        #coin { font-size: 80px; cursor: pointer; display: inline-block; transition: 0.1s; user-select: none; }
-        #coin:active { transform: scale(0.9); }
+        /* Assets Cards */
+        .card { padding: 25px; margin-bottom: 25px; position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .item { padding: 20px; text-align: center; transition: 0.4s; }
+        .item:hover { transform: translateY(-10px); border-color: var(--accent); }
+        
+        /* 21 Game Rooms */
+        .room-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .room-card { padding: 20px; text-align: center; cursor: pointer; border: 1px solid var(--glass-border); transition: 0.3s; }
+        .room-card:hover { border-color: var(--success); background: rgba(0, 255, 136, 0.05); }
 
-        .page { display: none; } .page.active { display: block; }
-        .avatar-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .content { margin-left: 0; padding: 20px; padding-bottom: 100px; }
+            .mobile-nav { display: grid; }
+        }
+
+        .toast { position: fixed; top: 20px; right: 20px; padding: 15px 30px; border-radius: 10px; z-index: 2000; transform: translateX(200%); transition: 0.5s; font-weight: bold; }
+        .toast.on { transform: translateX(0); }
     </style>
 </head>
 <body>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast glass"></div>
 
-<div id="auth" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
-    <div style="width: 100%; max-width: 350px; text-align: center;">
-        <h1 style="font-size: 40px; margin-bottom: 30px;">BroBank</h1>
-        <div id="authFields">
-            <input id="li" class="input" placeholder="Логин">
-            <input id="pi" class="input" type="password" placeholder="Пароль">
-            <button class="btn btn-blue" onclick="login()">Войти</button>
-            <button class="btn" style="background:none; color:#fff" onclick="regView()">Создать счет</button>
+<div id="auth" style="display:flex; align-items:center; justify-content:center; height:100vh;">
+    <div class="glass card" style="width: 380px; text-align: center;">
+        <h1 class="logo" style="margin-bottom: 30px; font-size: 28px; color: var(--accent);">BROBANK <br><span style="font-size: 12px; color:#fff">Cybernetic Finance</span></h1>
+        <div id="authBox">
+            <input id="li" class="input" placeholder="LOGIN_ID">
+            <input id="pi" class="input" type="password" placeholder="ACCESS_CODE">
+            <button class="btn btn-neon" style="width:100%" onclick="login()">Initialize Session</button>
+            <p onclick="regView()" style="margin-top:20px; cursor:pointer; font-size:12px; color:var(--accent)">Register New Entity</p>
         </div>
     </div>
 </div>
 
 <div id="app">
-    <div class="sidebar">
-        <h2 style="margin-bottom: 30px;">BroBank</h2>
-        <div class="nav-item active" onclick="showPg('dash', this)">🏠 Главная</div>
-        <div class="nav-item" onclick="showPg('trans', this)">💸 Переводы</div>
-        <div class="nav-item" onclick="showPg('market', this)">🛒 Маркет</div>
-        <div class="nav-item" onclick="showPg('games', this)">🚀 Игры</div>
-        <div class="nav-item" onclick="showPg('profile', this)">👤 Профиль</div>
-        <div id="admBtn" class="nav-item" style="display:none; color: var(--danger);" onclick="showPg('adm', this)">🛠️ Админ</div>
-        <button class="btn-red btn" style="margin-top: auto;" onclick="logout()">Выход</button>
+    <div class="sidebar glass">
+        <h2 class="logo" style="color: var(--accent); margin-bottom: 40px;">BROBANK</h2>
+        <div class="nav-link active" onclick="showPg('dash', this)"><span>🏠</span> Terminal</div>
+        <div class="nav-link" onclick="showPg('market', this)"><span>🛍️</span> Marketplace</div>
+        <div class="nav-link" onclick="showPg('casino', this)"><span>🎰</span> Game Zone</div>
+        <div class="nav-link" onclick="showPg('social', this)"><span>💬</span> Network</div>
+        <div class="nav-link" onclick="showPg('profile', this)"><span>👤</span> ID-Card</div>
+        <div id="admLink" class="nav-link" style="display:none; color: var(--danger);" onclick="showPg('adm', this)"><span>🛠️</span> Core Admin</div>
+        <button class="btn btn-neon" style="margin-top: auto; border-color: var(--danger); color: var(--danger);" onclick="logout()">Terminate</button>
     </div>
 
-    <div class="mobile-nav">
-        <div class="m-nav-it active" onclick="showPg('dash', this)" style="display:flex; justify-content:center; align-items:center;">🏠</div>
-        <div class="m-nav-it" onclick="showPg('trans', this)" style="display:flex; justify-content:center; align-items:center;">💸</div>
-        <div class="m-nav-it" onclick="showPg('market', this)" style="display:flex; justify-content:center; align-items:center;">🛒</div>
-        <div class="m-nav-it" onclick="showPg('games', this)" style="display:flex; justify-content:center; align-items:center;">🚀</div>
-        <div class="m-nav-it" onclick="showPg('profile', this)" style="display:flex; justify-content:center; align-items:center;">👤</div>
+    <div class="mobile-nav glass">
+        <div class="m-nav-it" onclick="showPg('dash', this)">🏠</div>
+        <div class="m-nav-it" onclick="showPg('market', this)">🛍️</div>
+        <div class="m-nav-it" onclick="showPg('casino', this)">🎰</div>
+        <div class="m-nav-it" onclick="showPg('social', this)">💬</div>
+        <div class="m-nav-it" onclick="showPg('profile', this)">👤</div>
     </div>
 
     <div class="content">
         <div id="pg-dash" class="page active">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                <div><h1 id="userName">...</h1><p id="userStatus" style="color:var(--sec); font-size:12px"></p></div>
-                <img id="userAv" class="avatar-img" src="" alt="">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px">
+                <div><h1 id="uName">Entity</h1><p id="uLog" style="color:var(--accent); opacity:0.6"></p></div>
+                <img id="uAvatar" src="" style="width:70px; height:70px; border-radius:15px; border:2px solid var(--accent); object-fit: cover;">
             </div>
             
-            <div class="click-area">
-                <div id="coin" onclick="moneyClick()">💰</div>
-                <p style="margin-top:10px; color:var(--sec)">Нажимай на мешок!</p>
+            <div class="glass card">
+                <p style="font-size:12px; text-transform:uppercase; color:var(--accent)">Available Credits</p>
+                <div id="uBal" style="font-size:48px; font-weight:800; font-family:'Orbitron'">0 ₴</div>
+                <div style="margin-top:10px; display:flex; justify-content:space-between; font-family:monospace">
+                    <span id="uCard">0000 0000 0000 0000</span>
+                    <span>EXP 04/29</span>
+                </div>
             </div>
 
-            <div id="cardsBox"></div>
-            <h3>Мои активы</h3>
-            <div id="assetsGrid" class="grid" style="margin-top:15px"></div>
+            <div class="glass" style="padding:20px; text-align:center; margin-bottom:30px">
+                <div id="clicker" onclick="mineMoney()" style="font-size:50px; cursor:pointer; transition:0.1s">⚡</div>
+                <p style="font-size:10px; color:var(--accent)">TAP TO GENERATE REVENUE</p>
+            </div>
+
+            <h2 style="margin-bottom:20px">Personal Assets</h2>
+            <div id="uAssets" class="grid"></div>
         </div>
 
         <div id="pg-market" class="page">
-            <div style="display:flex; gap:10px; margin-bottom:20px">
-                <button class="btn btn-blue" onclick="renderMarket('state')">Гос. Магазин</button>
-                <button class="btn" onclick="renderMarket('p2p')">Торговая площадка</button>
+            <div style="display:flex; gap:10px; margin-bottom:30px; overflow-x:auto">
+                <button class="btn btn-neon" onclick="renderShop('biz')">Бизнес</button>
+                <button class="btn btn-neon" onclick="renderShop('car')">Авто</button>
+                <button class="btn btn-neon" onclick="renderShop('home')">Жилье</button>
+                <button class="btn btn-neon" style="border-color:var(--purple); color:var(--purple)" onclick="renderP2P()">P2P Рынок</button>
             </div>
-            <div id="marketGrid" class="grid"></div>
+            <div id="shopGrid" class="grid"></div>
         </div>
 
-        <div id="pg-trans" class="page">
-            <h2>Переводы по логину</h2>
-            <div class="item-card" style="margin-top:20px">
-                <input id="trLog" class="input" placeholder="Логин получателя">
-                <input id="trSum" class="input" type="number" placeholder="Сумма ₴">
-                <button class="btn btn-blue" onclick="doTransfer()">Отправить</button>
+        <div id="pg-casino" class="page">
+            <h2 style="color:var(--accent)">Blackjack Rooms (21)</h2>
+            <div class="room-grid">
+                <div class="glass room-card" onclick="enterRoom(1)">Room #1 <br><small>Low Stakes</small></div>
+                <div class="glass room-card" onclick="enterRoom(2)">Room #2 <br><small>Low Stakes</small></div>
+                <div class="glass room-card" onclick="enterRoom(3)">Room #3 <br><small>Standard</small></div>
+                <div class="glass room-card" onclick="enterRoom(4)">Room #4 <br><small>Standard</small></div>
+                <div class="glass room-card" onclick="enterRoom(5)">Room #5 <br><small>VIP</small></div>
+                <div class="glass room-card" onclick="enterRoom(6)">Room #6 <br><small>Whales Only</small></div>
             </div>
-        </div>
 
-        <div id="pg-profile" class="page">
-            <h2>Настройки</h2>
-            <div class="item-card" style="margin-top:20px">
-                <p>Ссылка на аватарку:</p>
-                <input id="avUrl" class="input" placeholder="https://image.com/photo.jpg">
-                <input id="newNick" class="input" placeholder="Новое имя">
-                <button class="btn btn-blue" onclick="saveProfile()">Обновить данные</button>
+            <div id="game21" class="glass card" style="display:none; margin-top:20px">
+                <h3 id="roomTitle">Room #1</h3>
+                <div id="gameTable" style="height:200px; background:rgba(0,0,0,0.3); border-radius:10px; margin:15px 0; padding:15px; overflow-y:auto"></div>
+                <div style="display:flex; gap:10px">
+                    <input id="bet21" class="input" placeholder="Bet Amount" type="number">
+                    <button class="btn btn-neon" onclick="play21()">Hit/Play</button>
+                    <button class="btn btn-red" onclick="exitRoom()">Exit</button>
+                </div>
             </div>
-        </div>
-
-        <div id="pg-games" class="page">
-            <div id="rocket-zone">
-                <div id="rocket-mult" class="multiplier">x1.00</div>
-            </div>
-            <input id="betSum" class="input" style="margin-top:15px" type="number" placeholder="Ставка ₴">
-            <button id="betBtn" class="btn btn-blue" onclick="startRocket()">СТАРТ</button>
         </div>
 
         <div id="pg-adm" class="page">
-            <h2>Админ Панель</h2>
+            <h2>System Core Control</h2>
             <div class="grid" style="margin-top:20px">
-                <div class="item-card">
-                    <h3>Бан/Разбан</h3>
-                    <input id="aLog" class="input" placeholder="Логин">
-                    <div style="display:flex; gap:5px">
-                        <button class="btn btn-red" onclick="admBan(true)">БАН</button>
-                        <button class="btn" onclick="admBan(false)">РАЗБАН</button>
+                <div class="glass card">
+                    <h3>Money Management</h3>
+                    <input id="aUser" class="input" placeholder="Entity Login">
+                    <input id="aSum" class="input" type="number" placeholder="Amount">
+                    <div style="display:flex; gap:10px">
+                        <button class="btn btn-neon" style="flex:1" onclick="admCash('add')">Выдать</button>
+                        <button class="btn btn-red" style="flex:1" onclick="admCash('sub')">Забрать</button>
                     </div>
                 </div>
-                <div class="item-card">
-                    <h3>Штрафы / Деньги</h3>
-                    <input id="aLog2" class="input" placeholder="Логин">
-                    <input id="aSum" class="input" type="number" placeholder="Сумма (+ или -)">
-                    <button class="btn btn-blue" onclick="admMoney()">Выполнить</button>
+                <div class="glass card">
+                    <h3>Penalty System</h3>
+                    <input id="aUser2" class="input" placeholder="Entity Login">
+                    <input id="aFine" class="input" type="number" placeholder="Fine Sum">
+                    <button class="btn btn-red" style="width:100%" onclick="admFine()">Issue Fine</button>
                 </div>
-                <div class="item-card">
-                    <h3>Упр. Картами</h3>
-                    <input id="aCard" class="input" placeholder="Номер карты">
-                    <div style="display:flex; gap:5px">
-                        <button class="btn btn-red" onclick="admCard(true)">БЛОК</button>
-                        <button class="btn" onclick="admCard(false)">РАЗБЛОК</button>
-                    </div>
-                </div>
+            </div>
+        </div>
+        
+        <div id="pg-profile" class="page">
+            <h2>Identity Settings</h2>
+            <div class="glass card" style="margin-top:20px">
+                <input id="avUrl" class="input" placeholder="Avatar Image Link">
+                <input id="newNick" class="input" placeholder="Rename Entity">
+                <button class="btn btn-neon" onclick="updateID()">Synchronize</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-let db = JSON.parse(localStorage.getItem('bro_v7')) || { users: {}, cards: {}, market: [] };
+// Database Expansion
+let db = JSON.parse(localStorage.getItem('bro_v8')) || { 
+    users: {}, cards: {}, market: [], chat: {} 
+};
 let cur = null;
-let rocketFlying = false;
+let activeRoom = null;
 
-const save = () => localStorage.setItem('bro_v7', JSON.stringify(db));
-const toast = (m) => { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); };
+const DATA = {
+    biz: [
+        {n:"Terminal Cafe", p:5000, i:150, ic:"☕"}, {n:"Cyber Shop", p:25000, i:800, ic:"🔌"},
+        {n:"Mining Farm", p:150000, i:4500, ic:"⛓️"}, {n:"Data Center", p:1000000, i:25000, ic:"💾"},
+        {n:"Orbital Hotel", p:10000000, i:300000, ic:"🛰️"}
+    ],
+    car: [
+        {n:"Z-Lada", p:3000, ic:"🚗"}, {n:"Tesla Model C", p:50000, ic:"⚡"},
+        {n:"Hover-GT", p:250000, ic:"🛸"}, {n:"Night-Rider", p:900000, ic:"🏎️"}
+    ],
+    home: [
+        {n:"Capsule Room", p:20000, ic:"📦"}, {n:"Neon Loft", p:150000, ic:"🏢"},
+        {n:"Luxury Bunker", p:1500000, ic:"🛡️"}, {n:"Floating Villa", p:5000000, ic:"☁️"}
+    ]
+};
 
+const save = () => localStorage.setItem('bro_v8', JSON.stringify(db));
+const toast = (m, type='accent') => { 
+    const t = document.getElementById('toast'); 
+    t.innerText = m; t.style.borderColor = `var(--${type})`; 
+    t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); 
+};
+
+// Auth Functions
 function regView() {
-    document.getElementById('authFields').innerHTML = `
-        <input id="rl" class="input" placeholder="Придумайте логин">
-        <input id="rp" class="input" type="password" placeholder="Пароль">
-        <input id="ra" class="input" type="password" placeholder="Админ-код">
-        <button class="btn btn-blue" onclick="doReg()">Создать</button>
-        <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
+    document.getElementById('authBox').innerHTML = `
+        <input id="rl" class="input" placeholder="New ID">
+        <input id="rp" class="input" type="password" placeholder="Access Pass">
+        <input id="ra" class="input" type="password" placeholder="Admin Override">
+        <button class="btn btn-neon" style="width:100%" onclick="doReg()">Register</button>
+        <p onclick="location.reload()" style="margin-top:20px; cursor:pointer; font-size:12px; color:var(--accent)">Back to Terminal</p>
     `;
 }
 
 function doReg() {
     let l = document.getElementById('rl').value.toLowerCase().trim();
-    if(!l || db.users[l]) return toast("Логин занят");
-    let cNum = "4441" + Math.floor(1000 + Math.random() * 8999) + Math.floor(1000 + Math.random() * 8999);
+    if(!l || db.users[l]) return toast("ID Taken", 'danger');
+    let c = "4441 " + Array(3).fill(0).map(()=>Math.floor(1000+Math.random()*8999)).join(' ');
     db.users[l] = {
-        name: 'Новый игрок', login: l, pass: document.getElementById('rp').value,
-        avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+        name: 'Agent_'+Math.floor(Math.random()*999), login: l, pass: document.getElementById('rp').value,
+        avatar: 'https://i.pinimg.com/originals/eb/b0/2a/ebb02aedec9bc74f65e38356ad45463a.jpg',
         isAdmin: document.getElementById('ra').value === 'admin99',
-        bal: 100, card: cNum, cardBlocked: false, assets: [], isBanned: false
+        bal: 500, card: c, assets: [], isBanned: false
     };
-    db.cards[cNum] = l; save(); location.reload();
+    db.cards[c] = l; save(); location.reload();
 }
 
 function login() {
     let l = document.getElementById('li').value.toLowerCase().trim();
     let p = document.getElementById('pi').value;
     if(db.users[l] && db.users[l].pass === p) {
-        if(db.users[l].isBanned) return toast("ВЫ ЗАБАНЕНЫ");
-        localStorage.setItem('session', l);
-        location.reload();
-    } else toast("Ошибка входа");
+        if(db.users[l].isBanned) return toast("ENTITY BANNED", 'danger');
+        localStorage.setItem('session', l); location.reload();
+    } else toast("Access Denied", 'danger');
 }
 
 function logout() { localStorage.removeItem('session'); location.reload(); }
 
-function init() {
+// App Logic
+function startApp() {
     let s = localStorage.getItem('session');
-    if(s && db.users[s]) {
-        cur = db.users[s];
-        document.getElementById('auth').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        if(cur.isAdmin) document.getElementById('admBtn').style.display = 'flex';
-        updateUI();
-    }
+    if(!s || !db.users[s]) return;
+    cur = db.users[s];
+    document.getElementById('auth').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    if(cur.isAdmin) document.getElementById('admLink').style.display = 'flex';
+    updateUI();
 }
 
 function updateUI() {
-    document.getElementById('userName').innerText = cur.name;
-    document.getElementById('userAv').src = cur.avatar;
-    document.getElementById('userStatus').innerText = cur.isAdmin ? 'Сотрудник Банка' : 'Клиент';
-    
-    document.getElementById('cardsBox').innerHTML = `
-        <div class="bank-card ${cur.cardBlocked ? 'blocked' : ''}">
-            <p>BRO PLATINUM</p>
-            <div class="card-bal">${cur.bal.toLocaleString()} ₴</div>
-            <p style="font-family:monospace">${cur.card}</p>
-            ${cur.cardBlocked ? '<b style="color:var(--danger)">ЗАБЛОКИРОВАНА</b>' : ''}
-        </div>
-    `;
+    document.getElementById('uName').innerText = cur.name;
+    document.getElementById('uLog').innerText = `@${cur.login}`;
+    document.getElementById('uAvatar').src = cur.avatar;
+    document.getElementById('uBal').innerText = cur.bal.toLocaleString() + ' ₴';
+    document.getElementById('uCard').innerText = cur.card;
 
-    document.getElementById('assetsGrid').innerHTML = cur.assets.map((a, i) => `
-        <div class="item-card">
+    document.getElementById('uAssets').innerHTML = cur.assets.map((a, i) => `
+        <div class="glass item">
+            <div style="font-size:30px">${a.ic || '📦'}</div>
             <h3>${a.n}</h3>
-            <p style="color:var(--sec)">Доход: ${a.i} ₴/мин</p>
-            <button class="btn" style="margin-top:10px; font-size:12px" onclick="sellToP2P(${i})">На продажу</button>
+            <p style="color:var(--accent)">${a.type === 'biz' ? '+'+a.i+' ₴/min' : 'Ownership'}</p>
+            <button class="btn btn-neon" style="font-size:10px; margin-top:10px" onclick="sellItem(${i})">Sell to P2P</button>
         </div>
-    `).join('') || 'У вас нет имущества';
+    `).join('');
 }
 
 function showPg(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item, .m-nav-it').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-link, .m-nav-it').forEach(n => n.classList.remove('active'));
     document.getElementById('pg-'+id).classList.add('active');
-    el.classList.add('active');
-    if(id === 'market') renderMarket('state');
+    if(el) el.classList.add('active');
 }
 
-// Clicker
-function moneyClick() {
-    if(cur.cardBlocked) return toast("Карта заблокирована!");
-    cur.bal += 0.50;
+function mineMoney() {
+    cur.bal += 1;
+    document.getElementById('clicker').style.transform = 'scale(1.2) rotate(15deg)';
+    setTimeout(()=>document.getElementById('clicker').style.transform = 'scale(1)', 100);
     save(); updateUI();
 }
 
-// Market
-const STATE_ITEMS = [
-    {n:"Шаурмичная", p:10000, i:200}, {n:"СТО", p:100000, i:2500}, {n:"Отель", p:1000000, i:30000}
-];
-
-function renderMarket(mode) {
-    let grid = document.getElementById('marketGrid');
-    if(mode === 'state') {
-        grid.innerHTML = STATE_ITEMS.map(it => `
-            <div class="item-card">
-                <h3>${it.n}</h3><p>${it.p.toLocaleString()} ₴</p>
-                <button class="btn btn-blue" onclick="buyState('${it.n}', ${it.p}, ${it.i})">Купить</button>
-            </div>
-        `).join('');
-    } else {
-        grid.innerHTML = db.market.map((it, i) => `
-            <div class="item-card">
-                <div class="badge">P2P</div>
-                <h3>${it.n}</h3><p>${it.p.toLocaleString()} ₴</p>
-                <p style="font-size:10px">Продавец: ${it.seller}</p>
-                <button class="btn btn-blue" onclick="buyP2P(${i})">Купить</button>
-            </div>
-        `).join('') || 'Нет активных объявлений';
-    }
+// Marketplace Logic
+function renderShop(type) {
+    document.getElementById('shopGrid').innerHTML = DATA[type].map(it => `
+        <div class="glass item">
+            <div style="font-size:30px">${it.ic}</div>
+            <h3>${it.n}</h3>
+            <p style="color:var(--success)">${it.p.toLocaleString()} ₴</p>
+            <button class="btn btn-neon" style="width:100%; margin-top:10px" onclick="buyState('${type}', '${it.n}', ${it.p}, ${it.i||0}, '${it.ic}')">Acquire</button>
+        </div>
+    `).join('');
 }
 
-function buyState(n, p, i) {
-    if(cur.bal < p || cur.cardBlocked) return toast("Отказ");
-    cur.bal -= p; cur.assets.push({n, i}); save(); updateUI(); toast("Куплено!");
+function buyState(type, n, p, i, ic) {
+    if(cur.bal < p) return toast("Insufficient Credits", 'danger');
+    cur.bal -= p;
+    cur.assets.push({type, n, i, ic});
+    save(); updateUI(); toast("Transaction Successful", 'success');
 }
 
-function sellToP2P(idx) {
-    let p = prompt("Введите цену продажи:");
+function renderP2P() {
+    document.getElementById('shopGrid').innerHTML = db.market.map((it, i) => `
+        <div class="glass item" style="border-color:var(--purple)">
+            <div style="font-size:30px">${it.ic}</div>
+            <h3>${it.n}</h3>
+            <p>${it.p.toLocaleString()} ₴</p>
+            <small>Seller: ${it.s}</small>
+            <button class="btn btn-neon" style="width:100%; margin-top:10px; border-color:var(--purple)" onclick="buyP2P(${i})">Buy From P2P</button>
+        </div>
+    `).join('') || '<p style="grid-column: 1/-1; text-align:center">P2P Market Empty</p>';
+}
+
+function sellItem(idx) {
+    let p = prompt("Set Sale Price (₴):");
     if(!p || isNaN(p)) return;
     let item = cur.assets.splice(idx, 1)[0];
-    db.market.push({ ...item, p: parseInt(p), seller: cur.login });
-    save(); updateUI(); toast("Выставлено на рынок!");
+    db.market.push({ ...item, p: parseInt(p), s: cur.login });
+    save(); updateUI(); toast("Listed on P2P Market");
 }
 
 function buyP2P(idx) {
     let it = db.market[idx];
-    if(cur.bal < it.p || cur.cardBlocked) return toast("Мало денег");
+    if(cur.bal < it.p) return toast("No Credits", 'danger');
     cur.bal -= it.p;
-    db.users[it.seller].bal += it.p;
-    cur.assets.push({n: it.n, i: it.i});
+    if(db.users[it.s]) db.users[it.s].bal += it.p;
+    cur.assets.push({type: it.type, n: it.n, i: it.i, ic: it.ic});
     db.market.splice(idx, 1);
-    save(); updateUI(); toast("Покупка завершена!");
+    save(); updateUI(); toast("Acquired from Player");
 }
 
-// Admin Logic
-function admBan(val) {
-    let l = document.getElementById('aLog').value.trim();
-    if(db.users[l]) { db.users[l].isBanned = val; save(); toast("Статус изменен"); }
+// Casino 21 Logic
+function enterRoom(r) {
+    activeRoom = r;
+    document.getElementById('roomTitle').innerText = `Blackjack Room #${r}`;
+    document.getElementById('game21').style.display = 'block';
+    document.getElementById('gameTable').innerHTML = `<div>SYSTEM: Welcome to Room ${r}. Place your bet.</div>`;
 }
 
-function admMoney() {
-    let l = document.getElementById('aLog2').value.trim();
+function play21() {
+    let bet = parseInt(document.getElementById('bet21').value);
+    if(!bet || cur.bal < bet) return toast("Check Bet", 'danger');
+    
+    cur.bal -= bet;
+    let pScore = Math.floor(Math.random() * 10) + 12;
+    let dScore = Math.floor(Math.random() * 10) + 13;
+    let res = "";
+    
+    if(pScore > 21) res = "BUST! You Lost.";
+    else if(dScore > 21 || pScore > dScore) {
+        res = `WIN! You got ${pScore} vs Dealer ${dScore}`;
+        cur.bal += bet * 2;
+    } else if(pScore === dScore) {
+        res = "PUSH (Tie). Credits returned.";
+        cur.bal += bet;
+    } else {
+        res = `LOSS. You got ${pScore} vs Dealer ${dScore}`;
+    }
+    
+    document.getElementById('gameTable').innerHTML += `<div style="margin-bottom:5px"><b>[ROOM ${activeRoom}]</b> ${cur.name}: ${res}</div>`;
+    document.getElementById('gameTable').scrollTop = 9999;
+    save(); updateUI();
+}
+
+function exitRoom() { document.getElementById('game21').style.display = 'none'; activeRoom = null; }
+
+// Admin Power
+function admCash(mode) {
+    let l = document.getElementById('aUser').value.toLowerCase().trim();
     let s = parseInt(document.getElementById('aSum').value);
-    if(db.users[l]) { db.users[l].bal += s; save(); toast("Баланс обновлен"); }
+    if(db.users[l] && s) {
+        if(mode === 'add') db.users[l].bal += s;
+        else db.users[l].bal = Math.max(0, db.users[l].bal - s);
+        save(); toast("Balance Updated", 'success'); if(l === cur.login) updateUI();
+    } else toast("Target Not Found", 'danger');
 }
 
-function admCard(val) {
-    let c = document.getElementById('aCard').value.trim();
-    let l = db.cards[c];
-    if(l && db.users[l]) { db.users[l].cardBlocked = val; save(); toast("Карта изменена"); }
+function admFine() {
+    let l = document.getElementById('aUser2').value.toLowerCase().trim();
+    let s = parseInt(document.getElementById('aFine').value);
+    if(db.users[l] && s) {
+        db.users[l].bal = Math.max(0, db.users[l].bal - s);
+        save(); toast("Fine Applied", 'danger'); if(l === cur.login) updateUI();
+    }
 }
 
-function saveProfile() {
+function updateID() {
     let av = document.getElementById('avUrl').value;
     let ni = document.getElementById('newNick').value;
     if(av) cur.avatar = av;
     if(ni) cur.name = ni;
-    save(); updateUI(); toast("Профиль обновлен");
+    save(); updateUI(); toast("ID Updated", 'success');
 }
 
-function doTransfer() {
-    let l = document.getElementById('trLog').value.toLowerCase().trim();
-    let s = parseInt(document.getElementById('trSum').value);
-    if(db.users[l] && s > 0 && cur.bal >= s && !cur.cardBlocked) {
-        cur.bal -= s; db.users[l].bal += s; save(); updateUI(); toast("Отправлено!");
-    } else toast("Ошибка перевода");
-}
-
-function startRocket() {
-    if(rocketFlying) return;
-    let bet = parseInt(document.getElementById('betSum').value);
-    if(bet > 0 && cur.bal >= bet) {
-        cur.bal -= bet; rocketFlying = true;
-        let mult = 1.0;
-        let btn = document.getElementById('betBtn');
-        btn.innerText = "ЗАБРАТЬ"; btn.classList.replace('btn-blue', 'btn-red');
-        
-        let loop = setInterval(() => {
-            mult += 0.03;
-            document.getElementById('rocket-mult').innerText = 'x' + mult.toFixed(2);
-            if(Math.random() < 0.02) {
-                clearInterval(loop); rocketFlying = false;
-                btn.innerText = "СТАРТ"; btn.classList.replace('btn-red', 'btn-blue');
-                document.getElementById('rocket-mult').innerText = "BOOM!";
-                save(); updateUI();
-            }
-        }, 100);
-
-        btn.onclick = () => {
-            clearInterval(loop); rocketFlying = false;
-            cur.bal += Math.floor(bet * mult);
-            btn.innerText = "СТАРТ"; btn.classList.replace('btn-red', 'btn-blue');
-            toast("Выигрыш!"); save(); updateUI();
-            btn.onclick = startRocket;
-        };
-    }
-}
-
-// Прибыль раз в минуту
+// Income Cycle
 setInterval(() => {
     if(cur) {
-        let total = cur.assets.reduce((s, a) => s + a.i, 0);
-        if(total > 0 && !cur.cardBlocked) {
-            cur.bal += total; save(); updateUI();
+        let income = cur.assets.reduce((s, a) => s + (a.i || 0), 0);
+        if(income > 0) {
+            cur.bal += income; save(); updateUI();
+            toast(`Income Received: +${income} ₴`, 'success');
         }
     }
 }, 60000);
 
-init();
+window.onload = startApp;
 </script>
 </body>
-</html>
+                        </html>
