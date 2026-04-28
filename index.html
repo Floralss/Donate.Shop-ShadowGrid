@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BroBank Dark Premium</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root { --bg: #000; --card: #121212; --card-l: #1c1c1e; --accent: #ff3b30; --text: #fff; --sec: #8e8e93; --green: #34c759; --blue: #007aff; }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-body { background: var(--bg); color: var(--text); min-height: 100vh; }
-
-#auth { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #000; }
-.abox { width: 100%; max-width: 360px; padding: 20px; text-align: center; }
-
-#app { display: none; grid-template-columns: 240px 1fr; min-height: 100vh; }
-.sb { background: var(--bg); border-right: 1px solid #2c2c2e; padding: 20px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
-.nav-it { padding: 12px; border-radius: 12px; cursor: pointer; color: var(--sec); transition: 0.2s; margin-bottom: 5px; font-weight: 500; }
-.nav-it.on { background: var(--card-l); color: #fff; }
-
-.main { padding: 30px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-
-.m-card { background: var(--card-l); border-radius: 20px; padding: 20px; height: 170px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #2c2c2e; cursor: pointer; position: relative; }
-.m-card.blocked { border: 2px solid var(--accent); opacity: 0.6; }
-.m-card.blocked::after { content: 'ЗАБЛОКИРОВАНО'; position: absolute; top: 10px; right: 10px; color: var(--accent); font-size: 10px; font-weight: 800; border: 1px solid var(--accent); padding: 2px 5px; border-radius: 4px; }
-
-.fine-alert { background: rgba(255, 59, 48, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
-
-.btn { background: #fff; color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; }
-.btn-blue { background: var(--blue); color: #fff; }
-.btn-red { background: var(--accent); color: #fff; }
-.input { width: 100%; background: var(--card-l); border: 1px solid #2c2c2e; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 10px; }
-
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #fff; color: #000; padding: 10px 20px; border-radius: 15px; transition: 0.3s; z-index: 1000; font-weight: 600; }
-.toast.on { transform: translateX(-50%) translateY(0); }
-.page { display: none; } .page.on { display: block; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BroBank Dark Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #000; --card: #121212; --card-l: #1c1c1e; --accent: #ff3b30; --text: #fff; --sec: #8e8e93; --green: #34c759; --blue: #007aff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+        #auth { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #000; }
+        .abox { width: 100%; max-width: 360px; padding: 20px; text-align: center; }
+        #app { display: none; grid-template-columns: 240px 1fr; min-height: 100vh; }
+        .sb { background: var(--bg); border-right: 1px solid #2c2c2e; padding: 20px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+        .nav-it { padding: 12px; border-radius: 12px; cursor: pointer; color: var(--sec); transition: 0.2s; margin-bottom: 5px; font-weight: 500; }
+        .nav-it.on { background: var(--card-l); color: #fff; }
+        .main { padding: 30px; overflow-y: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .m-card { background: var(--card-l); border-radius: 20px; padding: 20px; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #2c2c2e; cursor: pointer; position: relative; }
+        .m-card.blocked { border: 2px solid var(--accent); opacity: 0.6; }
+        .m-card.blocked::after { content: 'ЗАБЛОКИРОВАНО'; position: absolute; top: 10px; right: 10px; color: var(--accent); font-size: 10px; font-weight: 800; border: 1px solid var(--accent); padding: 2px 5px; border-radius: 4px; }
+        .fine-alert { background: rgba(255, 59, 48, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        .btn { background: #fff; color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-blue { background: var(--blue); color: #fff; }
+        .btn-red { background: var(--accent); color: #fff; }
+        .input { width: 100%; background: var(--card-l); border: 1px solid #2c2c2e; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 10px; outline: none; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #fff; color: #000; padding: 10px 20px; border-radius: 15px; transition: 0.3s; z-index: 1000; font-weight: 600; }
+        .toast.on { transform: translateX(-50%) translateY(0); }
+        .page { display: none; } .page.on { display: block; }
+    </style>
 </head>
 <body>
 
@@ -60,6 +54,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
             <div class="nav-it on" onclick="pg('dash')">Главная</div>
             <div class="nav-it" onclick="pg('click')">Заработок</div>
             <div class="nav-it" onclick="pg('shop')">Магазин</div>
+            <div class="nav-it" onclick="pg('biz')">Бизнесы 💼</div>
             <div class="nav-it" onclick="pg('auc')">Аукцион ⚖️</div>
             <div class="nav-it" onclick="pg('inv')">Имущество</div>
             <div id="admB" class="nav-it" style="display:none; color:var(--accent)" onclick="pg('adm')">Админ-панель</div>
@@ -75,7 +70,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
                 <button class="btn" style="width:auto; margin:0" onclick="createCard()">+ Новая карта</button>
             </div>
             <div id="cardList" class="grid"></div>
-            <div style="margin-top:40px; max-width:400px; background:var(--card); padding:20px; border-radius:20px">
+            <div style="margin-top:40px; max-width:400px; background:var(--card); padding:20px; border-radius:20px; border: 1px solid #222;">
                 <h3>Перевод денег</h3>
                 <input id="tTo" class="input" placeholder="Номер карты">
                 <input id="tAmt" class="input" type="number" placeholder="Сумма">
@@ -85,15 +80,19 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
         <div id="p-click" class="page">
             <div style="text-align:center; padding:40px; background:var(--card); border-radius:25px">
-                <div id="coin" style="font-size:100px; cursor:pointer; transition:0.1s" onclick="clicker()">🟡</div>
-                <h2 id="clickVal" style="margin:20px 0">0.01 ₴</h2>
-                <div id="upgList" class="grid"></div>
+                <div id="coin" style="font-size:100px; cursor:pointer; transition:0.1s; user-select:none" onclick="clicker()">🟡</div>
+                <h2 id="clickValDisplay" style="margin:20px 0">0.05 ₴ / клик</h2>
             </div>
         </div>
 
         <div id="p-shop" class="page">
             <h2>Магазин недвижимости</h2>
             <div id="shopList" class="grid" style="margin-top:20px"></div>
+        </div>
+
+        <div id="p-biz" class="page">
+            <h2>Ваши предприятия</h2>
+            <div id="bizList" class="grid" style="margin-top:20px"></div>
         </div>
 
         <div id="p-inv" class="page">
@@ -138,7 +137,6 @@ let cur = null;
 function save() { localStorage.setItem('bro_db_v5', JSON.stringify(db)); }
 function toast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); }
 
-// SESSION CHECK
 window.onload = () => {
     let saved = localStorage.getItem('sessionUser');
     if(saved && db.users[saved]) {
@@ -160,12 +158,13 @@ function regMode() {
 
 function doReg() {
     let l = document.getElementById('rl').value.toLowerCase().trim();
+    if(!l) return toast("Введите логин");
     if(db.users[l]) return toast("Логин занят");
     let cNum = "4441" + Math.floor(100000000000 + Math.random() * 899999999999);
     db.users[l] = {
         name: document.getElementById('rn').value, login: l, pass: document.getElementById('rp').value,
         isAdmin: document.getElementById('ra').value === "admin2024", isBanned: false,
-        cards: [{num: cNum, bal: 100, type: '₴', blocked: false}], items: [], power: 0.05, fines: []
+        cards: [{num: cNum, bal: 100, type: '₴', blocked: false}], items: [], power: 0.05, fines: [], businesses: []
     };
     db.cards[cNum] = l; save(); toast("Успешно!"); location.reload();
 }
@@ -187,7 +186,9 @@ function start() {
     document.getElementById('app').style.display = 'grid';
     if(cur.isAdmin) document.getElementById('admB').style.display = 'block';
     
-    // Проверка штрафов и аукционов каждую секунду
+    // Доход от бизнесов раз в 10 секунд
+    setInterval(processIncome, 10000);
+    // Таймеры и штрафы каждую секунду
     setInterval(() => {
         checkFines();
         updateAuctionTimers();
@@ -200,42 +201,49 @@ function pg(id) {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
     document.querySelectorAll('.nav-it').forEach(n=>n.classList.remove('on'));
     document.getElementById('p-'+id).classList.add('on');
-    event.currentTarget.classList.add('on');
+    // Обновляем визуальное выделение в меню
+    const navs = document.querySelectorAll('.nav-it');
+    navs.forEach(n => { if(n.innerText.toLowerCase().includes(id) || (id==='dash' && n.innerText==='Главная')) n.classList.add('on') });
     render();
 }
 
-// ОСНОВНАЯ ЛОГИКА
-function checkFines() {
-    let now = Date.now();
-    let hasUnpaid = false;
-    cur.fines.forEach(f => {
-        if(!f.paid) {
-            hasUnpaid = true;
-            let timeLeft = f.deadline - now;
-            if(timeLeft <= 0) {
-                cur.cards.forEach(c => c.blocked = true);
-            }
-        }
+function processIncome() {
+    if(!cur.businesses) return;
+    cur.businesses.forEach(b => {
+        cur.cards[0].bal += b.income;
     });
-    
-    const notify = document.getElementById('fineNotify');
-    const unpaid = cur.fines.filter(f => !f.paid);
-    if(unpaid.length > 0) {
-        let f = unpaid[0];
-        let diff = f.deadline - now;
-        let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-        notify.innerHTML = `
-            <div class="fine-alert">
-                <b>Внимание!</b> У вас неоплаченный штраф: ${f.amt} ₴. 
-                До блокировки всех карт осталось: ${h}ч ${m}м ${s}с.
-                <button class="btn btn-red" style="width:auto; padding:5px 15px; margin-left:20px" onclick="payFine(${cur.fines.indexOf(f)})">Оплатить</button>
-            </div>`;
-    } else {
-        notify.innerHTML = "";
+    if(cur.businesses.length > 0) {
+        save();
+        render();
     }
 }
 
+function checkFines() {
+    if(!cur.fines) cur.fines = [];
+    let now = Date.now();
+    let unpaid = cur.fines.filter(f => !f.paid);
+    
+    const notify = document.getElementById('fineNotify');
+    if(unpaid.length > 0) {
+        let f = unpaid[0];
+        let diff = f.deadline - now;
+        if(diff <= 0) {
+            cur.cards.forEach(c => c.blocked = true);
+            notify.innerHTML = `<div class="fine-alert"><b>Счета заблокированы!</b> Оплатите штраф ${f.amt} ₴.</div>`;
+        } else {
+            let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+            notify.innerHTML = `
+                <div class="fine-alert">
+                    <b>Штраф:</b> ${f.amt} ₴. До блокировки: ${h}ч ${m}м ${s}с.
+                    <button class="btn btn-red" style="width:auto; padding:5px 15px; margin-left:20px" onclick="payFine(0)">Оплатить</button>
+                </div>`;
+        }
+    } else { notify.innerHTML = ""; }
+}
+
 function render() {
+    if(!cur) return;
+    
     // Карты
     document.getElementById('cardList').innerHTML = cur.cards.map(c => `
         <div class="m-card ${c.blocked?'blocked':''}" onclick="navigator.clipboard.writeText('${c.num}');toast('Номер скопирован')">
@@ -245,28 +253,43 @@ function render() {
     `).join('');
 
     // Инвентарь
-    document.getElementById('invList').innerHTML = cur.items.map((it, i) => `
+    document.getElementById('invList').innerHTML = (cur.items || []).map((it, i) => `
         <div class="m-card" style="height:auto">
             <h3>${it.name}</h3>
-            <p style="color:var(--sec)">Цена: ${it.price} ₴</p>
-            <button class="btn btn-blue" onclick="startAuc(${i})">На аукцион (1 час)</button>
+            <p style="color:var(--sec)">Стоимость: ${it.price} ₴</p>
+            <button class="btn btn-blue" onclick="startAuc(${i})">На аукцион</button>
             <button class="btn" style="background:#333; color:#fff" onclick="sellBank(${i}, ${it.price})">Продать банку (${(it.price*0.5).toFixed(0)} ₴)</button>
         </div>
     `).join('');
 
-    // Магазин
-    const shop = [{n:"Квартира", p:50000}, {n:"Дом у моря", p:300000}, {n:"BMW M4", p:150000}, {n:"Отель", p:2000000}];
-    document.getElementById('shopList').innerHTML = shop.map(s => `
+    // Магазин (Недвижимость и Бизнесы)
+    const shopItems = [
+        {n:"Квартира", p:50000, type:'item'}, 
+        {n:"BMW M4", p:150000, type:'item'},
+        {n:"Кофейня (Бизнес)", p:500000, type:'biz', inc: 2000},
+        {n:"Отель (Бизнес)", p:5000000, type:'biz', inc: 25000}
+    ];
+    document.getElementById('shopList').innerHTML = shopItems.map(s => `
         <div class="m-card" style="height:auto">
-            <h3>${s.n}</h3><p>${s.p} ₴</p>
-            <button class="btn btn-blue" onclick="buyItem('${s.n}', ${s.p})">Купить</button>
+            <h3>${s.n}</h3>
+            <p>${s.p.toLocaleString()} ₴</p>
+            ${s.type==='biz' ? `<p style="color:var(--green)">Доход: ${s.inc} ₴ / 10 сек</p>` : ''}
+            <button class="btn btn-blue" onclick="buyAny('${s.n}', ${s.p}, '${s.type}', ${s.inc || 0})">Купить</button>
         </div>
     `).join('');
+
+    // Список бизнесов
+    document.getElementById('bizList').innerHTML = (cur.businesses || []).map(b => `
+        <div class="m-card" style="height:auto">
+            <h3>${b.name}</h3>
+            <p style="color:var(--green)">Доход: +${b.income} ₴</p>
+            <small style="color:var(--sec)">Приносит прибыль каждые 10 сек</small>
+        </div>
+    `).join('') || '<p>У вас пока нет бизнесов</p>';
 
     // Аукцион
     document.getElementById('aucList').innerHTML = db.auctions.map((a, i) => `
         <div class="m-card" style="height:auto">
-            <div class="badge" style="background:var(--blue); font-size:10px; padding:3px 7px; border-radius:5px; width:fit-content">ЛОТ</div>
             <h3 style="margin:10px 0">${a.item.name}</h3>
             <p>Ставка: <b style="color:var(--green)">${a.curBid} ₴</b></p>
             <p style="font-size:12px; color:var(--sec)">Лидер: ${a.lastBidder || 'нет'}</p>
@@ -274,15 +297,30 @@ function render() {
             <button class="btn btn-blue" onclick="placeBid(${i})">Ставка +10%</button>
         </div>
     `).join('');
-
+    
+    document.getElementById('clickValDisplay').innerText = `${cur.power.toFixed(2)} ₴ / клик`;
     save();
+}
+
+function buyAny(n, p, type, inc) {
+    if(cur.cards[0].bal < p) return toast("Мало денег");
+    cur.cards[0].bal -= p;
+    if(type === 'biz') {
+        if(!cur.businesses) cur.businesses = [];
+        cur.businesses.push({name: n, income: inc});
+    } else {
+        cur.items.push({name: n, price: p});
+    }
+    toast("Покупка совершена!");
+    render();
 }
 
 function payFine(idx) {
     let f = cur.fines[idx];
-    if(cur.cards[0].bal < f.amt) return toast("Мало денег на основной карте");
+    if(cur.cards[0].bal < f.amt) return toast("Мало денег");
     cur.cards[0].bal -= f.amt;
     cur.fines.splice(idx, 1);
+    cur.cards.forEach(c => c.blocked = false);
     toast("Штраф оплачен!");
     render();
 }
@@ -293,7 +331,9 @@ function createCard() {
     let sym = t==='USD'?'$':t==='EUR'?'€':'₴';
     let n = "4441" + Math.floor(100000000000 + Math.random() * 899999999999);
     cur.cards.push({num:n, bal:0, type:sym, blocked:false});
-    db.cards[n] = cur.login; render();
+    db.cards[n] = cur.login; 
+    save();
+    render();
 }
 
 function transfer() {
@@ -308,15 +348,24 @@ function transfer() {
         let tU = db.users[targetLog];
         let tC = tU.cards.find(c => c.num === num);
         tC.bal += amt;
+        save();
         toast("Успешно отправлено!");
         render();
     } else toast("Карта не найдена");
 }
 
-// АУКЦИОН
+function clicker() {
+    if(cur.cards[0].blocked) return toast("Карта заблокирована!");
+    cur.cards[0].bal += cur.power;
+    document.getElementById('coin').style.transform = 'scale(0.9)';
+    setTimeout(()=>document.getElementById('coin').style.transform='scale(1)', 50);
+    render();
+}
+
+// АУКЦИОН ЛОГИКА
 function startAuc(idx) {
     let it = cur.items.splice(idx, 1)[0];
-    db.auctions.push({ item: it, seller: cur.login, curBid: it.price, lastBidder: null, end: Date.now() + 3600000 });
+    db.auctions.push({ item: it, seller: cur.login, curBid: it.price, lastBidder: null, end: Date.now() + 600000 }); // 10 минут для теста
     render();
 }
 
@@ -325,8 +374,10 @@ function placeBid(idx) {
     if(a.seller === cur.login) return toast("Нельзя ставить на своё");
     let bid = Math.floor(a.curBid * 1.1);
     if(cur.cards[0].bal < bid) return toast("Мало денег");
-    if(a.lastBidder) db.users[a.lastBidder].cards[0].bal += a.curBid; // Возврат
-    cur.cards[0].bal -= bid; a.curBid = bid; a.lastBidder = cur.login; render();
+    if(a.lastBidder) db.users[a.lastBidder].cards[0].bal += a.curBid;
+    cur.cards[0].bal -= bid; a.curBid = bid; a.lastBidder = cur.login; 
+    save();
+    render();
 }
 
 function updateAuctionTimers() {
@@ -349,20 +400,8 @@ function finishAuc(i) {
     } else {
         db.users[a.seller].items.push(a.item);
     }
+    save();
     render();
-}
-
-function clicker() {
-    if(cur.cards[0].blocked) return toast("Карта заблокирована!");
-    cur.cards[0].bal += cur.power;
-    document.getElementById('coin').style.transform = 'scale(0.9)';
-    setTimeout(()=>document.getElementById('coin').style.transform='scale(1)', 50);
-    render();
-}
-
-function buyItem(n, p) {
-    if(cur.cards[0].bal < p) return toast("Мало денег");
-    cur.cards[0].bal -= p; cur.items.push({name:n, price:p}); render();
 }
 
 function sellBank(idx, p) {
@@ -371,31 +410,37 @@ function sellBank(idx, p) {
     render();
 }
 
-// АДМИНКА
+// АДМИН-ФУНКЦИИ
 function admFine() {
-    let u = db.users[document.getElementById('aLog').value.toLowerCase().trim()];
+    let log = document.getElementById('aLog').value.toLowerCase().trim();
     let s = parseFloat(document.getElementById('aSum').value);
+    let u = db.users[log];
     if(u) {
-        u.fines.push({ amt: s, deadline: Date.now() + 86400000, paid: false }); // +24 часа
-        toast("Штраф выписан. Таймер на 24 часа пошел.");
+        if(!u.fines) u.fines = [];
+        u.fines.push({ amt: s, deadline: Date.now() + 86400000, paid: false });
         save();
+        toast("Штраф выписан игроку " + log);
     } else toast("Игрок не найден");
 }
 
 function admUnblock() {
     let n = document.getElementById('aCard').value.replace(/\s/g,'');
     let uL = db.cards[n];
-    if(uL) {
+    if(uL && db.users[uL]) {
         let card = db.users[uL].cards.find(c=>c.num === n);
-        card.blocked = false;
-        toast("Карта разблокирована. Баланс сохранен.");
-        save();
-    }
+        if(card) {
+            card.blocked = false;
+            save();
+            toast("Карта разблокирована");
+        }
+    } else toast("Карта не найдена");
 }
 
 function admBan(v) {
-    let u = db.users[document.getElementById('aBan').value.toLowerCase().trim()];
-    if(u) { u.isBanned = v; toast(v?"ЗАБАНЕН":"РАЗБАНЕН"); save(); }
+    let log = document.getElementById('aBan').value.toLowerCase().trim();
+    let u = db.users[log];
+    if(u) { u.isBanned = v; save(); toast(v?"ЗАБАНЕН":"РАЗБАНЕН"); }
+    else toast("Игрок не найден");
 }
 </script>
 </body>
