@@ -3,669 +3,881 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Magniy OS v14</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Magniy OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Golos+Text:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
 :root {
-  --bg: #0b0f17;
-  --surface: #131929;
-  --surface2: #1a2236;
+  --bg: #0d0f14;
+  --s1: #141820;
+  --s2: #1b2030;
+  --s3: #232a3b;
   --border: rgba(255,255,255,0.07);
-  --accent: #2563eb;
-  --accent2: #3b82f6;
-  --green: #10b981;
-  --red: #ef4444;
-  --text: #f0f4ff;
-  --muted: #6b7a9c;
-  --card-glow: 0 0 0 1px var(--border), 0 4px 24px rgba(0,0,0,0.4);
+  --accent: #4f8ef7;
+  --accent-d: #2563eb;
+  --green: #22c55e;
+  --red: #f43f5e;
+  --gold: #f59e0b;
+  --text: #eef2ff;
+  --muted: #5a6582;
+  --muted2: #8492b4;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Golos Text',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+h1,h2,h3,.logo{font-family:'Unbounded',sans-serif;}
 
-/* AUTH */
-#auth-screen {
-  position:fixed; inset:0; background:var(--bg); z-index:10000;
-  display:flex; align-items:center; justify-content:center; overflow-y:auto;
-  background-image: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 60%),
-                    radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.08) 0%, transparent 50%);
-}
-.auth-box {
-  width:340px; padding:40px 32px; text-align:center;
-  background:var(--surface); border-radius:24px;
-  box-shadow: 0 0 0 1px var(--border), 0 24px 80px rgba(0,0,0,0.6);
-}
-.auth-logo { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; letter-spacing:-1px; margin-bottom:4px; }
-.auth-logo span { color:var(--accent2); }
-.auth-sub { color:var(--muted); font-size:13px; margin-bottom:28px; }
-.inp {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:12px; padding:13px 16px; color:var(--text); outline:none;
-  font-size:14px; font-family:'DM Sans',sans-serif; margin-bottom:10px;
-  transition: border-color .2s;
-}
-.inp:focus { border-color:rgba(59,130,246,0.5); }
-.inp::placeholder { color:var(--muted); }
-.btn { border:none; padding:13px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-family:'DM Sans',sans-serif; font-size:14px; transition:.2s; }
-.btn-blue { background:var(--accent); color:#fff; }
-.btn-blue:hover { background:var(--accent2); transform:translateY(-1px); }
-.btn-red { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3); margin-top:6px; }
-.btn-ghost { background:var(--surface2); color:var(--text); border:1px solid var(--border); margin-top:6px; }
-.acc-chip {
-  background:var(--surface2); border:1px solid var(--border);
-  padding:10px 14px; border-radius:10px; margin-top:6px;
-  cursor:pointer; color:var(--accent2); font-size:13px;
-  display:flex; align-items:center; gap:8px; transition:.15s;
-}
-.acc-chip:hover { border-color:rgba(59,130,246,0.4); }
-.acc-dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
 
-/* NAV */
-.nav {
-  display:flex; background:var(--surface); border-bottom:1px solid var(--border);
-  overflow-x:auto; scrollbar-width:none; flex-shrink:0;
-}
-.nav::-webkit-scrollbar { display:none; }
-.nav-item {
-  padding:14px 18px; cursor:pointer; color:var(--muted);
-  white-space:nowrap; font-weight:600; font-size:12px;
-  display:flex; flex-direction:column; align-items:center; gap:3px;
-  transition:.2s; border-bottom:2px solid transparent; min-width:60px;
-  font-family:'DM Sans',sans-serif;
-}
-.nav-item span { font-size:18px; }
-.nav-item.active { color:var(--accent2); border-bottom-color:var(--accent); }
-.nav-item:hover:not(.active) { color:var(--text); }
+/* ── AUTH ── */
+#auth-screen{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;align-items:center;justify-content:center;overflow-y:auto;
+  background-image:radial-gradient(ellipse 60% 40% at 30% 60%,rgba(79,142,247,0.1) 0%,transparent 70%),
+  radial-gradient(ellipse 40% 60% at 80% 20%,rgba(245,158,11,0.05) 0%,transparent 60%);}
+.auth-wrap{width:320px;padding:36px 28px;background:var(--s1);border:1px solid var(--border);border-radius:24px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.6);}
+.auth-logo{font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:4px;}
+.auth-logo span{color:var(--accent);}
+.auth-sub{color:var(--muted2);font-size:12px;margin-bottom:24px;}
+.inp{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;color:var(--text);
+  font-family:'Golos Text',sans-serif;font-size:14px;outline:none;transition:.2s;margin-bottom:9px;}
+.inp:focus{border-color:rgba(79,142,247,0.5);}
+.inp::placeholder{color:var(--muted);}
+.btn{border:none;border-radius:12px;font-family:'Unbounded',sans-serif;font-weight:700;font-size:11px;cursor:pointer;transition:.2s;width:100%;padding:13px;}
+.btn-p{background:var(--accent);color:#fff;letter-spacing:.3px;}
+.btn-p:active{background:var(--accent-d);transform:scale(.98);}
+.btn-r{background:rgba(244,63,94,0.12);color:var(--red);border:1px solid rgba(244,63,94,0.25);margin-top:7px;}
+.btn-g{background:var(--s2);color:var(--text);border:1px solid var(--border);margin-top:7px;}
+.acc-chip{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:10px 14px;margin-top:6px;cursor:pointer;transition:.15s;}
+.acc-chip:hover{border-color:rgba(79,142,247,0.3);}
+.acc-dot{width:7px;height:7px;background:var(--green);border-radius:50%;flex-shrink:0;}
+.acc-name{color:var(--accent);font-weight:600;font-size:13px;}
 
-/* MAIN */
-.main { flex:1; overflow-y:auto; padding:16px 14px 100px; scrollbar-width:thin; scrollbar-color:var(--surface2) transparent; }
-.page { display:none; animation:fadeIn .2s ease; }
-.page.active { display:block; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+/* ── BOTTOM NAV (Monobank style) ── */
+.bnav{
+  display:flex;align-items:stretch;background:var(--s1);
+  border-top:1px solid var(--border);flex-shrink:0;
+  padding:0 4px;padding-bottom:env(safe-area-inset-bottom);
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:10px 4px 8px;cursor:pointer;position:relative;
+  color:var(--muted);font-size:9px;font-weight:600;letter-spacing:.3px;transition:.15s;
+  border-top:2px solid transparent;
+}
+.bnav-item .ico{font-size:20px;line-height:1;}
+.bnav-item.active{color:var(--accent);border-top-color:var(--accent);}
+.bnav-item:active{opacity:.7;}
+/* bell badge */
+.bell-badge{position:absolute;top:6px;right:calc(50% - 14px);background:var(--red);color:#fff;font-size:9px;font-weight:800;
+  border-radius:99px;padding:1px 5px;min-width:16px;text-align:center;display:none;}
+.bell-badge.show{display:block;}
 
-/* CARDS */
-.card {
-  background:var(--surface); border-radius:18px; padding:18px;
-  margin-bottom:12px; border:1px solid var(--border);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-}
-.section-title { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; margin:18px 0 10px; }
+/* ── MAIN SCROLL ── */
+.main{flex:1;overflow-y:auto;padding:14px 14px 0;}
 
-/* DASH BALANCE CARD */
-.balance-card {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
-  border-radius:22px; padding:24px; margin-bottom:16px; position:relative; overflow:hidden;
+/* ── PAGE ── */
+.page{display:none;animation:pgIn .18s ease;}
+.page.active{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── SECTION LABEL ── */
+.sec-lbl{font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin:18px 0 8px;}
+
+/* ── BALANCE CARD ── */
+.bal-card{
+  border-radius:22px;padding:22px 20px 20px;margin-bottom:12px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#1a3a7a 0%,#1e52c4 55%,#3b82f6 100%);
 }
-.balance-card::before {
-  content:''; position:absolute; top:-40px; right:-40px;
-  width:180px; height:180px; border-radius:50%;
-  background:rgba(255,255,255,0.05);
-}
-.balance-card::after {
-  content:''; position:absolute; bottom:-60px; left:20px;
-  width:220px; height:220px; border-radius:50%;
-  background:rgba(255,255,255,0.03);
-}
-.bal-label { font-size:12px; color:rgba(255,255,255,0.6); font-weight:500; margin-bottom:4px; }
-.bal-amount { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; letter-spacing:-1px; margin-bottom:16px; }
-.bal-user { display:flex; align-items:center; gap:10px; }
-.bal-ava { width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); object-fit:cover; }
-.bal-nick { font-weight:600; font-size:15px; }
-.work-btn {
-  position:absolute; top:20px; right:20px; z-index:1;
-  background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2);
-  border-radius:10px; padding:8px 14px; color:#fff; font-weight:700;
-  font-size:12px; cursor:pointer; backdrop-filter:blur(10px); transition:.2s;
-  font-family:'DM Sans',sans-serif;
-}
-.work-btn:hover { background:rgba(255,255,255,0.25); }
+.bal-card::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.05);top:-60px;right:-40px;}
+.bal-card::after{content:'';position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.04);bottom:-50px;left:-20px;}
+.bal-tag{font-size:11px;color:rgba(255,255,255,0.55);font-weight:500;margin-bottom:2px;}
+.bal-amount{font-family:'Unbounded',sans-serif;font-size:32px;font-weight:900;letter-spacing:-1.5px;margin-bottom:18px;position:relative;}
+.bal-row{display:flex;align-items:center;justify-content:space-between;position:relative;}
+.bal-user{display:flex;align-items:center;gap:10px;}
+.bal-ava-wrap{position:relative;flex-shrink:0;}
+.bal-ava{width:38px;height:38px;border-radius:50%;border:2.5px solid rgba(255,255,255,0.35);object-fit:cover;}
+.crown{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:14px;filter:drop-shadow(0 0 4px gold);}
+.bal-nick{font-weight:700;font-size:14px;}
+.bal-role{font-size:10px;color:rgba(255,255,255,0.55);margin-top:1px;}
+.work-fab{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(8px);
+  color:#fff;border-radius:12px;padding:9px 14px;font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;
+  cursor:pointer;transition:.2s;}
+.work-fab:active{background:rgba(255,255,255,0.25);}
 
 /* QUICK STATS */
-.stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; }
-.stat-icon { font-size:22px; margin-bottom:6px; }
-.stat-val { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; }
-.stat-lbl { font-size:11px; color:var(--muted); margin-top:2px; }
+.qs-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;}
+.qs{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:14px;}
+.qs-ico{font-size:20px;margin-bottom:5px;}
+.qs-val{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700;}
+.qs-lbl{font-size:10px;color:var(--muted2);margin-top:2px;}
 
-/* INVENTORY */
-.inv-item {
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:12px; padding:12px 14px;
-  display:flex; align-items:center; gap:12px; margin-bottom:8px;
-}
-.inv-icon { font-size:24px; }
-.inv-name { font-weight:600; font-size:14px; }
+/* ACTION BTNS ROW */
+.act-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.act-btn{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;transition:.15s;}
+.act-btn:active{background:var(--s2);}
+.act-btn .ico{font-size:22px;display:block;margin-bottom:4px;}
+.act-btn .lbl{font-size:9px;color:var(--muted2);font-weight:600;letter-spacing:.2px;}
 
-/* SHOP GRID */
-.shop-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px; }
-.shop-item {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:16px; padding:14px; position:relative; overflow:hidden;
-}
-.shop-emoji { font-size:28px; margin-bottom:8px; display:block; }
-.shop-name { font-weight:600; font-size:13px; margin-bottom:4px; }
-.shop-price { color:var(--accent2); font-weight:700; font-size:14px; font-family:'Syne',sans-serif; margin-bottom:10px; }
-.shop-buy {
-  background:var(--accent); color:#fff; border:none; border-radius:8px;
-  padding:7px; width:100%; font-weight:700; font-size:12px; cursor:pointer;
-  font-family:'DM Sans',sans-serif; transition:.15s;
-}
-.shop-buy:hover { background:var(--accent2); }
-.shop-income { font-size:10px; color:var(--green); margin-bottom:8px; }
+/* INV ITEMS */
+.inv-item{background:var(--s1);border:1px solid var(--border);border-radius:13px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:7px;}
+.inv-ico{font-size:26px;flex-shrink:0;}
+.inv-name{font-weight:600;font-size:13px;}
+.inv-sub{font-size:11px;color:var(--muted2);}
+
+/* SHOP */
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:6px;}
+.shop-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:14px 13px;position:relative;}
+.shop-emoji{font-size:30px;margin-bottom:7px;display:block;}
+.shop-name{font-weight:700;font-size:13px;margin-bottom:3px;}
+.shop-price{font-family:'Unbounded',sans-serif;font-size:13px;color:var(--accent);margin-bottom:6px;}
+.shop-income{font-size:10px;color:var(--green);margin-bottom:8px;}
+.shop-buy-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px;width:100%;
+  font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:.15s;}
+.shop-buy-btn:active{background:var(--accent-d);}
 
 /* TRADE */
-.trade-item {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:16px; padding:14px; margin-bottom:10px;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.trade-info { flex:1; }
-.trade-name { font-weight:700; font-size:14px; }
-.trade-seller { font-size:12px; color:var(--muted); margin-top:2px; }
-.trade-price { font-family:'Syne',sans-serif; font-size:16px; font-weight:800; color:var(--accent2); margin-right:12px; }
-.trade-buy-btn {
-  background:var(--accent); color:#fff; border:none; border-radius:10px;
-  padding:8px 16px; font-weight:700; font-size:13px; cursor:pointer;
-  font-family:'DM Sans',sans-serif; white-space:nowrap;
-}
+.trade-post-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;}
+.trade-item{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.trade-ico{font-size:28px;flex-shrink:0;}
+.trade-info{flex:1;min-width:0;}
+.trade-name{font-weight:700;font-size:13px;}
+.trade-seller{font-size:11px;color:var(--muted2);}
+.trade-price{font-family:'Unbounded',sans-serif;font-size:14px;color:var(--accent);font-weight:700;margin-right:8px;flex-shrink:0;}
+.trade-buy{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 13px;
+  font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;}
+.trade-buy:active{background:var(--accent-d);}
 
 /* CHAT */
-.chat-msgs { height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:12px; background:var(--surface); border-radius:16px; border:1px solid var(--border); scrollbar-width:thin; }
-.msg { padding:10px 14px; border-radius:14px; max-width:78%; font-size:14px; line-height:1.4; }
-.msg b { font-size:11px; opacity:.7; display:block; margin-bottom:2px; }
-.msg-m { background:var(--accent); align-self:flex-end; border-bottom-right-radius:4px; }
-.msg-o { background:var(--surface2); align-self:flex-start; border:1px solid var(--border); border-bottom-left-radius:4px; }
-.chat-input-row { display:flex; gap:8px; margin-top:10px; align-items:stretch; }
-.chat-send {
-  background:var(--accent); border:none; border-radius:12px;
-  width:46px; color:#fff; font-size:18px; cursor:pointer; flex-shrink:0; transition:.15s;
-}
-.chat-send:hover { background:var(--accent2); }
+.chat-box{height:calc(100dvh - 210px);overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:10px;}
+.msg-wrap{display:flex;flex-direction:column;}
+.msg-wrap.me{align-items:flex-end;}
+.msg-wrap.other{align-items:flex-start;}
+.msg-sender{font-size:10px;color:var(--muted2);margin-bottom:2px;padding:0 4px;}
+.msg-bubble{padding:9px 13px;border-radius:16px;max-width:80%;font-size:13px;line-height:1.45;}
+.msg-wrap.me .msg-bubble{background:var(--accent);border-bottom-right-radius:4px;}
+.msg-wrap.other .msg-bubble{background:var(--s2);border:1px solid var(--border);border-bottom-left-radius:4px;}
+.chat-bar{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);background:var(--s1);flex-shrink:0;}
+.chat-send{background:var(--accent);border:none;border-radius:11px;width:44px;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+/* INBOX / NOTIFICATIONS */
+.notif-item{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px;position:relative;}
+.notif-item.unread{border-color:rgba(79,142,247,0.3);}
+.notif-item.unread::before{content:'';position:absolute;top:14px;right:14px;width:7px;height:7px;border-radius:50%;background:var(--accent);}
+.notif-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.notif-ico{font-size:20px;}
+.notif-title{font-weight:700;font-size:13px;}
+.notif-body{font-size:12px;color:var(--muted2);line-height:1.4;}
+.notif-time{font-size:10px;color:var(--muted);margin-top:4px;}
+.notif-action{margin-top:10px;display:flex;gap:7px;}
+.notif-confirm{background:var(--green);color:#fff;border:none;border-radius:9px;padding:8px 16px;
+  font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;cursor:pointer;}
+.notif-decline{background:var(--s2);color:var(--muted2);border:1px solid var(--border);border-radius:9px;padding:8px 16px;
+  font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;cursor:pointer;}
 
 /* PROFILE */
-.prof-ava-wrap { display:flex; justify-content:center; margin-bottom:20px; }
-.prof-ava { width:80px; height:80px; border-radius:50%; border:3px solid var(--accent); object-fit:cover; }
-.color-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
-.color-swatch {
-  width:34px; height:34px; border-radius:50%; cursor:pointer;
-  border:3px solid transparent; transition:.15s;
-}
-.color-swatch.active, .color-swatch:hover { border-color:#fff; transform:scale(1.1); }
+.prof-head{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:24px;text-align:center;margin-bottom:12px;position:relative;}
+.prof-ava-wrap{position:relative;display:inline-block;margin-bottom:10px;}
+.prof-ava{width:76px;height:76px;border-radius:50%;border:3px solid var(--accent);object-fit:cover;}
+.prof-crown{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:18px;}
+.prof-name{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;margin-bottom:3px;}
+.prof-role{font-size:11px;color:var(--muted2);}
+.color-pick-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px;}
+.csw{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.15s;}
+.csw.on,.csw:hover{border-color:#fff;transform:scale(1.1);}
 
 /* ADMIN */
-.adm-stat { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.adm-action{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;}
+.adm-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--muted2);letter-spacing:.5px;margin-bottom:10px;}
 
 /* TOAST */
-.toast {
-  position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:12px; padding:10px 20px; font-size:13px; font-weight:600;
-  z-index:9000; opacity:0; transition:.3s; white-space:nowrap;
-}
-.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-.toast.success { border-color:rgba(16,185,129,0.4); color:var(--green); }
-.toast.error { border-color:rgba(239,68,68,0.4); color:var(--red); }
+.toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--s2);
+  border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;
+  z-index:9999;opacity:0;transition:.25s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:rgba(34,197,94,0.4);color:var(--green);}
+.toast.err{border-color:rgba(244,63,94,0.4);color:var(--red);}
 
 /* BANNED */
-#banned-screen {
-  display:none; position:fixed; inset:0; background:#000; z-index:20000;
-  align-items:center; justify-content:center; flex-direction:column; gap:10px;
-}
+#banned-screen{display:none;position:fixed;inset:0;background:#000;z-index:20000;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:30px;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:8000;align-items:flex-end;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--s1);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;}
+.modal-title{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px;}
 </style>
 </head>
 <body>
 
 <!-- BANNED -->
-<div id="banned-screen" style="display:none; position:fixed; inset:0; background:#000; z-index:20000; align-items:center; justify-content:center; flex-direction:column; gap:10px; text-align:center; padding:30px;">
-  <div style="font-size:60px;">🚫</div>
-  <h2 style="font-family:'Syne',sans-serif; font-size:28px; color:var(--red);">АККАУНТ ЗАБЛОКИРОВАН</h2>
-  <p style="color:var(--muted);">Ваш аккаунт был заблокирован администратором.</p>
-  <button class="btn btn-ghost" style="max-width:200px; margin-top:10px;" onclick="exitAcc()">Выйти</button>
+<div id="banned-screen">
+  <div style="font-size:56px;">🚫</div>
+  <h2 style="font-family:'Unbounded',sans-serif;color:var(--red);font-size:22px;">ЗАБЛОКИРОВАНО</h2>
+  <p style="color:var(--muted2);font-size:13px;">Ваш аккаунт заблокирован администратором.</p>
+  <button class="btn btn-g" style="max-width:180px;margin-top:8px;" onclick="exitAcc()">ВЫЙТИ</button>
 </div>
 
 <!-- AUTH -->
 <div id="auth-screen">
-  <div class="auth-box">
+  <div class="auth-wrap">
     <div class="auth-logo">MAGNIY <span>OS</span></div>
     <div class="auth-sub">Цифровая экономика</div>
     <input id="l-in" class="inp" placeholder="Логин">
     <input id="p-in" class="inp" type="password" placeholder="Пароль">
-    <input id="a-code" class="inp" placeholder="Код администратора (необязательно)">
-    <button class="btn btn-blue" onclick="auth()">ВОЙТИ / СОЗДАТЬ АККАУНТ</button>
-    <div id="acc-list" style="margin-top:20px; text-align:left;"></div>
+    <input id="a-code" class="inp" placeholder="Код (для создателя)">
+    <button class="btn btn-p" onclick="auth()">ВОЙТИ / СОЗДАТЬ АККАУНТ</button>
+    <div id="acc-list" style="margin-top:16px;"></div>
   </div>
 </div>
 
-<!-- NAV -->
-<div class="nav">
-  <div class="nav-item active" onclick="sw('dash',this)"><span>🏠</span>Главная</div>
-  <div class="nav-item" onclick="sw('shop',this)"><span>🏪</span>Магазин</div>
-  <div class="nav-item" onclick="sw('trade',this)"><span>🤝</span>Рынок</div>
-  <div class="nav-item" onclick="sw('chat',this)"><span>💬</span>Чат</div>
-  <div class="nav-item" onclick="sw('prof',this)"><span>⚙️</span>Профиль</div>
-  <div id="adm-nav" class="nav-item" style="color:#ef4444;display:none;" onclick="sw('adm',this)"><span>🛠</span>Адмін</div>
-  <div class="nav-item" onclick="exitAcc()" style="color:var(--red);"><span>🚪</span>Выход</div>
-</div>
+<!-- MAIN CONTENT -->
+<div class="main" id="main-scroll">
 
-<div class="main">
-
-  <!-- DASH -->
-  <div id="p-dash" class="page active">
-    <div class="balance-card">
-      <button class="work-btn" onclick="work()">+ РАБОТАТЬ</button>
-      <div class="bal-label">Баланс счёта</div>
+  <!-- HOME -->
+  <div id="p-home" class="page active">
+    <div class="bal-card" id="bal-card">
+      <div class="bal-tag">Баланс рахунку</div>
       <div class="bal-amount" id="u-bal">0 ₴</div>
-      <div class="bal-user">
-        <img class="bal-ava" id="u-ava" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-        <span class="bal-nick" id="u-nick">...</span>
+      <div class="bal-row">
+        <div class="bal-user">
+          <div class="bal-ava-wrap">
+            <img class="bal-ava" id="u-ava" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+            <div class="crown" id="u-crown" style="display:none">👑</div>
+          </div>
+          <div>
+            <div class="bal-nick" id="u-nick">...</div>
+            <div class="bal-role" id="u-role">Гравець</div>
+          </div>
+        </div>
+        <button class="work-fab" onclick="work()">+ РАБОТАТЬ</button>
       </div>
     </div>
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon">📦</div>
-        <div class="stat-val" id="inv-count">0</div>
-        <div class="stat-lbl">Объектов имущества</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">💼</div>
-        <div class="stat-val" id="biz-income">0 ₴</div>
-        <div class="stat-lbl">Доход с бизнеса/час</div>
-      </div>
+    <div class="act-row">
+      <div class="act-btn" onclick="sw('shop',3)"><span class="ico">🏪</span><span class="lbl">МАГАЗИН</span></div>
+      <div class="act-btn" onclick="sw('trade',2)"><span class="ico">🤝</span><span class="lbl">РЫНОК</span></div>
+      <div class="act-btn" onclick="sw('chat',1)"><span class="ico">💬</span><span class="lbl">ЧАТ</span></div>
+      <div class="act-btn" onclick="sw('inbox',4)"><span class="ico">📬</span><span class="lbl">ПОЧТА</span></div>
     </div>
-    <div class="section-title">Моё имущество</div>
+    <div class="qs-row">
+      <div class="qs"><div class="qs-ico">📦</div><div class="qs-val" id="qs-inv">0</div><div class="qs-lbl">Об'єктів</div></div>
+      <div class="qs"><div class="qs-ico">💼</div><div class="qs-val" id="qs-inc">0 ₴</div><div class="qs-lbl">Дохід/год</div></div>
+    </div>
+    <div class="sec-lbl">Моє майно</div>
     <div id="inv-container"></div>
+    <div style="height:14px"></div>
   </div>
 
   <!-- SHOP -->
   <div id="p-shop" class="page">
-    <div class="section-title">🚗 Автосалон</div>
+    <div class="sec-lbl" style="margin-top:6px">🚗 Автосалон</div>
     <div id="s-car" class="shop-grid"></div>
-    <div class="section-title">🏠 Недвижимость</div>
+    <div class="sec-lbl">🏠 Нерухомість</div>
     <div id="s-house" class="shop-grid"></div>
-    <div class="section-title">💼 Бизнес</div>
+    <div class="sec-lbl">💼 Бізнес</div>
     <div id="s-biz" class="shop-grid"></div>
+    <div style="height:14px"></div>
   </div>
 
   <!-- TRADE -->
   <div id="p-trade" class="page">
-    <div class="card">
-      <div class="section-title" style="margin-top:0">Выставить на продажу</div>
+    <div class="trade-post-card">
+      <div class="adm-title">ВИСТАВИТИ НА ПРОДАЖ</div>
       <select id="tr-obj" class="inp"></select>
-      <input id="tr-pr" class="inp" type="number" placeholder="Ваша цена (₴)">
-      <button class="btn btn-blue" onclick="postToTrade()">Выставить на рынок</button>
+      <input id="tr-pr" class="inp" type="number" placeholder="Ціна (₴)">
+      <button class="btn btn-p" onclick="postToTrade()">ВИСТАВИТИ НА РИНОК</button>
     </div>
-    <div class="section-title">Активные лоты</div>
+    <div class="sec-lbl">Активні лоти</div>
     <div id="trade-board"></div>
+    <div style="height:14px"></div>
   </div>
 
-  <!-- CHAT -->
-  <div id="p-chat" class="page">
-    <div class="chat-msgs" id="chat-list"></div>
-    <div class="chat-input-row">
-      <input id="m-in" class="inp" style="margin:0;flex:1" placeholder="Написать сообщение...">
-      <button class="chat-send" onclick="sendMsg()">➤</button>
-    </div>
+  <!-- CHAT — flex layout -->
+  <div id="p-chat" class="page" style="display:none;flex-direction:column;height:calc(100dvh - 112px);">
+    <div class="chat-box" id="chat-list"></div>
+  </div>
+
+  <!-- INBOX -->
+  <div id="p-inbox" class="page">
+    <div class="sec-lbl" style="margin-top:6px">Повідомлення</div>
+    <div id="inbox-list"></div>
+    <div style="height:14px"></div>
   </div>
 
   <!-- PROFILE -->
   <div id="p-prof" class="page">
-    <div class="card" style="text-align:center;">
+    <div class="prof-head">
       <div class="prof-ava-wrap">
-        <img class="prof-ava" id="prof-ava-img" src="">
+        <img class="prof-ava" id="prof-ava" src="">
+        <div class="prof-crown" id="prof-crown" style="display:none">👑</div>
       </div>
-      <div style="font-family:'Syne',sans-serif; font-size:20px; font-weight:800;" id="prof-nick-display">...</div>
+      <div class="prof-name" id="prof-nick">...</div>
+      <div class="prof-role" id="prof-role-lbl">Гравець</div>
     </div>
-    <div class="card">
-      <div class="section-title" style="margin-top:0">Редактировать профиль</div>
-      <input id="st-n" class="inp" placeholder="Никнейм">
+    <div class="adm-action">
+      <div class="adm-title">РЕДАГУВАТИ ПРОФІЛЬ</div>
+      <input id="st-n" class="inp" placeholder="Нікнейм">
       <input id="st-a" class="inp" placeholder="URL аватарки">
-      <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">Цвет акцента:</div>
-      <div class="color-row" id="color-swatches"></div>
-      <input type="color" id="st-c" class="inp" style="height:48px; padding:6px; cursor:pointer;">
-      <button class="btn btn-blue" onclick="saveProf()">СОХРАНИТЬ ИЗМЕНЕНИЯ</button>
+      <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;">Колір акценту:</div>
+      <div class="color-pick-row" id="color-swatches"></div>
+      <input type="color" id="st-c" class="inp" style="height:48px;padding:6px;cursor:pointer;">
+      <button class="btn btn-p" onclick="saveProf()">ЗБЕРЕГТИ</button>
     </div>
+    <div style="height:14px"></div>
   </div>
 
   <!-- ADMIN -->
   <div id="p-adm" class="page">
-    <div class="card">
-      <div class="section-title" style="margin-top:0">⚡ Панель администратора</div>
-      <input id="ad-u" class="inp" placeholder="Логин игрока">
-      <input id="ad-v" class="inp" type="number" placeholder="Сумма (₴)">
-      <button class="btn btn-blue" onclick="adm('give')" style="margin-bottom:8px;">💰 Выдать деньги</button>
-      <button class="btn" style="background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3);" onclick="adm('ban')">🚫 Заблокировать аккаунт</button>
-      <button class="btn btn-ghost" style="margin-top:6px;" onclick="adm('unban')">✅ Разблокировать</button>
+    <div class="sec-lbl" style="margin-top:6px">Панель адміністратора</div>
+
+    <!-- Give money (creator only) -->
+    <div class="adm-action" id="adm-give-block">
+      <div class="adm-title">💰 ВИДАТИ ГРОШІ</div>
+      <input id="ad-u-give" class="inp" placeholder="Логін гравця">
+      <input id="ad-v-give" class="inp" type="number" placeholder="Сума (₴)">
+      <button class="btn btn-p" onclick="adm('give')">ВИДАТИ</button>
     </div>
+
+    <!-- Fine -->
+    <div class="adm-action">
+      <div class="adm-title">💸 ШТРАФ</div>
+      <input id="ad-u-fine" class="inp" placeholder="Логін гравця">
+      <input id="ad-v-fine" class="inp" type="number" placeholder="Сума штрафу (₴)">
+      <input id="ad-r-fine" class="inp" placeholder="Причина штрафу">
+      <button class="btn" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.3);margin-top:4px;" onclick="adm('fine')">ВИПИСАТИ ШТРАФ</button>
+    </div>
+
+    <!-- Send admin offer -->
+    <div class="adm-action" id="adm-offer-block">
+      <div class="adm-title">⚡ ЗАПРОПОНУВАТИ АДМІНКУ</div>
+      <input id="ad-u-offer" class="inp" placeholder="Логін гравця">
+      <button class="btn" style="background:rgba(79,142,247,0.12);color:var(--accent);border:1px solid rgba(79,142,247,0.3);" onclick="adm('offer')">ВІДПРАВИТИ ПРОПОЗИЦІЮ (500M ₴)</button>
+    </div>
+
+    <!-- Ban / Unban -->
+    <div class="adm-action">
+      <div class="adm-title">🚫 БАН / РОЗБАН</div>
+      <input id="ad-u-ban" class="inp" placeholder="Логін гравця">
+      <button class="btn btn-r" onclick="adm('ban')">ЗАБЛОКУВАТИ</button>
+      <button class="btn btn-g" style="margin-top:7px;" onclick="adm('unban')">✅ РОЗБЛОКУВАТИ</button>
+    </div>
+
+    <div style="height:14px"></div>
   </div>
 
+</div>
+
+<!-- CHAT BAR (only visible on chat page) -->
+<div class="chat-bar" id="chat-bar" style="display:none;">
+  <input id="m-in" class="inp" style="margin:0;flex:1;" placeholder="Повідомлення...">
+  <button class="chat-send" onclick="sendMsg()">➤</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav" id="bnav">
+  <div class="bnav-item active" id="nav-home" onclick="sw('home',0)">
+    <span class="ico">🏠</span>ГОЛОВНА
+  </div>
+  <div class="bnav-item" id="nav-shop" onclick="sw('shop',3)">
+    <span class="ico">🛍</span>МАГАЗИН
+  </div>
+  <div class="bnav-item" id="nav-trade" onclick="sw('trade',2)">
+    <span class="ico">🤝</span>РИНОК
+  </div>
+  <div class="bnav-item" id="nav-chat" onclick="sw('chat',1)">
+    <span class="ico">💬</span>ЧАТ
+  </div>
+  <div class="bnav-item" id="nav-inbox" onclick="sw('inbox',4)">
+    <span class="ico">🔔</span>
+    <div class="bell-badge" id="bell-badge">0</div>
+    ПОШТА
+  </div>
+  <div class="bnav-item" id="nav-prof" onclick="sw('prof',5)">
+    <span class="ico">👤</span>ПРОФІЛЬ
+  </div>
+  <div class="bnav-item" id="nav-adm" style="display:none;color:var(--red);" onclick="sw('adm',6)">
+    <span class="ico">🛠</span>АДМІН
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
-  authDomain: "magniybank.firebaseapp.com",
-  databaseURL: "https://magniybank-default-rtdb.firebaseio.com",
-  projectId: "magniybank",
-  storageBucket: "magniybank.firebasestorage.app",
-  messagingSenderId: "1006815080708",
-  appId: "1:1006815080708:web:e9c3afd0a15d8abbe46051"
+  apiKey:"AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
+  authDomain:"magniybank.firebaseapp.com",
+  databaseURL:"https://magniybank-default-rtdb.firebaseio.com",
+  projectId:"magniybank",
+  storageBucket:"magniybank.firebasestorage.app",
+  messagingSenderId:"1006815080708",
+  appId:"1:1006815080708:web:e9c3afd0a15d8abbe46051"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let user = localStorage.getItem('mag_active_u');
 let uData = null;
+const CREATOR_CODE = 'MAG777';
+const ADMIN_PRICE = 500000000;
 
-const COLORS = ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#d97706'];
+const COLORS = ['#4f8ef7','#7c3aed','#ec4899','#f97316','#22c55e','#06b6d4','#eab308','#ef4444'];
+
 const SHOP_DB = {
-  car: [
-    {n:"Запорожец", e:"🚗", p:1000},
-    {n:"Лада", e:"🚙", p:5000},
-    {n:"BMW M5", e:"🏎", p:150000},
-    {n:"Гелендваген", e:"🚐", p:400000},
-    {n:"Ferrari", e:"🏁", p:1200000}
+  car:[
+    {n:"Запорожець",e:"🚗",p:1000},{n:"Лада",e:"🚙",p:5000},{n:"BMW M5",e:"🏎",p:150000},
+    {n:"Гелендваген",e:"🚐",p:400000},{n:"Ferrari",e:"🏁",p:1200000}
   ],
-  house: [
-    {n:"Гараж", e:"🏚", p:8000},
-    {n:"Квартира", e:"🏢", p:60000},
-    {n:"Дача", e:"🏡", p:120000},
-    {n:"Особняк", e:"🏰", p:800000},
-    {n:"Остров", e:"🏝", p:10000000}
+  house:[
+    {n:"Гараж",e:"🏚",p:8000},{n:"Квартира",e:"🏢",p:60000},{n:"Дача",e:"🏡",p:120000},
+    {n:"Особняк",e:"🏰",p:800000},{n:"Острів",e:"🏝",p:10000000}
   ],
-  biz: [
-    {n:"Ларёк", e:"🏪", p:25000, i:1000},
-    {n:"Автомойка", e:"🚿", p:100000, i:4000},
-    {n:"ТЦ", e:"🏬", p:2000000, i:50000}
+  biz:[
+    {n:"Ларьок",e:"🏪",p:25000,i:1000},{n:"Автомийка",e:"🚿",p:100000,i:4000},
+    {n:"ТЦ",e:"🏬",p:2000000,i:50000}
   ]
 };
 
-function toast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show ' + type;
-  setTimeout(() => t.className = 'toast', 2500);
+// ── TOAST ──
+function toast(msg, type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>t.className='toast',2600);
 }
 
-// AUTH
-function auth() {
-  let l = document.getElementById('l-in').value.toLowerCase().trim();
-  let p = document.getElementById('p-in').value;
-  let code = document.getElementById('a-code').value;
-  if(!l || !p) { toast('Введите логин и пароль', 'error'); return; }
-  db.ref('users/'+l).once('value', s => {
-    if(!s.exists()) {
+// ── AUTH ──
+function auth(){
+  let l=document.getElementById('l-in').value.toLowerCase().trim();
+  let p=document.getElementById('p-in').value;
+  let code=document.getElementById('a-code').value.trim();
+  if(!l||!p){toast('Введіть логін і пароль','err');return;}
+  db.ref('users/'+l).once('value',s=>{
+    if(!s.exists()){
       db.ref('users/'+l).set({
-        login:l, pass:p, bal:5000, nick:l, ava:'', theme:'#2563eb',
-        inv:{}, isAdmin:(code==='MAG777'), isBanned:false
+        login:l,pass:p,bal:5000,nick:l,ava:'',theme:'#4f8ef7',
+        inv:{},isCreator:(code===CREATOR_CODE),isAdmin:(code===CREATOR_CODE),isBanned:false
       });
     } else {
-      let d = s.val();
-      if(d.pass !== p) { toast('Неверный пароль', 'error'); return; }
+      let d=s.val();
+      if(d.pass!==p){toast('Неправильний пароль','err');return;}
     }
-    let accs = JSON.parse(localStorage.getItem('mag_accs')||'[]');
-    if(!accs.includes(l)) accs.push(l);
-    localStorage.setItem('mag_accs', JSON.stringify(accs));
-    localStorage.setItem('mag_active_u', l);
+    let accs=JSON.parse(localStorage.getItem('mag_accs')||'[]');
+    if(!accs.includes(l))accs.push(l);
+    localStorage.setItem('mag_accs',JSON.stringify(accs));
+    localStorage.setItem('mag_active_u',l);
     location.reload();
   });
 }
-
-function renderAccs() {
-  let list = document.getElementById('acc-list');
-  let accs = JSON.parse(localStorage.getItem('mag_accs')||'[]');
-  if(!accs.length) return;
-  list.innerHTML = '<p style="color:var(--muted);font-size:11px;margin-bottom:8px;">СОХРАНЁННЫЕ АККАУНТЫ</p>';
-  accs.forEach(a => {
-    list.innerHTML += `<div class="acc-chip" onclick="switchAcc('${a}')"><div class="acc-dot"></div>${a}</div>`;
+function renderAccs(){
+  let list=document.getElementById('acc-list');
+  let accs=JSON.parse(localStorage.getItem('mag_accs')||'[]');
+  if(!accs.length)return;
+  list.innerHTML='<p style="color:var(--muted);font-size:10px;margin-bottom:6px;">ЗБЕРЕЖЕНІ АККАУНТИ</p>';
+  accs.forEach(a=>{
+    list.innerHTML+=`<div class="acc-chip" onclick="switchAcc('${a}')"><div class="acc-dot"></div><span class="acc-name">${a}</span></div>`;
   });
 }
 renderAccs();
+function switchAcc(a){localStorage.setItem('mag_active_u',a);location.reload();}
+function exitAcc(){localStorage.removeItem('mag_active_u');location.reload();}
 
-function switchAcc(a) { localStorage.setItem('mag_active_u', a); location.reload(); }
-function exitAcc() { localStorage.removeItem('mag_active_u'); location.reload(); }
-
-// INIT COLOR SWATCHES
-function initSwatches() {
-  let wrap = document.getElementById('color-swatches');
-  wrap.innerHTML = '';
-  COLORS.forEach(c => {
-    let d = document.createElement('div');
-    d.className = 'color-swatch' + (uData.theme === c ? ' active' : '');
-    d.style.background = c;
-    d.onclick = () => {
-      document.getElementById('st-c').value = c;
-      updateTheme(c);
-      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-      d.classList.add('active');
-    };
-    wrap.appendChild(d);
-  });
-  document.getElementById('st-c').value = uData.theme || '#2563eb';
+// ── APPLY THEME ──
+function applyTheme(c){
+  document.documentElement.style.setProperty('--accent',c);
+  // Calculate darker variant
+  document.documentElement.style.setProperty('--accent-d',c);
+  localStorage.setItem('mag_theme_'+user,c);
 }
+(()=>{if(user){let t=localStorage.getItem('mag_theme_'+user);if(t)applyTheme(t);}})();
 
-// MAIN LOAD
-if(user) {
-  db.ref('users/'+user).on('value', s => {
-    uData = s.val();
-    if(!uData) return;
-
-    // Check ban
-    if(uData.isBanned) {
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('banned-screen').style.display = 'flex';
+// ── MAIN LISTENER ──
+if(user){
+  db.ref('users/'+user).on('value',s=>{
+    uData=s.val();
+    if(!uData)return;
+    if(uData.isBanned){
+      document.getElementById('auth-screen').style.display='none';
+      document.getElementById('banned-screen').style.display='flex';
       return;
     }
+    document.getElementById('auth-screen').style.display='none';
+    applyTheme(uData.theme||'#4f8ef7');
 
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('u-nick').textContent = uData.nick;
-    document.getElementById('u-bal').textContent = Number(uData.bal).toLocaleString('ru') + ' ₴';
-    let ava = uData.ava || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-    document.getElementById('u-ava').src = ava;
-    document.getElementById('prof-ava-img').src = ava;
-    document.getElementById('prof-nick-display').textContent = uData.nick;
-    document.getElementById('st-n').value = uData.nick;
-    document.getElementById('st-a').value = uData.ava || '';
-    updateTheme(uData.theme || '#2563eb');
-    if(uData.isAdmin) document.getElementById('adm-nav').style.display = 'flex';
+    // Balance & user info
+    document.getElementById('u-bal').textContent=Number(uData.bal).toLocaleString('uk')+' ₴';
+    let ava=uData.ava||'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    document.getElementById('u-ava').src=ava;
+    document.getElementById('u-nick').textContent=uData.nick;
+    document.getElementById('prof-ava').src=ava;
+    document.getElementById('prof-nick').textContent=uData.nick;
+
+    let roleText = uData.isCreator?'👑 Творець':uData.isAdmin?'⚡ Адміністратор':'Гравець';
+    document.getElementById('u-role').textContent=roleText;
+    document.getElementById('prof-role-lbl').textContent=roleText;
+
+    // Crown
+    let showCrown=uData.isCreator;
+    document.getElementById('u-crown').style.display=showCrown?'block':'none';
+    document.getElementById('prof-crown').style.display=showCrown?'block':'none';
+
+    // Admin nav
+    if(uData.isAdmin||uData.isCreator){
+      document.getElementById('nav-adm').style.display='flex';
+      // Creator-only block (give money / offer admin)
+      document.getElementById('adm-give-block').style.display=uData.isCreator?'block':'none';
+      document.getElementById('adm-offer-block').style.display=uData.isCreator?'block':'none';
+    }
+
+    // Profile fields
+    document.getElementById('st-n').value=uData.nick;
+    document.getElementById('st-a').value=uData.ava||'';
+    document.getElementById('st-c').value=uData.theme||'#4f8ef7';
     initSwatches();
+
     renderInv();
     renderTradeSelect();
   });
 
-  db.ref('global_trade').on('value', s => {
-    let board = document.getElementById('trade-board');
-    board.innerHTML = '';
-    let count = 0;
-    s.forEach(child => {
-      let d = child.val();
-      count++;
-      board.innerHTML += `
+  // Trade board
+  db.ref('global_trade').on('value',s=>{
+    let board=document.getElementById('trade-board');
+    board.innerHTML='';
+    let count=0;
+    s.forEach(child=>{
+      let d=child.val(); count++;
+      board.innerHTML+=`
         <div class="trade-item">
+          <div class="trade-ico">${d.e||'📦'}</div>
           <div class="trade-info">
-            <div class="trade-name">${d.e || '📦'} ${d.n}</div>
-            <div class="trade-seller">Продавец: ${d.sn}</div>
+            <div class="trade-name">${d.n}</div>
+            <div class="trade-seller">Продавець: ${d.sn}</div>
           </div>
-          <div class="trade-price">${Number(d.p).toLocaleString('ru')}₴</div>
-          <button class="trade-buy-btn" onclick="buyTrade('${child.key}')">КУПИТЬ</button>
+          <div class="trade-price">${Number(d.p).toLocaleString('uk')}₴</div>
+          <button class="trade-buy" onclick="buyTrade('${child.key}')">КУПИТИ</button>
         </div>`;
     });
-    if(!count) board.innerHTML = '<div class="card" style="text-align:center; color:var(--muted);">Рынок пуст</div>';
+    if(!count)board.innerHTML='<div style="color:var(--muted2);text-align:center;padding:24px;font-size:13px;">Ринок порожній</div>';
   });
 
-  db.ref('chat').limitToLast(30).on('value', s => {
-    if(!uData) return;
-    let box = document.getElementById('chat-list');
-    box.innerHTML = '';
-    s.forEach(m => {
-      let d = m.val();
-      let isMe = d.f === uData.nick;
-      box.innerHTML += `<div class="msg ${isMe?'msg-m':'msg-o'}"><b>${d.f}</b>${d.t}</div>`;
+  // Chat
+  db.ref('chat').limitToLast(40).on('value',s=>{
+    if(!uData)return;
+    let box=document.getElementById('chat-list');
+    let wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<40;
+    box.innerHTML='';
+    s.forEach(m=>{
+      let d=m.val();
+      let isMe=d.f===uData.nick;
+      box.innerHTML+=`
+        <div class="msg-wrap ${isMe?'me':'other'}">
+          ${!isMe?`<div class="msg-sender">${d.f}</div>`:''}
+          <div class="msg-bubble">${escHtml(d.t)}</div>
+        </div>`;
     });
-    box.scrollTop = box.scrollHeight;
+    if(wasBottom)box.scrollTop=box.scrollHeight;
+  });
+
+  // Inbox / notifications
+  db.ref('notifications/'+user).on('value',s=>{
+    let list=document.getElementById('inbox-list');
+    list.innerHTML='';
+    let unread=0;
+    let items=[];
+    s.forEach(child=>{items.push({key:child.key,...child.val()});});
+    items.reverse();
+    if(!items.length){
+      list.innerHTML='<div style="color:var(--muted2);text-align:center;padding:30px;font-size:13px;">Немає повідомлень</div>';
+    }
+    items.forEach(d=>{
+      if(!d.read)unread++;
+      let extra='';
+      // Admin offer notification with confirm/decline
+      if(d.type==='admin_offer'&&!d.responded){
+        extra=`<div class="notif-action">
+          <button class="notif-confirm" onclick="respondAdminOffer('${d.key}','accept')">✅ ПІДТВЕРДИТИ</button>
+          <button class="notif-decline" onclick="respondAdminOffer('${d.key}','decline')">❌ ВІДХИЛИТИ</button>
+        </div>`;
+      }
+      list.innerHTML+=`
+        <div class="notif-item ${d.read?'':'unread'}">
+          <div class="notif-top">
+            <span class="notif-ico">${d.ico||'📩'}</span>
+            <span class="notif-title">${d.title||''}</span>
+          </div>
+          <div class="notif-body">${d.body||''}</div>
+          <div class="notif-time">${d.time||''}</div>
+          ${extra}
+        </div>`;
+      // Mark as read after 2s
+      if(!d.read){
+        setTimeout(()=>db.ref('notifications/'+user+'/'+d.key+'/read').set(true),2000);
+      }
+    });
+    // Badge
+    let badge=document.getElementById('bell-badge');
+    if(unread>0){badge.textContent=unread;badge.classList.add('show');}
+    else{badge.classList.remove('show');}
   });
 }
 
-function updateTheme(color) {
-  document.documentElement.style.setProperty('--accent', color);
-  document.documentElement.style.setProperty('--accent2', color);
-  // Lighten slightly for accent2
-  localStorage.setItem('mag_theme_'+user, color);
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function pushNotif(targetUser, notif){
+  db.ref('notifications/'+targetUser).push({...notif, read:false, time:new Date().toLocaleString('uk')});
 }
 
-// Apply saved theme immediately (before Firebase loads)
-(function() {
-  if(user) {
-    let t = localStorage.getItem('mag_theme_'+user);
-    if(t) updateTheme(t);
-  }
-})();
+// ── SWATCHES ──
+function initSwatches(){
+  let wrap=document.getElementById('color-swatches');
+  wrap.innerHTML='';
+  COLORS.forEach(c=>{
+    let d=document.createElement('div');
+    d.className='csw'+(uData&&uData.theme===c?' on':'');
+    d.style.background=c;
+    d.onclick=()=>{
+      document.getElementById('st-c').value=c;
+      applyTheme(c);
+      wrap.querySelectorAll('.csw').forEach(s=>s.classList.remove('on'));
+      d.classList.add('on');
+    };
+    wrap.appendChild(d);
+  });
+}
 
-function renderInv() {
-  let inv = document.getElementById('inv-container');
-  let sel = document.getElementById('tr-obj');
-  inv.innerHTML = '';
-  if(!uData) return;
-  let items = uData.inv || {};
-  let keys = Object.keys(items);
-  document.getElementById('inv-count').textContent = keys.length;
-  let bizIncome = 0;
-  if(!keys.length) {
-    inv.innerHTML = '<div class="card" style="text-align:center; color:var(--muted);">Имущества нет</div>';
+// ── INV RENDER ──
+function renderInv(){
+  let c=document.getElementById('inv-container');
+  c.innerHTML='';
+  if(!uData)return;
+  let inv=uData.inv||{};
+  let keys=Object.keys(inv);
+  document.getElementById('qs-inv').textContent=keys.length;
+  let bizInc=0;
+  if(!keys.length){
+    c.innerHTML='<div style="color:var(--muted2);font-size:13px;padding:10px 0;">Майна немає</div>';
+    document.getElementById('qs-inc').textContent='0 ₴';
     return;
   }
-  keys.forEach(k => {
-    let item = items[k];
-    if(item.i) bizIncome += item.i;
-    inv.innerHTML += `<div class="inv-item"><span class="inv-icon">${item.e||'📦'}</span><span class="inv-name">${item.n}</span></div>`;
+  keys.forEach(k=>{
+    let item=inv[k];
+    if(item.i)bizInc+=item.i;
+    c.innerHTML+=`<div class="inv-item"><span class="inv-ico">${item.e||'📦'}</span><div><div class="inv-name">${item.n}</div>${item.i?`<div class="inv-sub">+${item.i.toLocaleString('uk')} ₴/год</div>`:''}</div></div>`;
   });
-  document.getElementById('biz-income').textContent = bizIncome.toLocaleString('ru') + ' ₴';
+  document.getElementById('qs-inc').textContent=bizInc.toLocaleString('uk')+' ₴';
 }
 
-function renderTradeSelect() {
-  let sel = document.getElementById('tr-obj');
-  sel.innerHTML = '';
-  let items = (uData && uData.inv) ? uData.inv : {};
-  let keys = Object.keys(items);
-  if(!keys.length) {
-    sel.innerHTML = '<option disabled>— Нет имущества —</option>';
-    return;
+// ── TRADE SELECT ──
+function renderTradeSelect(){
+  let sel=document.getElementById('tr-obj');
+  sel.innerHTML='';
+  let inv=(uData&&uData.inv)||{};
+  let keys=Object.keys(inv);
+  if(!keys.length){sel.innerHTML='<option disabled>— Майна немає —</option>';return;}
+  keys.forEach(k=>{
+    let item=inv[k];
+    sel.innerHTML+=`<option value="${k}">${item.e||'📦'} ${item.n}</option>`;
+  });
+}
+
+// ── NAVIGATION ──
+let curPage='home';
+const navMap={home:0,chat:1,trade:2,shop:3,inbox:4,prof:5,adm:6};
+function sw(id, navIdx){
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
+  document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('active'));
+
+  curPage=id;
+  let pg=document.getElementById('p-'+id);
+  if(id==='chat'){
+    pg.style.display='flex';
+    setTimeout(()=>{let b=document.getElementById('chat-list');b.scrollTop=b.scrollHeight;},100);
+  } else {
+    pg.classList.add('active');
   }
-  keys.forEach(k => {
-    let item = items[k];
-    sel.innerHTML += `<option value="${k}">${item.e||'📦'} ${item.n}</option>`;
-  });
+
+  // Nav highlight
+  let navEl=document.getElementById('nav-'+id);
+  if(navEl)navEl.classList.add('active');
+
+  // Chat bar visibility
+  document.getElementById('chat-bar').style.display=(id==='chat')?'flex':'none';
+  document.getElementById('main-scroll').style.paddingBottom=(id==='chat')?'0':'0';
+
+  if(id==='shop')renderShop();
+  if(id==='trade')renderTradeSelect();
 }
 
-function saveProf() {
-  let n = document.getElementById('st-n').value.trim() || uData.nick;
-  let a = document.getElementById('st-a').value.trim();
-  let c = document.getElementById('st-c').value;
-  db.ref('users/'+user).update({nick:n, ava:a, theme:c}).then(() => {
-    updateTheme(c);
-    localStorage.setItem('mag_theme_'+user, c);
-    document.getElementById('prof-ava-img').src = a || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-    toast('Профиль сохранён ✓');
-  });
-}
-
-function buyShop(t, i) {
-  let item = SHOP_DB[t][i];
-  if(!uData) return;
-  if(uData.bal < item.p) { toast('Недостаточно средств', 'error'); return; }
-  let inv = uData.inv || {};
-  let key = Date.now().toString();
-  inv[key] = {...item};
-  db.ref('users/'+user).update({bal: uData.bal - item.p, inv: inv}).then(() => {
-    toast(`${item.e} ${item.n} куплен!`);
-  });
-}
-
-function postToTrade() {
-  let key = document.getElementById('tr-obj').value;
-  let price = parseInt(document.getElementById('tr-pr').value);
-  if(!key || !price || price <= 0) { toast('Выберите объект и укажите цену', 'error'); return; }
-  let inv = uData.inv || {};
-  let item = inv[key];
-  if(!item) { toast('Объект не найден', 'error'); return; }
-  let newInv = {...inv};
-  delete newInv[key];
-  db.ref('users/'+user).update({inv: newInv}).then(() => {
-    db.ref('global_trade').push({n:item.n, e:item.e||'📦', p:price, s:user, sn:uData.nick, raw:item}).then(() => {
-      document.getElementById('tr-pr').value = '';
-      toast('Лот выставлен на рынок ✓');
-    });
-  });
-}
-
-function buyTrade(id) {
-  db.ref('global_trade/'+id).once('value', s => {
-    let d = s.val();
-    if(!d) { toast('Лот уже куплен', 'error'); return; }
-    if(uData.bal < d.p) { toast('Недостаточно средств', 'error'); return; }
-    if(d.s === user) { toast('Нельзя купить своё', 'error'); return; }
-    let inv = uData.inv || {};
-    let newKey = Date.now().toString();
-    inv[newKey] = d.raw;
-    db.ref('users/'+user).update({bal: uData.bal - d.p, inv: inv}).then(() => {
-      db.ref('users/'+d.s+'/bal').transaction(c => (c||0) + d.p);
-      db.ref('global_trade/'+id).remove();
-      toast(`${d.e||'📦'} ${d.n} куплен!`);
-    });
-  });
-}
-
-function sw(id, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('p-'+id).classList.add('active');
-  el.classList.add('active');
-  if(id === 'shop') renderShop();
-  if(id === 'trade') renderTradeSelect();
-}
-
-function renderShop() {
-  ['car','house','biz'].forEach(t => {
-    let c = document.getElementById('s-'+t); c.innerHTML = '';
-    SHOP_DB[t].forEach((item, i) => {
-      c.innerHTML += `
-        <div class="shop-item">
+// ── SHOP ──
+function renderShop(){
+  ['car','house','biz'].forEach(t=>{
+    let c=document.getElementById('s-'+t); c.innerHTML='';
+    SHOP_DB[t].forEach((item,i)=>{
+      c.innerHTML+=`
+        <div class="shop-card">
           <span class="shop-emoji">${item.e}</span>
           <div class="shop-name">${item.n}</div>
-          ${item.i ? `<div class="shop-income">+${item.i.toLocaleString('ru')} ₴/ч</div>` : ''}
-          <div class="shop-price">${item.p.toLocaleString('ru')} ₴</div>
-          <button class="shop-buy" onclick="buyShop('${t}',${i})">КУПИТЬ</button>
+          ${item.i?`<div class="shop-income">+${item.i.toLocaleString('uk')} ₴/год</div>`:''}
+          <div class="shop-price">${item.p.toLocaleString('uk')} ₴</div>
+          <button class="shop-buy-btn" onclick="buyShop('${t}',${i})">КУПИТИ</button>
         </div>`;
     });
   });
 }
 
-function work() {
-  db.ref('users/'+user+'/bal').transaction(c => (c||0) + 100).then(() => toast('+100 ₴ получено'));
+function buyShop(t,i){
+  if(!uData)return;
+  let item=SHOP_DB[t][i];
+  if(uData.bal<item.p){toast('Недостатньо коштів','err');return;}
+  let inv=uData.inv||{};
+  inv[Date.now().toString()]={...item};
+  db.ref('users/'+user).update({bal:uData.bal-item.p,inv});
+  toast(`${item.e} ${item.n} куплено!`);
 }
 
-function sendMsg() {
-  let t = document.getElementById('m-in').value.trim();
-  if(!t || !uData) return;
-  db.ref('chat').push({f: uData.nick, t: t}).then(() => {
-    document.getElementById('m-in').value = '';
+// ── TRADE ──
+function postToTrade(){
+  let key=document.getElementById('tr-obj').value;
+  let price=parseInt(document.getElementById('tr-pr').value);
+  if(!key||!price||price<=0){toast('Оберіть об\'єкт та вкажіть ціну','err');return;}
+  let inv=uData.inv||{};
+  let item=inv[key];
+  if(!item){toast('Об\'єкт не знайдено','err');return;}
+  let newInv={...inv};
+  delete newInv[key];
+  db.ref('users/'+user).update({inv:newInv}).then(()=>{
+    db.ref('global_trade').push({n:item.n,e:item.e||'📦',p:price,s:user,sn:uData.nick,raw:{...item}}).then(()=>{
+      document.getElementById('tr-pr').value='';
+      toast('Лот виставлено ✓');
+    });
   });
 }
 
-document.getElementById('m-in').addEventListener('keydown', e => { if(e.key === 'Enter') sendMsg(); });
+function buyTrade(id){
+  db.ref('global_trade/'+id).once('value',s=>{
+    let d=s.val();
+    if(!d){toast('Лот вже куплено','err');return;}
+    if(uData.bal<d.p){toast('Недостатньо коштів','err');return;}
+    if(d.s===user){toast('Не можна купити своє','err');return;}
+    let inv=uData.inv||{};
+    inv[Date.now().toString()]=d.raw;
+    db.ref('users/'+user).update({bal:uData.bal-d.p,inv}).then(()=>{
+      db.ref('users/'+d.s+'/bal').transaction(c=>(c||0)+d.p);
+      db.ref('global_trade/'+id).remove();
+      pushNotif(d.s,{ico:'💰',title:'Ваш лот куплено!',body:`${d.e||'📦'} ${d.n} продано за ${Number(d.p).toLocaleString('uk')} ₴`,type:'sale'});
+      toast(`${d.e||'📦'} ${d.n} куплено!`);
+    });
+  });
+}
 
-function adm(type) {
-  if(!uData || !uData.isAdmin) { toast('Нет прав', 'error'); return; }
-  let t = document.getElementById('ad-u').value.toLowerCase().trim();
-  let v = parseInt(document.getElementById('ad-v').value);
-  if(!t) { toast('Введите логин', 'error'); return; }
-  if(type === 'give') {
-    if(!v) { toast('Введите сумму', 'error'); return; }
-    db.ref('users/'+t+'/bal').transaction(c => (c||0)+v).then(() => toast(`+${v} ₴ выдано ${t}`));
+// ── CHAT ──
+function sendMsg(){
+  let t=document.getElementById('m-in').value.trim();
+  if(!t||!uData)return;
+  db.ref('chat').push({f:uData.nick,t:t}).then(()=>{
+    document.getElementById('m-in').value='';
+    let b=document.getElementById('chat-list');
+    b.scrollTop=b.scrollHeight;
+  });
+}
+document.getElementById('m-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg();});
+
+// ── RESPOND ADMIN OFFER ──
+function respondAdminOffer(key, action){
+  if(action==='accept'){
+    if(!uData){return;}
+    if(uData.bal<ADMIN_PRICE){toast('Недостатньо коштів (500M ₴)','err');return;}
+    db.ref('users/'+user).update({bal:uData.bal-ADMIN_PRICE,isAdmin:true});
+    db.ref('notifications/'+user+'/'+key).update({responded:true,read:true});
+    toast('Адмінку отримано! ⚡');
+    // Notify creator
+    db.ref('users').orderByChild('isCreator').equalTo(true).once('value',s=>{
+      s.forEach(c=>{
+        pushNotif(c.key,{ico:'⚡',title:'Куплено адмінку',body:`${uData.nick} придбав адміністраторські права`,type:'info'});
+      });
+    });
+  } else {
+    db.ref('notifications/'+user+'/'+key).update({responded:true,read:true});
+    toast('Відхилено');
   }
-  if(type === 'ban') db.ref('users/'+t).update({isBanned:true}).then(() => toast(`${t} заблокирован`));
-  if(type === 'unban') db.ref('users/'+t).update({isBanned:false}).then(() => toast(`${t} разблокирован`));
+}
+
+// ── WORK ──
+function work(){
+  db.ref('users/'+user+'/bal').transaction(c=>(c||0)+100).then(()=>toast('+100 ₴ отримано'));
+}
+
+// ── PROFILE ──
+function saveProf(){
+  let n=document.getElementById('st-n').value.trim()||uData.nick;
+  let a=document.getElementById('st-a').value.trim();
+  let c=document.getElementById('st-c').value;
+  db.ref('users/'+user).update({nick:n,ava:a,theme:c}).then(()=>{
+    applyTheme(c);
+    document.getElementById('prof-ava').src=a||'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    document.getElementById('u-ava').src=a||'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    toast('Збережено ✓');
+  });
+}
+
+// ── ADMIN ──
+function adm(type){
+  if(!uData||((!uData.isAdmin&&!uData.isCreator))){toast('Немає прав','err');return;}
+  if(type==='give'){
+    if(!uData.isCreator){toast('Тільки для творця','err');return;}
+    let t=document.getElementById('ad-u-give').value.toLowerCase().trim();
+    let v=parseInt(document.getElementById('ad-v-give').value);
+    if(!t||!v){toast('Заповніть поля','err');return;}
+    db.ref('users/'+t+'/bal').transaction(c=>(c||0)+v).then(()=>{
+      pushNotif(t,{ico:'💰',title:'Видача коштів',body:`Вам нараховано ${v.toLocaleString('uk')} ₴ від адміністрації`,type:'money'});
+      toast(`+${v.toLocaleString('uk')} ₴ видано ${t}`);
+    });
+  }
+  if(type==='fine'){
+    let t=document.getElementById('ad-u-fine').value.toLowerCase().trim();
+    let v=parseInt(document.getElementById('ad-v-fine').value);
+    let reason=document.getElementById('ad-r-fine').value.trim();
+    if(!t||!v||!reason){toast('Заповніть усі поля','err');return;}
+    db.ref('users/'+t).once('value',s=>{
+      if(!s.exists()){toast('Гравець не знайдений','err');return;}
+      let d=s.val();
+      let newBal=Math.max(0,(d.bal||0)-v);
+      db.ref('users/'+t+'/bal').set(newBal).then(()=>{
+        pushNotif(t,{ico:'💸',title:'Штраф!',body:`Вам виписано штраф ${v.toLocaleString('uk')} ₴. Причина: ${reason}`,type:'fine'});
+        toast(`Штраф ${v.toLocaleString('uk')} ₴ виписано ${t}`);
+      });
+    });
+  }
+  if(type==='offer'){
+    if(!uData.isCreator){toast('Тільки для творця','err');return;}
+    let t=document.getElementById('ad-u-offer').value.toLowerCase().trim();
+    if(!t){toast('Введіть логін','err');return;}
+    db.ref('users/'+t).once('value',s=>{
+      if(!s.exists()){toast('Гравець не знайдений','err');return;}
+      pushNotif(t,{
+        ico:'⚡',
+        title:'Пропозиція адмінки!',
+        body:`Вам надіслано пропозицію на адміністраторські права вартістю ${ADMIN_PRICE.toLocaleString('uk')} ₴. Натисніть «Підтвердити» для отримання.`,
+        type:'admin_offer',
+        responded:false
+      });
+      toast(`Пропозицію відправлено ${t}`);
+    });
+  }
+  if(type==='ban'){
+    let t=document.getElementById('ad-u-ban').value.toLowerCase().trim();
+    if(!t){toast('Введіть логін','err');return;}
+    db.ref('users/'+t).update({isBanned:true}).then(()=>{
+      pushNotif(t,{ico:'🚫',title:'Аккаунт заблоковано',body:'Ваш аккаунт заблоковано адміністрацією.',type:'ban'});
+      toast(`${t} заблоковано`);
+    });
+  }
+  if(type==='unban'){
+    let t=document.getElementById('ad-u-ban').value.toLowerCase().trim();
+    if(!t){toast('Введіть логін','err');return;}
+    db.ref('users/'+t).update({isBanned:false}).then(()=>toast(`${t} розблоковано`));
+  }
 }
 </script>
 </body>
