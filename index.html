@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BroBank Classic Pro</title>
+    <title>Magniy Bank Online</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg: #050505; --card: #121214; --accent: #007AFF; --danger: #FF3B30; 
-            --success: #34C759; --text: #FFFFFF; --sec: #8E8E93; 
-        }
+        :root { --bg: #050505; --card: #121214; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --text: #FFFFFF; --sec: #8E8E93; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); line-height: 1.5; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
 
         /* Элементы управления */
-        .btn { background: #fff; color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; margin-bottom: 5px; }
+        .btn { background: #fff; color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; margin-bottom: 8px; }
         .btn:active { transform: scale(0.98); }
         .btn-blue { background: var(--accent); color: #fff; }
         .btn-red { background: var(--danger); color: #fff; }
@@ -22,10 +21,9 @@
 
         /* Навигация */
         #app { display: none; min-height: 100vh; }
-        .sidebar { width: 250px; background: #000; border-right: 1px solid #1c1c1e; padding: 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; }
+        .sidebar { width: 250px; background: #000; border-right: 1px solid #1c1c1e; padding: 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; z-index: 100; }
         .content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
-        
-        .nav-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--sec); margin-bottom: 5px; }
+        .nav-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--sec); margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
         .nav-item.active { background: var(--card); color: #fff; font-weight: 600; }
 
         @media (max-width: 768px) {
@@ -35,7 +33,7 @@
         }
 
         .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: none; grid-template-columns: repeat(5, 1fr); border-top: 1px solid #1c1c1e; height: 70px; z-index: 100; }
-        .m-item { display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--sec); }
+        .m-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; color: var(--sec); }
         .m-item.active { color: var(--accent); }
 
         /* Компоненты */
@@ -47,13 +45,11 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; z-index: 1000; transition: 0.4s; font-weight: 600; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; z-index: 1000; transition: 0.4s; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .toast.on { transform: translateX(-50%) translateY(0); }
 
-        /* Казино 21 */
-        .room-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .room { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #222; }
-        #log21 { height: 150px; overflow-y: auto; background: #000; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: var(--success); }
+        /* Казино лог */
+        #log21 { height: 150px; overflow-y: auto; background: #000; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: var(--success); text-align: left; border: 1px solid #222; }
     </style>
 </head>
 <body>
@@ -62,11 +58,11 @@
 
 <div id="auth" style="display:flex; align-items:center; justify-content:center; height:100vh; padding:20px;">
     <div style="width:100%; max-width:350px;">
-        <h1 style="text-align:center; margin-bottom:30px;">BroBank</h1>
+        <h1 style="text-align:center; margin-bottom:30px; font-weight: 800; letter-spacing: -1px;">MAGNIY BANK</h1>
         <div id="authFields">
             <input id="li" class="input" placeholder="Логин">
             <input id="pi" class="input" type="password" placeholder="Пароль">
-            <button class="btn btn-blue" onclick="login()">Войти</button>
+            <button class="btn btn-blue" onclick="login()">Войти в систему</button>
             <button class="btn" style="background:none; color:#fff" onclick="regView()">Создать аккаунт</button>
         </div>
     </div>
@@ -74,14 +70,15 @@
 
 <div id="app">
     <div class="sidebar">
-        <h2 style="margin-bottom:30px;">BroBank</h2>
+        <h2 style="margin-bottom:30px;">Magniy</h2>
         <div class="nav-item active" onclick="showPg('dash', this)">🏠 Главная</div>
+        <div class="nav-item" onclick="showPg('trans', this)">💸 Перевод</div>
         <div class="nav-item" onclick="showPg('market', this)">🛍️ Магазин</div>
         <div class="nav-item" onclick="showPg('p2p', this)">🤝 P2P Рынок</div>
         <div class="nav-item" onclick="showPg('games', this)">🎰 Казино 21</div>
-        <div id="admLink" class="nav-item" style="display:none; color:var(--danger)" onclick="showPg('adm', this)">🛠️ Админка</div>
-        <div class="nav-item" onclick="showPg('profile', this)" style="margin-top:auto">👤 Профиль</div>
-        <button class="btn btn-red" style="margin-top:10px" onclick="logout()">Выход</button>
+        <div class="nav-item" onclick="showPg('profile', this)">👤 Профиль</div>
+        <div id="admLink" class="nav-item" style="display:none; color:var(--danger)" onclick="showPg('adm', this)">🛠️ Админ</div>
+        <button class="btn btn-red" style="margin-top:auto" onclick="logout()">Выйти</button>
     </div>
 
     <div class="mobile-nav">
@@ -95,52 +92,57 @@
     <div class="content">
         <div id="pg-dash" class="page active">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                <div><h1 id="uName">Entity</h1><p id="uLog" style="color:var(--sec)"></p></div>
+                <div><h1 id="uName">...</h1><p id="uLog" style="color:var(--sec)"></p></div>
                 <img id="uAvatar" src="" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid var(--accent)">
             </div>
             <div class="bank-card">
-                <p style="opacity:0.6">Баланс счета</p>
+                <p style="opacity:0.6">Доступные средства</p>
                 <div id="uBal" class="card-bal">0 ₴</div>
-                <p id="uCard" style="font-family:monospace; letter-spacing:2px">4441 0000 0000 0000</p>
+                <p id="uCard" style="font-family:monospace; letter-spacing:2px">4441 ....</p>
             </div>
-            <div class="item-card" style="margin-bottom:25px">
-                <div id="clicker" style="font-size:50px; cursor:pointer" onclick="clickMoney()">💰</div>
-                <p>Кликай для заработка!</p>
+            <div class="item-card" onclick="clickMoney()" style="cursor:pointer; background: #1c1c1e;">
+                <div style="font-size:40px">💰</div>
+                <p>Кликни, чтобы заработать 1 ₴</p>
             </div>
-            <h3>Мои активы</h3>
-            <div id="uAssets" class="grid" style="margin-top:15px"></div>
+            <h3 style="margin:25px 0 15px">Моё имущество</h3>
+            <div id="uAssets" class="grid"></div>
+        </div>
+
+        <div id="pg-trans" class="page">
+            <h2>Онлайн перевод</h2>
+            <div class="item-card" style="margin-top:20px">
+                <input id="trLog" class="input" placeholder="Логин получателя">
+                <input id="trSum" class="input" type="number" placeholder="Сумма ₴">
+                <button class="btn btn-blue" onclick="doTransfer()">Отправить мгновенно</button>
+            </div>
         </div>
 
         <div id="pg-market" class="page">
-            <h2>Государственный магазин</h2>
-            <div style="display:flex; gap:10px; margin:20px 0; overflow-x:auto">
-                <button class="btn btn-blue" onclick="renderShop('biz')">Бизнесы</button>
-                <button class="btn" onclick="renderShop('car')">Автосалон</button>
-                <button class="btn" onclick="renderShop('home')">Недвижимость</button>
+            <div style="display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; padding-bottom:5px">
+                <button class="btn btn-blue" style="min-width:120px" onclick="renderShop('biz')">Бизнесы</button>
+                <button class="btn" style="min-width:120px" onclick="renderShop('car')">Автосалон</button>
+                <button class="btn" style="min-width:120px" onclick="renderShop('home')">Недвижимость</button>
             </div>
             <div id="shopGrid" class="grid"></div>
         </div>
 
         <div id="pg-p2p" class="page">
-            <h2>Торговая площадка игроков</h2>
-            <p style="color:var(--sec); margin-bottom:20px">Здесь можно купить имущество других игроков</p>
+            <h2>P2P Торговля</h2>
+            <p style="color:var(--sec); margin-bottom:20px">Покупайте активы напрямую у других игроков</p>
             <div id="p2pGrid" class="grid"></div>
         </div>
 
         <div id="pg-games" class="page">
-            <h2>Blackjack 21 (Комнаты)</h2>
-            <div class="room-grid" style="margin-top:20px">
-                <div class="room" onclick="enterRoom(1)">Комната #1</div>
-                <div class="room" onclick="enterRoom(2)">Комната #2</div>
-                <div class="room" onclick="enterRoom(3)">Комната #3</div>
-                <div class="room" onclick="enterRoom(4)">Комната #4</div>
-                <div class="room" onclick="enterRoom(5)">Комната #5</div>
-                <div class="room" onclick="enterRoom(6)">Комната #6</div>
+            <h2>Казино "21" Онлайн</h2>
+            <div class="grid" style="margin-top:20px">
+                <div class="item-card" style="cursor:pointer" onclick="enterRoom(1)">Комната #1</div>
+                <div class="item-card" style="cursor:pointer" onclick="enterRoom(2)">Комната #2</div>
+                <div class="item-card" style="cursor:pointer" onclick="enterRoom(3)">Комната #3</div>
             </div>
-            <div id="gameZone" style="display:none" class="item-card">
-                <h3 id="roomTitle">Комната #1</h3>
+            <div id="gameZone" style="display:none; margin-top:20px" class="item-card">
+                <h3 id="roomTitle">Комната</h3>
                 <div id="log21"></div>
-                <input id="bet21" class="input" type="number" placeholder="Ваша ставка ₴">
+                <input id="bet21" class="input" type="number" placeholder="Ставка ₴">
                 <div style="display:flex; gap:10px">
                     <button class="btn btn-blue" onclick="play21()">Играть</button>
                     <button class="btn btn-red" onclick="exitRoom()">Выйти</button>
@@ -149,36 +151,34 @@
         </div>
 
         <div id="pg-profile" class="page">
-            <h2>Настройки аккаунта</h2>
+            <h2>Настройки ID</h2>
             <div class="item-card" style="margin-top:20px">
-                <p style="text-align:left">Ссылка на аватар:</p>
-                <input id="avUrl" class="input" placeholder="URL картинки">
-                <p style="text-align:left">Ваше имя:</p>
-                <input id="newNick" class="input" placeholder="Новый ник">
-                <button class="btn btn-blue" onclick="updateProfile()">Сохранить изменения</button>
+                <input id="avUrl" class="input" placeholder="Ссылка на фото (URL)">
+                <input id="newNick" class="input" placeholder="Имя игрока">
+                <button class="btn btn-blue" onclick="updateProfile()">Обновить данные</button>
             </div>
         </div>
 
         <div id="pg-adm" class="page">
-            <h2>Панель управления</h2>
+            <h2>Core Admin</h2>
             <div class="grid" style="margin-top:20px">
                 <div class="item-card">
                     <h3>Финансы</h3>
-                    <input id="aUser" class="input" placeholder="Логин игрока">
+                    <input id="aLog" class="input" placeholder="Логин">
                     <input id="aSum" class="input" type="number" placeholder="Сумма">
-                    <div style="display:flex; gap:5px">
-                        <button class="btn btn-blue" onclick="admCash('add')">Выдать</button>
-                        <button class="btn btn-red" onclick="admCash('sub')">Забрать</button>
+                    <div style="display:flex; gap:10px">
+                        <button class="btn btn-blue" onclick="admAction('add')">Выдать</button>
+                        <button class="btn btn-red" onclick="admAction('sub')">Забрать</button>
                     </div>
                 </div>
                 <div class="item-card">
-                    <h3>Наказания</h3>
-                    <input id="aUser2" class="input" placeholder="Логин игрока">
-                    <button class="btn btn-red" onclick="admBan(true)">БАН</button>
-                    <button class="btn" onclick="admBan(false)">Разбан</button>
-                    <hr style="margin:10px 0; border:0; border-top:1px solid #333">
+                    <h3>Модерация</h3>
+                    <input id="aLog2" class="input" placeholder="Логин">
+                    <button class="btn btn-red" onclick="admAction('ban')">ЗАБАНИТЬ</button>
+                    <button class="btn" onclick="admAction('unban')">Разбанить</button>
+                    <hr style="margin:10px 0; opacity:0.1">
                     <input id="aFine" class="input" type="number" placeholder="Сумма штрафа">
-                    <button class="btn btn-red" onclick="admFine()">Выписать штраф</button>
+                    <button class="btn btn-red" onclick="admAction('fine')">Выписать штраф</button>
                 </div>
             </div>
         </div>
@@ -186,109 +186,124 @@
 </div>
 
 <script>
-let db = JSON.parse(localStorage.getItem('bro_v9')) || { users: {}, cards: {}, market: [] };
-let cur = null;
-let activeRoom = null;
-
-const SHOP_DATA = {
-    biz: [
-        {n:"Ларек", p:5000, i:150, ic:"🌯"}, {n:"Кафе", p:25000, i:700, ic:"☕"},
-        {n:"Мойка", p:100000, i:3000, ic:"🚿"}, {n:"Завод", p:2000000, i:60000, ic:"🏭"}
-    ],
-    car: [
-        {n:"Lada", p:3000, ic:"🚗"}, {n:"Skoda", p:20000, ic:"🚘"},
-        {n:"BMW M5", p:120000, ic:"🏎️"}, {n:"Bugatti", p:2000000, ic:"🚀"}
-    ],
-    home: [
-        {n:"Комната", p:15000, ic:"📦"}, {n:"Квартира", p:80000, ic:"🏢"},
-        {n:"Дом", p:400000, ic:"🏡"}, {n:"Вилла", p:3000000, ic:"🏰"}
-    ]
+// --- ИНИЦИАЛИЗАЦИЯ ТВОЕГО FIREBASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
+  authDomain: "magniybank.firebaseapp.com",
+  databaseURL: "https://magniybank-default-rtdb.firebaseio.com",
+  projectId: "magniybank",
+  storageBucket: "magniybank.firebasestorage.app",
+  messagingSenderId: "1006815080708",
+  appId: "1:1006815080708:web:e9c3afd0a15d8abbe46051",
+  measurementId: "G-1W0FP9YX6G"
 };
 
-const save = () => localStorage.setItem('bro_v9', JSON.stringify(db));
-const toast = (m) => { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let curLog = localStorage.getItem('session');
+let userData = null;
+let activeRoom = null;
+
+const toast = (m) => { 
+    const t = document.getElementById('toast'); 
+    t.innerText = m; t.classList.add('on'); 
+    setTimeout(()=>t.classList.remove('on'), 3000); 
+};
+
+// Контент магазина
+const SHOP = {
+    biz: [{n:"Ларек", p:10000, i:200, ic:"🌯"}, {n:"СТО", p:50000, i:1200, ic:"🛠️"}, {n:"Завод", p:500000, i:15000, ic:"🏭"}],
+    car: [{n:"Lada", p:5000, ic:"🚗"}, {n:"BMW", p:80000, ic:"🏎️"}, {n:"Tesla", p:250000, ic:"⚡"}],
+    home: [{n:"Квартира", p:40000, ic:"🏢"}, {n:"Дом", p:200000, ic:"🏡"}, {n:"Вилла", p:1000000, ic:"🏰"}]
+};
 
 // Auth
+function login() {
+    let l = document.getElementById('li').value.toLowerCase().trim();
+    let p = document.getElementById('pi').value;
+    db.ref('users/' + l).once('value', s => {
+        let d = s.val();
+        if(d && d.pass === p) {
+            if(d.isBanned) return toast("ВЫ ЗАБАНЕНЫ");
+            localStorage.setItem('session', l); location.reload();
+        } else toast("Ошибка входа");
+    });
+}
+
 function regView() {
     document.getElementById('authFields').innerHTML = `
         <input id="rl" class="input" placeholder="Логин">
         <input id="rp" class="input" type="password" placeholder="Пароль">
-        <input id="ra" class="input" type="password" placeholder="Админ-код">
-        <button class="btn btn-blue" onclick="doReg()">Создать</button>
+        <input id="ra" class="input" placeholder="Админ-код">
+        <button class="btn btn-blue" onclick="doReg()">Зарегистрироваться</button>
         <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
     `;
 }
 
 function doReg() {
     let l = document.getElementById('rl').value.toLowerCase().trim();
-    if(!l || db.users[l]) return toast("Логин занят");
-    let c = "4441 " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999);
-    db.users[l] = {
-        name: 'Игрок', login: l, pass: document.getElementById('rp').value,
-        avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-        isAdmin: document.getElementById('ra').value === 'admin99',
-        bal: 500, card: c, assets: [], isBanned: false
-    };
-    db.cards[c] = l; save(); location.reload();
+    let p = document.getElementById('rp').value;
+    if(!l || !p) return toast("Заполни поля");
+    db.ref('users/' + l).once('value', s => {
+        if(s.exists()) return toast("Логин занят");
+        db.ref('users/' + l).set({
+            login: l, pass: p, name: 'Клиент '+l, bal: 1000,
+            isAdmin: document.getElementById('ra').value === 'admin99',
+            card: '4441 ' + Math.floor(1000+Math.random()*8999) + ' ' + Math.floor(1000+Math.random()*8999),
+            avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+            assets: [], isBanned: false
+        }).then(() => { localStorage.setItem('session', l); location.reload(); });
+    });
 }
 
-function login() {
-    let l = document.getElementById('li').value.toLowerCase().trim();
-    let p = document.getElementById('pi').value;
-    if(db.users[l] && db.users[l].pass === p) {
-        if(db.users[l].isBanned) return toast("БАН!");
-        localStorage.setItem('session', l); location.reload();
-    } else toast("Неверные данные");
-}
-
-function logout() { localStorage.removeItem('session'); location.reload(); }
-
-// Core
-function init() {
-    let s = localStorage.getItem('session');
-    if(s && db.users[s]) {
-        cur = db.users[s];
+// Main logic
+if(curLog) {
+    db.ref('users/' + curLog).on('value', s => {
+        userData = s.val();
+        if(!userData) return;
         document.getElementById('auth').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        if(cur.isAdmin) document.getElementById('admLink').style.display = 'block';
-        updateUI();
-    }
+        document.getElementById('uName').innerText = userData.name;
+        document.getElementById('uLog').innerText = "@"+userData.login;
+        document.getElementById('uBal').innerText = userData.bal.toLocaleString() + ' ₴';
+        document.getElementById('uCard').innerText = userData.card;
+        document.getElementById('uAvatar').src = userData.avatar;
+        if(userData.isAdmin) document.getElementById('admLink').style.display = 'flex';
+        renderMyAssets();
+    });
 }
 
-function updateUI() {
-    document.getElementById('uName').innerText = cur.name;
-    document.getElementById('uLog').innerText = "@" + cur.login;
-    document.getElementById('uAvatar').src = cur.avatar;
-    document.getElementById('uBal').innerText = cur.bal.toLocaleString() + " ₴";
-    document.getElementById('uCard').innerText = cur.card;
-    
-    document.getElementById('uAssets').innerHTML = cur.assets.map((a, i) => `
+function renderMyAssets() {
+    let box = document.getElementById('uAssets');
+    if(!userData.assets) return box.innerHTML = '<p style="opacity:0.5">Пусто</p>';
+    box.innerHTML = userData.assets.map((a, i) => `
         <div class="item-card">
-            <div style="font-size:30px">${a.ic}</div>
+            <div style="font-size:30px">${a.ic || '📦'}</div>
             <h4>${a.n}</h4>
-            <p style="color:var(--sec); font-size:12px">${a.i ? 'Доход: '+a.i+' ₴/мин' : 'Личное'}</p>
-            <button class="btn" style="margin-top:10px; font-size:11px" onclick="sellToP2P(${i})">Продать игрокам</button>
+            <p style="font-size:11px; color:var(--sec)">${a.i ? 'Прибыль: '+a.i+' ₴/мин' : 'Личное'}</p>
+            <button class="btn" style="margin-top:10px; font-size:11px" onclick="sellP2P(${i})">Продать игрокам</button>
         </div>
-    `).join('') || '<p style="grid-column:1/-1; text-align:center; opacity:0.5">У вас ничего нет</p>';
+    `).join('');
 }
 
-function showPg(id, el) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item, .m-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('pg-'+id).classList.add('active');
-    if(el) el.classList.add('active');
-    if(id === 'market') renderShop('biz');
-    if(id === 'p2p') renderP2P();
-}
+function clickMoney() { db.ref('users/' + curLog + '/bal').set(userData.bal + 1); }
 
-// Clicker
-function clickMoney() {
-    cur.bal += 1; save(); updateUI();
+function doTransfer() {
+    let to = document.getElementById('trLog').value.toLowerCase().trim();
+    let sum = parseInt(document.getElementById('trSum').value);
+    if(sum <= 0 || userData.bal < sum) return toast("Недостаточно средств");
+    db.ref('users/' + to).once('value', s => {
+        if(!s.exists()) return toast("Игрок не найден");
+        db.ref('users/' + curLog + '/bal').set(userData.bal - sum);
+        db.ref('users/' + to + '/bal').set(s.val().bal + sum);
+        toast("Перевод выполнен!");
+    });
 }
 
 // Shop
-function renderShop(type) {
-    document.getElementById('shopGrid').innerHTML = SHOP_DATA[type].map(it => `
+function renderShop(t) {
+    document.getElementById('shopGrid').innerHTML = SHOP[t].map(it => `
         <div class="item-card">
             <div style="font-size:30px">${it.ic}</div>
             <h4>${it.n}</h4>
@@ -299,115 +314,136 @@ function renderShop(type) {
 }
 
 function buyState(n, p, i, ic) {
-    if(cur.bal < p) return toast("Недостаточно денег");
-    cur.bal -= p;
-    cur.assets.push({n, i, ic});
-    save(); updateUI(); toast("Успешная покупка!");
+    if(userData.bal < p) return toast("Мало денег");
+    let assets = userData.assets || [];
+    assets.push({n, i, ic});
+    db.ref('users/' + curLog + '/bal').set(userData.bal - p);
+    db.ref('users/' + curLog + '/assets').set(assets);
+    toast("Поздравляем с покупкой!");
 }
 
 // P2P
-function sellToP2P(idx) {
-    let p = prompt("Введите цену продажи игрокам (₴):");
+function sellP2P(i) {
+    let p = prompt("Введите цену продажи:");
     if(!p || isNaN(p)) return;
-    let item = cur.assets.splice(idx, 1)[0];
-    db.market.push({ ...item, p: parseInt(p), s: cur.login });
-    save(); updateUI(); toast("Выставлено на рынок");
+    let item = userData.assets.splice(i, 1)[0];
+    db.ref('users/' + curLog + '/assets').set(userData.assets);
+    db.ref('p2p_market').push({ ...item, price: parseInt(p), seller: curLog });
+    toast("Выставлено на рынок!");
 }
 
-function renderP2P() {
-    document.getElementById('p2pGrid').innerHTML = db.market.map((it, i) => `
-        <div class="item-card">
+db.ref('p2p_market').on('value', s => {
+    let market = s.val();
+    let box = document.getElementById('p2pGrid');
+    box.innerHTML = '';
+    for(let id in market) {
+        let it = market[id];
+        box.innerHTML += `<div class="item-card">
             <div style="font-size:30px">${it.ic}</div>
-            <h4>${it.n}</h4>
-            <p>${it.p.toLocaleString()} ₴</p>
-            <small style="color:var(--sec)">Продавец: ${it.s}</small>
-            <button class="btn btn-blue" style="margin-top:10px" onclick="buyP2P(${i})">Купить</button>
-        </div>
-    `).join('') || '<p style="grid-column:1/-1; text-align:center">На рынке пусто</p>';
+            <h4>${it.n}</h4><p>${it.price} ₴</p>
+            <small>Продавец: ${it.seller}</small>
+            <button class="btn btn-blue" style="margin-top:10px" onclick="buyP2P('${id}')">Купить</button>
+        </div>`;
+    }
+});
+
+function buyP2P(id) {
+    db.ref('p2p_market/'+id).once('value', s => {
+        let it = s.val();
+        if(userData.bal < it.price) return toast("Нет денег");
+        db.ref('users/' + it.seller + '/bal').once('value', sv => {
+            db.ref('users/' + it.seller + '/bal').set((sv.val() || 0) + it.price);
+        });
+        db.ref('users/' + curLog + '/bal').set(userData.bal - it.price);
+        let assets = userData.assets || [];
+        assets.push({n: it.n, i: it.i||0, ic: it.ic});
+        db.ref('users/' + curLog + '/assets').set(assets);
+        db.ref('p2p_market/'+id).remove();
+        toast("Успешная P2P сделка!");
+    });
 }
 
-function buyP2P(idx) {
-    let it = db.market[idx];
-    if(cur.bal < it.p) return toast("Нет денег");
-    cur.bal -= it.p;
-    if(db.users[it.s]) db.users[it.s].bal += it.p;
-    cur.assets.push({n: it.n, i: it.i, ic: it.ic});
-    db.market.splice(idx, 1);
-    save(); updateUI(); toast("Куплено у игрока!");
-}
-
-// Blackjack 21
+// Casino
 function enterRoom(r) {
     activeRoom = r;
-    document.getElementById('roomTitle').innerText = `Комната #${r}`;
+    document.getElementById('roomTitle').innerText = "Комната #" + r;
     document.getElementById('gameZone').style.display = 'block';
-    document.getElementById('log21').innerHTML = `Добро пожаловать в комнату ${r}. Сделайте ставку.`;
+    db.ref('casino/room_'+r).on('value', s => {
+        let logs = s.val() || [];
+        document.getElementById('log21').innerHTML = logs.map(l => `<div>${l}</div>`).join('');
+        document.getElementById('log21').scrollTop = 9999;
+    });
 }
 
 function play21() {
     let bet = parseInt(document.getElementById('bet21').value);
-    if(!bet || cur.bal < bet) return toast("Ошибка ставки");
-    cur.bal -= bet;
+    if(!bet || userData.bal < bet) return toast("Ошибка ставки");
+    db.ref('users/' + curLog + '/bal').set(userData.bal - bet);
     let my = Math.floor(Math.random() * 10) + 12;
     let dl = Math.floor(Math.random() * 10) + 13;
-    let msg = "";
-    if(my > 21) msg = "ПЕРЕБОР! Проигрыш.";
-    else if(dl > 21 || my > dl) { msg = `ПОБЕДА! ${my} vs ${dl}`; cur.bal += bet * 2; }
-    else if(my === dl) { msg = "НИЧЬЯ! Возврат."; cur.bal += bet; }
-    else { msg = `ПРОИГРЫШ! ${my} vs ${dl}`; }
-    
-    document.getElementById('log21').innerHTML += `<br>[${cur.login}]: ${msg}`;
-    document.getElementById('log21').scrollTop = 9999;
-    save(); updateUI();
+    let res = "";
+    if(my > 21) res = "проиграл (перебор)";
+    else if(dl > 21 || my > dl) { res = "ВЫИГРАЛ!"; db.ref('users/' + curLog + '/bal').set(userData.bal + bet); }
+    else if(my === dl) { res = "ничья"; db.ref('users/' + curLog + '/bal').set(userData.bal); }
+    else res = "проиграл";
+
+    db.ref('casino/room_'+activeRoom).once('value', s => {
+        let logs = s.val() || [];
+        logs.push(`${userData.name}: ${res} (${my} vs ${dl})`);
+        if(logs.length > 10) logs.shift();
+        db.ref('casino/room_'+activeRoom).set(logs);
+    });
 }
 
-function exitRoom() { document.getElementById('gameZone').style.display = 'none'; activeRoom = null; }
+function exitRoom() { 
+    if(activeRoom) db.ref('casino/room_'+activeRoom).off();
+    document.getElementById('gameZone').style.display = 'none'; 
+}
 
 // Profile
 function updateProfile() {
     let av = document.getElementById('avUrl').value;
     let ni = document.getElementById('newNick').value;
-    if(av) cur.avatar = av;
-    if(ni) cur.name = ni;
-    save(); updateUI(); toast("Данные обновлены!");
+    if(av) db.ref('users/'+curLog+'/avatar').set(av);
+    if(ni) db.ref('users/'+curLog+'/name').set(ni);
+    toast("Обновлено!");
 }
 
 // Admin
-function admCash(mode) {
-    let l = document.getElementById('aUser').value.toLowerCase().trim();
-    let s = parseInt(document.getElementById('aSum').value);
-    if(db.users[l] && s) {
-        if(mode === 'add') db.users[l].bal += s;
-        else db.users[l].bal = Math.max(0, db.users[l].bal - s);
-        save(); toast("Готово"); if(l === cur.login) updateUI();
-    } else toast("Игрок не найден");
+function admAction(type) {
+    let target = (type === 'add' || type === 'sub') ? document.getElementById('aLog').value : document.getElementById('aLog2').value;
+    target = target.toLowerCase().trim();
+    let val = parseInt(document.getElementById('aSum').value) || parseInt(document.getElementById('aFine').value);
+    let ref = db.ref('users/'+target);
+    
+    ref.once('value', s => {
+        if(!s.exists()) return toast("Игрок не найден");
+        if(type === 'add') ref.child('bal').set(s.val().bal + val);
+        if(type === 'sub') ref.child('bal').set(Math.max(0, s.val().bal - val));
+        if(type === 'fine') ref.child('bal').set(Math.max(0, s.val().bal - val));
+        if(type === 'ban') ref.child('isBanned').set(true);
+        if(type === 'unban') ref.child('isBanned').set(false);
+        toast("Админ-действие выполнено");
+    });
 }
 
-function admBan(v) {
-    let l = document.getElementById('aUser2').value.trim();
-    if(db.users[l]) { db.users[l].isBanned = v; save(); toast("Статус изменен"); }
+function showPg(id, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item, .m-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('pg-'+id).classList.add('active');
+    el.classList.add('active');
+    if(id === 'market') renderShop('biz');
 }
 
-function admFine() {
-    let l = document.getElementById('aUser2').value.trim();
-    let s = parseInt(document.getElementById('aFine').value);
-    if(db.users[l] && s) {
-        db.users[l].bal = Math.max(0, db.users[l].bal - s);
-        save(); toast("Штраф выписан"); if(l === cur.login) updateUI();
-    }
-}
+function logout() { localStorage.removeItem('session'); location.reload(); }
 
-// Прибыль
+// Доход
 setInterval(() => {
-    if(cur) {
-        let income = cur.assets.reduce((s, a) => s + (a.i || 0), 0);
-        if(income > 0) {
-            cur.bal += income; save(); updateUI();
-        }
+    if(userData && userData.assets) {
+        let inc = userData.assets.reduce((s, a) => s + (a.i || 0), 0);
+        if(inc > 0) db.ref('users/'+curLog+'/bal').set(userData.bal + inc);
     }
 }, 60000);
-
-init();
 </script>
 </body>
-</html>
+                </html>
