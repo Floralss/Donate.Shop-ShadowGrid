@@ -3,60 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy OS Ultimate</title>
+    <title>Magniy OS Gold Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --card: #111; --accent: #007AFF; --danger: #FF3B30; --text: #fff; --sec: #8E8E93; }
+        :root { --bg: #050505; --card: #121214; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --gold: #D4AF37; --text: #fff; --sec: #8E8E93; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* Auth */
+        /* Auth Screen */
         #auth { display: flex; height: 100vh; align-items: center; justify-content: center; background: #000; padding: 20px; }
-        .auth-box { width: 100%; max-width: 350px; text-align: center; }
+        .auth-box { width: 100%; max-width: 360px; text-align: center; }
 
-        /* App Layout */
+        /* Sidebar & Layout */
         #app { display: none; height: 100vh; width: 100vw; display: flex; }
-        .sidebar { width: 260px; background: #080808; border-right: 1px solid #1c1c1e; padding: 20px; display: flex; flex-direction: column; shrink: 0; }
-        .main { flex-grow: 1; padding: 25px; overflow-y: auto; background: var(--bg); }
+        .sidebar { width: 260px; background: #000; border-right: 1px solid #1c1c1e; padding: 25px; display: flex; flex-direction: column; shrink: 0; }
+        .main { flex-grow: 1; padding: 30px; overflow-y: auto; background: var(--bg); }
 
         /* Navigation */
-        .nav-link { padding: 14px; border-radius: 12px; cursor: pointer; color: var(--sec); margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; }
+        .nav-link { padding: 14px 18px; border-radius: 14px; cursor: pointer; color: var(--sec); margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
         .nav-link:hover { background: #111; color: #fff; }
-        .nav-link.active { background: var(--accent); color: #fff; }
+        .nav-link.active { background: var(--accent); color: #fff; font-weight: 600; }
+        .nav-admin { border: 1px solid var(--danger); color: var(--danger) !important; }
 
-        /* Bank Card */
-        .card-wrapper { perspective: 1000px; margin-bottom: 30px; }
-        .bank-card { width: 100%; max-width: 320px; height: 190px; position: relative; transform-style: preserve-3d; transition: 0.6s; cursor: pointer; margin: 0 auto; }
-        .bank-card.flipped { transform: rotateY(180deg); }
-        .card-side { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 18px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: space-between; }
-        .card-f { background: linear-gradient(135deg, #2c2c2c, #000); }
-        .card-b { background: #111; transform: rotateY(180deg); justify-content: center; align-items: center; }
-        .card-num { font-size: 20px; letter-spacing: 2px; font-family: monospace; font-weight: 700; margin: 10px 0; }
+        /* Card Styles */
+        .cards-container { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .bank-card { min-width: 300px; height: 180px; position: relative; border-radius: 20px; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: linear-gradient(135deg, #222, #000); }
+        .card-usd { background: linear-gradient(135deg, #1e3a8a, #000); }
+        .card-eur { background: linear-gradient(135deg, #3f3f46, #18181b); }
+        .card-num { font-size: 18px; letter-spacing: 2px; font-family: monospace; font-weight: 700; }
+        .card-chip { width: 40px; height: 30px; background: var(--gold); border-radius: 6px; }
 
-        /* Balance & Stats */
-        .bal-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .bal-card { background: var(--card); padding: 15px; border-radius: 14px; border: 1px solid #222; text-align: center; }
-        .bal-card span { font-size: 10px; color: var(--sec); text-transform: uppercase; }
-        .bal-card b { display: block; font-size: 16px; margin-top: 5px; }
+        /* UI Elements */
+        .bal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; }
+        .bal-item { background: var(--card); padding: 18px; border-radius: 16px; border: 1px solid #222; text-align: center; }
+        .bal-item span { font-size: 10px; color: var(--sec); text-transform: uppercase; }
+        .bal-item b { display: block; font-size: 18px; margin-top: 5px; color: var(--success); }
 
-        /* Items Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .item { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid #222; text-align: center; }
-
-        /* Buttons & Inputs */
-        .btn { background: #fff; color: #000; border: none; padding: 15px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        .btn { background: #fff; color: #000; border: none; padding: 15px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; margin-bottom: 10px; }
         .btn-blue { background: var(--accent); color: #fff; }
         .btn-red { background: var(--danger); color: #fff; }
-        .input { width: 100%; background: #151515; border: 1px solid #222; padding: 15px; border-radius: 14px; color: #fff; margin-bottom: 10px; outline: none; }
+        .input { width: 100%; background: #1c1c1e; border: 1px solid #2c2c2e; padding: 15px; border-radius: 14px; color: #fff; margin-bottom: 12px; outline: none; }
+
+        .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .shop-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #222; text-align: center; }
 
         .page { display: none; } .page.active { display: block; }
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; z-index: 10000; transition: 0.4s; font-weight: 700; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #fff; color: #000; padding: 12px 30px; border-radius: 50px; z-index: 10000; transition: 0.4s; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #toast.on { transform: translateX(-50%) translateY(0); }
 
-        @media (max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: grid; position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; grid-template-columns: repeat(6, 1fr); border-top: 1px solid #222; } }
-        .mobile-nav { display: none; } .m-item { display: flex; align-items: center; justify-content: center; color: var(--sec); font-size: 20px; }
+        @media (max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: grid; position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; grid-template-columns: repeat(6, 1fr); border-top: 1px solid #222; } }
+        .mobile-nav { display: none; } .m-item { display: flex; align-items: center; justify-content: center; color: var(--sec); font-size: 24px; }
     </style>
 </head>
 <body>
@@ -65,86 +63,84 @@
 
 <div id="auth">
     <div class="auth-box">
-        <h1 style="font-weight:900; margin-bottom:30px; font-size:36px;">MAGNIY OS</h1>
+        <h1 style="font-weight:900; letter-spacing:-2px; font-size:48px; margin-bottom:40px;">MAGNIY</h1>
         <div id="auth-ui">
             <input id="l-in" class="input" placeholder="Логин">
             <input id="p-in" class="input" type="password" placeholder="Пароль">
-            <button class="btn btn-blue" onclick="doLogin()">Войти</button>
-            <button class="btn" style="background:none; color:var(--sec)" onclick="showReg()">Создать аккаунт</button>
+            <button class="btn btn-blue" onclick="doLogin()">Войти в аккаунт</button>
+            <button class="btn" style="background:none; color:var(--sec)" onclick="showReg()">Создать новый аккаунт</button>
         </div>
     </div>
 </div>
 
 <div id="app">
     <div class="sidebar">
-        <h2 style="margin-bottom:20px; color:var(--accent)">Magniy</h2>
+        <h2 style="color:var(--accent); margin-bottom:30px;">Magniy Bank</h2>
         <div class="nav-link active" onclick="sw('dash', this)">🏠 Главная</div>
+        <div class="nav-link" onclick="sw('cards', this)">💳 Мои карты</div>
+        <div class="nav-link" onclick="sw('exch', this)">💱 Обменник</div>
         <div class="nav-link" onclick="sw('shop', this)">🛍️ Магазины</div>
-        <div class="nav-link" onclick="sw('market', this)">⚖️ Торговля</div>
-        <div class="nav-link" onclick="sw('chat', this)">💬 Сообщения</div>
         <div class="nav-link" onclick="sw('game', this)">♠️ Казино 21</div>
-        <div id="adm-nav" class="nav-link" style="display:none; color:var(--danger); border:1px solid var(--danger)" onclick="sw('adm', this)">🛠️ АДМИНКА</div>
+        <div id="adm-nav" class="nav-link nav-admin" style="display:none;" onclick="sw('adm', this)">🛠️ АДМИН ПАНЕЛЬ</div>
+        
         <button class="btn btn-red" style="margin-top:auto" onclick="exit()">🚪 ВЫЙТИ</button>
     </div>
 
     <div class="main">
         <div id="p-dash" class="page active">
-            <h2 id="u-name">Загрузка...</h2><br>
+            <h2 id="u-greet">Привет!</h2><br>
+            <div class="bal-grid">
+                <div class="bal-item"><span>Гривны</span><b id="b-uah">0 ₴</b></div>
+                <div class="bal-item"><span>Доллары</span><b id="b-usd">0 $</b></div>
+                <div class="bal-item"><span>Евро</span><b id="b-eur">0 €</b></div>
+            </div>
+            <button class="btn btn-blue" onclick="work()">💰 Заработать 5 ₴ (Клик)</button>
             
-            <div class="card-wrapper">
-                <div class="bank-card" id="main-card" onclick="this.classList.toggle('flipped')">
-                    <div class="card-side card-f">
-                        <div style="width:45px; height:32px; background:linear-gradient(135deg, gold, #b8860b); border-radius:6px;"></div>
-                        <div class="card-num" id="c-num">0000 0000 0000 0000</div>
-                        <div style="display:flex; justify-content:space-between; font-size:12px; opacity:0.7">
-                            <span id="c-owner">NAME SURNAME</span>
-                            <span id="c-date">04/30</span>
-                        </div>
-                    </div>
-                    <div class="card-side card-b">
-                        <p style="font-size:10px; margin-bottom:5px; opacity:0.5">CVV CODE</p>
-                        <div style="background:#fff; color:#000; padding:5px 15px; font-weight:900; border-radius:4px;" id="c-cvv">000</div>
-                    </div>
+            <h3 style="margin-top:30px;">Мое имущество</h3>
+            <div id="my-assets" class="item-grid" style="margin-top:15px;"></div>
+        </div>
+
+        <div id="p-cards" class="page">
+            <h2>Ваши банковские карты</h2><br>
+            <div class="cards-container" id="cards-list"></div>
+            <br>
+            <h3>Выпустить новую карту</h3><br>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-blue" onclick="issueCard('USD')">Карта USD ($)</button>
+                <button class="btn btn-blue" onclick="issueCard('EUR')">Карта EUR (€)</button>
+            </div>
+        </div>
+
+        <div id="p-exch" class="page">
+            <h2>Обмен валют</h2><br>
+            <div class="bal-item" style="text-align:left">
+                <p style="margin-bottom:15px;">Курс: 1$ = 40₴ | 1€ = 45₴</p>
+                <input id="ex-amount" class="input" type="number" placeholder="Сумма">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button class="btn btn-blue" onclick="exchange('uah','usd')">₴ в $</button>
+                    <button class="btn btn-blue" onclick="exchange('uah','eur')">₴ в €</button>
+                    <button class="btn btn-blue" onclick="exchange('usd','uah')">$ в ₴</button>
+                    <button class="btn btn-blue" onclick="exchange('eur','uah')">€ в ₴</button>
                 </div>
             </div>
-
-            <div class="bal-row">
-                <div class="bal-card"><span>Гривны</span><b id="b-uah">0 ₴</b></div>
-                <div class="bal-card"><span>Доллары</span><b id="b-usd">0 $</b></div>
-                <div class="bal-card"><span>Евро</span><b id="b-eur">0 €</b></div>
-            </div>
-
-            <button class="btn btn-blue" onclick="work()">💰 Кликнуть (+5 ₴)</button>
-
-            <h3 style="margin:20px 0 10px;">Моё имущество</h3>
-            <div id="assets" class="grid"></div>
         </div>
 
         <div id="p-shop" class="page">
             <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn" onclick="loadShop('auto')">🏎️ Авто</button>
-                <button class="btn" onclick="loadShop('home')">🏠 Дома</button>
-                <button class="btn" onclick="loadShop('biz')">💼 Бизнес</button>
+                <button class="btn" onclick="renderShop('auto')">🏎️ Автосалон</button>
+                <button class="btn" onclick="renderShop('home')">🏠 Недвижимость</button>
+                <button class="btn" onclick="renderShop('biz')">💼 Бизнесы</button>
             </div>
-            <div id="shop-grid" class="grid"></div>
-        </div>
-
-        <div id="p-chat" class="page">
-            <h2>Личные сообщения</h2><br>
-            <div id="chat-box" style="height:350px; background:#080808; border-radius:15px; border:1px solid #222; padding:20px; overflow-y:auto; margin-bottom:10px;"></div>
-            <div style="display:flex; gap:10px">
-                <input id="chat-to" class="input" style="width:120px" placeholder="Логин">
-                <input id="chat-msg" class="input" placeholder="Сообщение...">
-                <button class="btn btn-blue" style="width:80px" onclick="sendPriv()">🕊️</button>
-            </div>
+            <div id="shop-grid" class="item-grid"></div>
         </div>
 
         <div id="p-adm" class="page">
-            <h2>Админ-панель</h2><br>
+            <h2>Управление системой</h2><br>
             <input id="a-user" class="input" placeholder="Логин игрока">
             <input id="a-val" class="input" type="number" placeholder="Сумма">
-            <div style="display:flex; gap:10px">
-                <button class="btn btn-blue" onclick="admGift('usd')">Дать $</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn btn-blue" onclick="admAction('bal')">Дать ₴</button>
+                <button class="btn btn-blue" onclick="admAction('usd')">Дать $</button>
                 <button class="btn btn-red" onclick="admBan()">ЗАБАНИТЬ</button>
             </div>
         </div>
@@ -152,7 +148,7 @@
 </div>
 
 <script>
-// CONFIG
+// FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
   authDomain: "magniybank.firebaseapp.com",
@@ -165,10 +161,14 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-let cur = localStorage.getItem('user');
+let session = localStorage.getItem('user');
 let uData = null;
 
 const toast = (m) => { const t = document.getElementById('toast'); t.innerText=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); };
+
+// GENERATOR
+function genNum() { return "4441 " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999) + " " + Math.floor(1000+Math.random()*8999); }
+function genCvv() { return Math.floor(100+Math.random()*899); }
 
 // AUTH
 function doLogin() {
@@ -177,9 +177,9 @@ function doLogin() {
     db.ref('users/'+l).once('value', s => {
         let d = s.val();
         if(d && d.pass === p) {
-            if(d.isBanned) return toast("ВЫ ЗАБАНЕНЫ");
+            if(d.isBanned) return toast("ОТКАЗАНО В ДОСТУПЕ");
             localStorage.setItem('user', l); location.reload();
-        } else toast("Ошибка!");
+        } else toast("Неверные данные");
     });
 }
 
@@ -187,9 +187,9 @@ function showReg() {
     document.getElementById('auth-ui').innerHTML = `
         <input id="rl" class="input" placeholder="Логин">
         <input id="rp" class="input" type="password" placeholder="Пароль">
-        <input id="rn" class="input" placeholder="Имя на карту">
-        <input id="rt" class="input" placeholder="Токен (admin99)">
-        <button class="btn btn-blue" onclick="doReg()">Создать</button>
+        <input id="rn" class="input" placeholder="Ваше Имя">
+        <input id="rt" class="input" placeholder="Токен (admin99 для админки)">
+        <button class="btn btn-blue" onclick="doReg()">Зарегистрироваться</button>
         <button class="btn" style="background:none; color:#fff" onclick="location.reload()">Назад</button>
     `;
 }
@@ -197,84 +197,127 @@ function showReg() {
 function doReg() {
     let l = document.getElementById('rl').value.toLowerCase().trim();
     let p = document.getElementById('rp').value;
-    let n = document.getElementById('rn').value || "USER";
+    let n = document.getElementById('rn').value || "Клиент";
     let t = document.getElementById('rt').value;
-    
-    // ГЕНЕРАЦИЯ КАРТЫ
-    let c1 = Math.floor(1000+Math.random()*8999);
-    let c2 = Math.floor(1000+Math.random()*8999);
-    let c3 = Math.floor(1000+Math.random()*8999);
-    let cFull = "4441 " + c1 + " " + c2 + " " + c3;
-    let cvv = Math.floor(100+Math.random()*899);
+
+    let mainCard = { num: genNum(), cvv: genCvv(), type: 'UAH' };
 
     db.ref('users/'+l).set({
-        login: l, pass: p, name: n, bal: 1000, usd: 0, eur: 0,
-        cardN: cFull, cardC: cvv, cardD: "04/30",
-        isAdmin: (t === "admin99"), assets: []
+        login: l, pass: p, name: n, bal: 500, usd: 0, eur: 0,
+        isAdmin: (t === "admin99"),
+        cards: [mainCard],
+        assets: []
     }).then(() => { localStorage.setItem('user', l); location.reload(); });
 }
 
-// MAIN
-const shops = {
-    auto: [{n:"Lada", p:2000}, {n:"BMW M5", p:25000}, {n:"Lamborghini", p:150000}],
-    home: [{n:"Квартира", p:15000}, {n:"Дом", p:60000}, {n:"Вилла", p:300000}],
-    biz: [{n:"Ларек", p:50000}, {n:"Кафе", p:120000}, {n:"Завод", p:1000000}]
+// LOGIC
+const items = {
+    auto: [{n:"Lada", p:2500}, {n:"BMW M5", p:35000}, {n:"Porsche", p:95000}],
+    home: [{n:"Квартира", p:20000}, {n:"Особняк", p:120000}],
+    biz: [{n:"Ларек", p:45000}, {n:"Завод", p:800000}]
 };
 
-if(cur) {
-    db.ref('users/'+cur).on('value', s => {
+if(session) {
+    db.ref('users/'+session).on('value', s => {
         uData = s.val();
         if(!uData) return;
         document.getElementById('auth').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
         
-        document.getElementById('u-name').innerText = "Привет, " + uData.name;
+        document.getElementById('u-greet').innerText = "С возвращением, " + uData.name;
         document.getElementById('b-uah').innerText = uData.bal.toLocaleString() + " ₴";
-        document.getElementById('b-usd').innerText = (uData.usd || 0).toLocaleString() + " $";
-        document.getElementById('b-eur').innerText = (uData.eur || 0).toLocaleString() + " €";
-        
-        document.getElementById('c-num').innerText = uData.cardN || "НЕ ГЕНЕРИРОВАНО";
-        document.getElementById('c-owner').innerText = uData.name.toUpperCase();
-        document.getElementById('c-cvv').innerText = uData.cardC || "000";
+        document.getElementById('b-usd').innerText = uData.usd.toLocaleString() + " $";
+        document.getElementById('b-eur').innerText = uData.eur.toLocaleString() + " €";
 
         if(uData.isAdmin) document.getElementById('adm-nav').style.display = 'flex';
 
-        let aDiv = document.getElementById('assets'); aDiv.innerHTML = '';
-        (uData.assets || []).forEach(a => aDiv.innerHTML += `<div class="item"><b>${a}</b></div>`);
+        // Render Cards
+        let cList = document.getElementById('cards-list'); cList.innerHTML = '';
+        (uData.cards || []).forEach(c => {
+            cList.innerHTML += `
+                <div class="bank-card ${c.type === 'USD' ? 'card-usd' : (c.type === 'EUR' ? 'card-eur' : '')}">
+                    <div class="card-chip"></div>
+                    <div class="card-num">${c.num}</div>
+                    <div style="display:flex; justify-content:space-between; font-size:12px;">
+                        <span>${uData.name.toUpperCase()}</span>
+                        <span>04/30 | CVV: ${c.cvv} | <b>${c.type}</b></span>
+                    </div>
+                </div>`;
+        });
+
+        // Assets
+        let aList = document.getElementById('my-assets'); aList.innerHTML = '';
+        (uData.assets || []).forEach(a => aList.innerHTML += `<div class="shop-card"><b>${a}</b></div>`);
     });
 }
 
-function work() { db.ref('users/'+cur+'/bal').set(uData.bal + 5); }
+function work() { db.ref('users/'+session+'/bal').set(uData.bal + 5); }
 
-function loadShop(type) {
+function issueCard(type) {
+    if(uData.bal < 1000) return toast("Выпуск карты стоит 1000 ₴");
+    let newCard = { num: genNum(), cvv: genCvv(), type: type };
+    let cards = uData.cards || [];
+    cards.push(newCard);
+    db.ref('users/'+session).update({ bal: uData.bal - 1000, cards: cards });
+    toast("Карта "+type+" успешно открыта!");
+}
+
+function exchange(from, to) {
+    let amt = parseInt(document.getElementById('ex-amount').value);
+    if(!amt || amt <= 0) return toast("Введите сумму");
+    
+    if(from === 'uah' && to === 'usd' && uData.bal >= amt) {
+        db.ref('users/'+session).update({ bal: uData.bal - amt, usd: uData.usd + Math.floor(amt/40) });
+    } else if(from === 'uah' && to === 'eur' && uData.bal >= amt) {
+        db.ref('users/'+session).update({ bal: uData.bal - amt, eur: uData.eur + Math.floor(amt/45) });
+    } else if(from === 'usd' && to === 'uah' && uData.usd >= amt) {
+        db.ref('users/'+session).update({ usd: uData.usd - amt, bal: uData.bal + (amt*40) });
+    } else if(from === 'eur' && to === 'uah' && uData.eur >= amt) {
+        db.ref('users/'+session).update({ eur: uData.eur - amt, bal: uData.bal + (amt*45) });
+    } else {
+        return toast("Недостаточно средств");
+    }
+    toast("Обмен выполнен!");
+}
+
+function renderShop(cat) {
     let grid = document.getElementById('shop-grid'); grid.innerHTML = '';
-    shops[type].forEach(i => {
-        grid.innerHTML += `<div class="item"><b>${i.n}</b><p>${i.p} $</p><button class="btn btn-blue" style="padding:5px; margin-top:10px" onclick="buy('${i.n}', ${i.p})">Купить</button></div>`;
+    items[cat].forEach(i => {
+        grid.innerHTML += `<div class="shop-card"><b>${i.n}</b><p>${i.p.toLocaleString()} $</p><button class="btn btn-blue" style="padding:5px; margin-top:10px" onclick="buy('${i.n}', ${i.p})">Купить</button></div>`;
     });
 }
 
 function buy(n, p) {
-    if(uData.usd < p) return toast("Мало $");
+    if(uData.usd < p) return toast("Нужно больше долларов!");
     let a = uData.assets || []; a.push(n);
-    db.ref('users/'+cur).update({ usd: uData.usd - p, assets: a });
-    toast("Куплено!");
+    db.ref('users/'+session).update({ usd: uData.usd - p, assets: a });
+    toast("Успешная покупка!");
 }
 
 function sw(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
     document.getElementById('p-'+id).classList.add('active');
-    if(el) el.classList.add('active');
+    el.classList.add('active');
 }
 
-function admGift(t) {
+function admAction(type) {
     let l = document.getElementById('a-user').value.toLowerCase().trim();
     let v = parseInt(document.getElementById('a-val').value);
-    db.ref('users/'+l+'/'+t).transaction(c => (c||0) + v);
-    toast("Выдано!");
+    db.ref('users/'+l+'/'+type).transaction(c => (c || 0) + v);
+    toast("Выполнено!");
 }
 
-function exit() { localStorage.clear(); location.reload(); }
+function admBan() {
+    let l = document.getElementById('a-user').value.toLowerCase().trim();
+    db.ref('users/'+l).update({ isBanned: true });
+    toast("Игрок забанен!");
+}
+
+function exit() {
+    localStorage.removeItem('user');
+    location.reload();
+}
 </script>
 </body>
-    </html>
+</html>
