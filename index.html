@@ -1,131 +1,357 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy OS v14 Supreme</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <style>
-        :root { --bg: #000; --card: #161618; --accent: #007AFF; --text: #fff; --sec: #8e8e93; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Magniy OS v14</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<style>
+:root {
+  --bg: #0b0f17;
+  --surface: #131929;
+  --surface2: #1a2236;
+  --border: rgba(255,255,255,0.07);
+  --accent: #2563eb;
+  --accent2: #3b82f6;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #f0f4ff;
+  --muted: #6b7a9c;
+  --card-glow: 0 0 0 1px var(--border), 0 4px 24px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
 
-        /* NAV */
-        .nav { display: flex; background: #0a0a0a; border-bottom: 1px solid #222; overflow-x: auto; scrollbar-width: none; }
-        .nav-item { padding: 16px; cursor: pointer; color: var(--sec); white-space: nowrap; font-weight: 700; font-size: 13px; }
-        .nav-item.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
+/* AUTH */
+#auth-screen {
+  position:fixed; inset:0; background:var(--bg); z-index:10000;
+  display:flex; align-items:center; justify-content:center; overflow-y:auto;
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.08) 0%, transparent 50%);
+}
+.auth-box {
+  width:340px; padding:40px 32px; text-align:center;
+  background:var(--surface); border-radius:24px;
+  box-shadow: 0 0 0 1px var(--border), 0 24px 80px rgba(0,0,0,0.6);
+}
+.auth-logo { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; letter-spacing:-1px; margin-bottom:4px; }
+.auth-logo span { color:var(--accent2); }
+.auth-sub { color:var(--muted); font-size:13px; margin-bottom:28px; }
+.inp {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:12px; padding:13px 16px; color:var(--text); outline:none;
+  font-size:14px; font-family:'DM Sans',sans-serif; margin-bottom:10px;
+  transition: border-color .2s;
+}
+.inp:focus { border-color:rgba(59,130,246,0.5); }
+.inp::placeholder { color:var(--muted); }
+.btn { border:none; padding:13px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-family:'DM Sans',sans-serif; font-size:14px; transition:.2s; }
+.btn-blue { background:var(--accent); color:#fff; }
+.btn-blue:hover { background:var(--accent2); transform:translateY(-1px); }
+.btn-red { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3); margin-top:6px; }
+.btn-ghost { background:var(--surface2); color:var(--text); border:1px solid var(--border); margin-top:6px; }
+.acc-chip {
+  background:var(--surface2); border:1px solid var(--border);
+  padding:10px 14px; border-radius:10px; margin-top:6px;
+  cursor:pointer; color:var(--accent2); font-size:13px;
+  display:flex; align-items:center; gap:8px; transition:.15s;
+}
+.acc-chip:hover { border-color:rgba(59,130,246,0.4); }
+.acc-dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
 
-        .main { flex-grow: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
-        .card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #262626; }
-        
-        .btn { border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 6px; }
-        .btn-accent { background: var(--accent); color: #fff; }
-        .input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 12px; color: #fff; margin-bottom: 8px; outline: none; }
+/* NAV */
+.nav {
+  display:flex; background:var(--surface); border-bottom:1px solid var(--border);
+  overflow-x:auto; scrollbar-width:none; flex-shrink:0;
+}
+.nav::-webkit-scrollbar { display:none; }
+.nav-item {
+  padding:14px 18px; cursor:pointer; color:var(--muted);
+  white-space:nowrap; font-weight:600; font-size:12px;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  transition:.2s; border-bottom:2px solid transparent; min-width:60px;
+  font-family:'DM Sans',sans-serif;
+}
+.nav-item span { font-size:18px; }
+.nav-item.active { color:var(--accent2); border-bottom-color:var(--accent); }
+.nav-item:hover:not(.active) { color:var(--text); }
 
-        /* AUTH & MULTI-ACC */
-        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; overflow-y: auto; }
-        .acc-chip { background: #1a1a1a; padding: 10px; border-radius: 10px; margin-top: 5px; cursor: pointer; border: 1px solid #333; display: block; width: 100%; color: var(--accent); }
+/* MAIN */
+.main { flex:1; overflow-y:auto; padding:16px 14px 100px; scrollbar-width:thin; scrollbar-color:var(--surface2) transparent; }
+.page { display:none; animation:fadeIn .2s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
-        /* CHAT */
-        #chat-list { height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #080808; border-radius: 15px; }
-        .msg { padding: 10px; border-radius: 14px; max-width: 80%; font-size: 14px; }
-        .msg-m { background: var(--accent); align-self: flex-end; }
-        .msg-o { background: #262628; align-self: flex-start; }
+/* CARDS */
+.card {
+  background:var(--surface); border-radius:18px; padding:18px;
+  margin-bottom:12px; border:1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.section-title { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; margin:18px 0 10px; }
 
-        .page { display: none; } .page.active { display: block; }
-    </style>
+/* DASH BALANCE CARD */
+.balance-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+  border-radius:22px; padding:24px; margin-bottom:16px; position:relative; overflow:hidden;
+}
+.balance-card::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:180px; height:180px; border-radius:50%;
+  background:rgba(255,255,255,0.05);
+}
+.balance-card::after {
+  content:''; position:absolute; bottom:-60px; left:20px;
+  width:220px; height:220px; border-radius:50%;
+  background:rgba(255,255,255,0.03);
+}
+.bal-label { font-size:12px; color:rgba(255,255,255,0.6); font-weight:500; margin-bottom:4px; }
+.bal-amount { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; letter-spacing:-1px; margin-bottom:16px; }
+.bal-user { display:flex; align-items:center; gap:10px; }
+.bal-ava { width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); object-fit:cover; }
+.bal-nick { font-weight:600; font-size:15px; }
+.work-btn {
+  position:absolute; top:20px; right:20px; z-index:1;
+  background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2);
+  border-radius:10px; padding:8px 14px; color:#fff; font-weight:700;
+  font-size:12px; cursor:pointer; backdrop-filter:blur(10px); transition:.2s;
+  font-family:'DM Sans',sans-serif;
+}
+.work-btn:hover { background:rgba(255,255,255,0.25); }
+
+/* QUICK STATS */
+.stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; }
+.stat-icon { font-size:22px; margin-bottom:6px; }
+.stat-val { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; }
+.stat-lbl { font-size:11px; color:var(--muted); margin-top:2px; }
+
+/* INVENTORY */
+.inv-item {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:12px; padding:12px 14px;
+  display:flex; align-items:center; gap:12px; margin-bottom:8px;
+}
+.inv-icon { font-size:24px; }
+.inv-name { font-weight:600; font-size:14px; }
+
+/* SHOP GRID */
+.shop-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px; }
+.shop-item {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:14px; position:relative; overflow:hidden;
+}
+.shop-emoji { font-size:28px; margin-bottom:8px; display:block; }
+.shop-name { font-weight:600; font-size:13px; margin-bottom:4px; }
+.shop-price { color:var(--accent2); font-weight:700; font-size:14px; font-family:'Syne',sans-serif; margin-bottom:10px; }
+.shop-buy {
+  background:var(--accent); color:#fff; border:none; border-radius:8px;
+  padding:7px; width:100%; font-weight:700; font-size:12px; cursor:pointer;
+  font-family:'DM Sans',sans-serif; transition:.15s;
+}
+.shop-buy:hover { background:var(--accent2); }
+.shop-income { font-size:10px; color:var(--green); margin-bottom:8px; }
+
+/* TRADE */
+.trade-item {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:14px; margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.trade-info { flex:1; }
+.trade-name { font-weight:700; font-size:14px; }
+.trade-seller { font-size:12px; color:var(--muted); margin-top:2px; }
+.trade-price { font-family:'Syne',sans-serif; font-size:16px; font-weight:800; color:var(--accent2); margin-right:12px; }
+.trade-buy-btn {
+  background:var(--accent); color:#fff; border:none; border-radius:10px;
+  padding:8px 16px; font-weight:700; font-size:13px; cursor:pointer;
+  font-family:'DM Sans',sans-serif; white-space:nowrap;
+}
+
+/* CHAT */
+.chat-msgs { height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:12px; background:var(--surface); border-radius:16px; border:1px solid var(--border); scrollbar-width:thin; }
+.msg { padding:10px 14px; border-radius:14px; max-width:78%; font-size:14px; line-height:1.4; }
+.msg b { font-size:11px; opacity:.7; display:block; margin-bottom:2px; }
+.msg-m { background:var(--accent); align-self:flex-end; border-bottom-right-radius:4px; }
+.msg-o { background:var(--surface2); align-self:flex-start; border:1px solid var(--border); border-bottom-left-radius:4px; }
+.chat-input-row { display:flex; gap:8px; margin-top:10px; align-items:stretch; }
+.chat-send {
+  background:var(--accent); border:none; border-radius:12px;
+  width:46px; color:#fff; font-size:18px; cursor:pointer; flex-shrink:0; transition:.15s;
+}
+.chat-send:hover { background:var(--accent2); }
+
+/* PROFILE */
+.prof-ava-wrap { display:flex; justify-content:center; margin-bottom:20px; }
+.prof-ava { width:80px; height:80px; border-radius:50%; border:3px solid var(--accent); object-fit:cover; }
+.color-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.color-swatch {
+  width:34px; height:34px; border-radius:50%; cursor:pointer;
+  border:3px solid transparent; transition:.15s;
+}
+.color-swatch.active, .color-swatch:hover { border-color:#fff; transform:scale(1.1); }
+
+/* ADMIN */
+.adm-stat { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:12px; padding:10px 20px; font-size:13px; font-weight:600;
+  z-index:9000; opacity:0; transition:.3s; white-space:nowrap;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.success { border-color:rgba(16,185,129,0.4); color:var(--green); }
+.toast.error { border-color:rgba(239,68,68,0.4); color:var(--red); }
+
+/* BANNED */
+#banned-screen {
+  display:none; position:fixed; inset:0; background:#000; z-index:20000;
+  align-items:center; justify-content:center; flex-direction:column; gap:10px;
+}
+</style>
 </head>
 <body>
 
-<div id="auth-screen">
-    <div style="width: 300px; text-align: center; padding: 20px;">
-        <h1 style="font-size: 35px; letter-spacing: -1px;">MAGNIY <span id="logo-c" style="color:var(--accent)">OS</span></h1><br>
-        <input id="l-in" class="input" placeholder="Логин">
-        <input id="p-in" class="input" type="password" placeholder="Пароль">
-        <input id="a-code" class="input" placeholder="Код (для админки)">
-        <button class="btn btn-accent" onclick="auth()">ВОЙТИ / СОЗДАТЬ</button>
-        <div id="acc-list" style="margin-top: 20px;"></div>
-    </div>
+<!-- BANNED -->
+<div id="banned-screen" style="display:none; position:fixed; inset:0; background:#000; z-index:20000; align-items:center; justify-content:center; flex-direction:column; gap:10px; text-align:center; padding:30px;">
+  <div style="font-size:60px;">🚫</div>
+  <h2 style="font-family:'Syne',sans-serif; font-size:28px; color:var(--red);">АККАУНТ ЗАБЛОКИРОВАН</h2>
+  <p style="color:var(--muted);">Ваш аккаунт был заблокирован администратором.</p>
+  <button class="btn btn-ghost" style="max-width:200px; margin-top:10px;" onclick="exitAcc()">Выйти</button>
 </div>
 
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">MAGNIY <span>OS</span></div>
+    <div class="auth-sub">Цифровая экономика</div>
+    <input id="l-in" class="inp" placeholder="Логин">
+    <input id="p-in" class="inp" type="password" placeholder="Пароль">
+    <input id="a-code" class="inp" placeholder="Код администратора (необязательно)">
+    <button class="btn btn-blue" onclick="auth()">ВОЙТИ / СОЗДАТЬ АККАУНТ</button>
+    <div id="acc-list" style="margin-top:20px; text-align:left;"></div>
+  </div>
+</div>
+
+<!-- NAV -->
 <div class="nav">
-    <div class="nav-item active" onclick="sw('dash', this)">🏠</div>
-    <div class="nav-item" onclick="sw('shop', this)">🛍️ Гос</div>
-    <div class="nav-item" onclick="sw('trade', this)">🤝 Трейд</div>
-    <div class="nav-item" onclick="sw('chat', this)">💬 Чат</div>
-    <div class="nav-item" onclick="sw('prof', this)">⚙️</div>
-    <div id="adm-nav" class="nav-item" style="color:red; display:none;" onclick="sw('adm', this)">🛠</div>
-    <div class="nav-item" onclick="exitAcc()" style="color:#ff3b30">🚪 Выход</div>
+  <div class="nav-item active" onclick="sw('dash',this)"><span>🏠</span>Главная</div>
+  <div class="nav-item" onclick="sw('shop',this)"><span>🏪</span>Магазин</div>
+  <div class="nav-item" onclick="sw('trade',this)"><span>🤝</span>Рынок</div>
+  <div class="nav-item" onclick="sw('chat',this)"><span>💬</span>Чат</div>
+  <div class="nav-item" onclick="sw('prof',this)"><span>⚙️</span>Профиль</div>
+  <div id="adm-nav" class="nav-item" style="color:#ef4444;display:none;" onclick="sw('adm',this)"><span>🛠</span>Адмін</div>
+  <div class="nav-item" onclick="exitAcc()" style="color:var(--red);"><span>🚪</span>Выход</div>
 </div>
 
 <div class="main">
-    <div id="p-dash" class="page active">
-        <div class="card" style="text-align: center;">
-            <img id="u-ava" src="" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--accent); margin-bottom: 10px;">
-            <h2 id="u-nick">...</h2>
-            <h1 id="u-bal" style="margin:10px 0; color:var(--accent)">0 ₴</h1>
-            <button class="btn btn-accent" onclick="work()">РАБОТАТЬ (+100 ₴)</button>
-        </div>
-        <h3>Моё имущество:</h3>
-        <div id="inv-container" style="margin-top:10px"></div>
-    </div>
 
-    <div id="p-shop" class="page">
-        <h3>🚗 Автосалон</h3><div id="s-car" class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;"></div>
-        <h3>🏠 Недвижимость</h3><div id="s-house" class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;"></div>
-        <h3>💼 Бизнес</h3><div id="s-biz" class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+  <!-- DASH -->
+  <div id="p-dash" class="page active">
+    <div class="balance-card">
+      <button class="work-btn" onclick="work()">+ РАБОТАТЬ</button>
+      <div class="bal-label">Баланс счёта</div>
+      <div class="bal-amount" id="u-bal">0 ₴</div>
+      <div class="bal-user">
+        <img class="bal-ava" id="u-ava" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+        <span class="bal-nick" id="u-nick">...</span>
+      </div>
     </div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-val" id="inv-count">0</div>
+        <div class="stat-lbl">Объектов имущества</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💼</div>
+        <div class="stat-val" id="biz-income">0 ₴</div>
+        <div class="stat-lbl">Доход с бизнеса/час</div>
+      </div>
+    </div>
+    <div class="section-title">Моё имущество</div>
+    <div id="inv-container"></div>
+  </div>
 
-    <div id="p-trade" class="page">
-        <div class="card">
-            <h3>Продать своё</h3>
-            <select id="tr-obj" class="input"></select>
-            <input id="tr-pr" class="input" type="number" placeholder="Цена">
-            <button class="btn btn-accent" onclick="postToTrade()">Выставить на рынок</button>
-        </div>
-        <div id="trade-board"></div>
-    </div>
+  <!-- SHOP -->
+  <div id="p-shop" class="page">
+    <div class="section-title">🚗 Автосалон</div>
+    <div id="s-car" class="shop-grid"></div>
+    <div class="section-title">🏠 Недвижимость</div>
+    <div id="s-house" class="shop-grid"></div>
+    <div class="section-title">💼 Бизнес</div>
+    <div id="s-biz" class="shop-grid"></div>
+  </div>
 
-    <div id="p-chat" class="page">
-        <div id="chat-list"></div>
-        <div style="display:flex; gap:5px; margin-top:10px;">
-            <input id="m-in" class="input" style="margin:0" placeholder="Сообщение...">
-            <button class="btn btn-accent" style="width:60px; margin:0" onclick="sendMsg()">></button>
-        </div>
+  <!-- TRADE -->
+  <div id="p-trade" class="page">
+    <div class="card">
+      <div class="section-title" style="margin-top:0">Выставить на продажу</div>
+      <select id="tr-obj" class="inp"></select>
+      <input id="tr-pr" class="inp" type="number" placeholder="Ваша цена (₴)">
+      <button class="btn btn-blue" onclick="postToTrade()">Выставить на рынок</button>
     </div>
+    <div class="section-title">Активные лоты</div>
+    <div id="trade-board"></div>
+  </div>
 
-    <div id="p-prof" class="page">
-        <div class="card">
-            <h3>Настройки</h3><br>
-            <input id="st-n" class="input" placeholder="Никнейм">
-            <input id="st-a" class="input" placeholder="URL Аватарки">
-            <p>Цвет системы:</p>
-            <input type="color" id="st-c" class="input" style="height:50px" oninput="updateTheme(this.value)">
-            <button class="btn btn-accent" onclick="saveProf()">СОХРАНИТЬ</button>
-        </div>
+  <!-- CHAT -->
+  <div id="p-chat" class="page">
+    <div class="chat-msgs" id="chat-list"></div>
+    <div class="chat-input-row">
+      <input id="m-in" class="inp" style="margin:0;flex:1" placeholder="Написать сообщение...">
+      <button class="chat-send" onclick="sendMsg()">➤</button>
     </div>
+  </div>
 
-    <div id="p-adm" class="page">
-        <div class="card">
-            <h3>Admin Panel</h3>
-            <input id="ad-u" class="input" placeholder="Логин игрока">
-            <input id="ad-v" class="input" type="number" placeholder="Сумма">
-            <button class="btn btn-accent" onclick="adm('give')">Выдать деньги</button>
-            <button class="btn" style="background:red; color:white" onclick="adm('ban')">БАН</button>
-        </div>
+  <!-- PROFILE -->
+  <div id="p-prof" class="page">
+    <div class="card" style="text-align:center;">
+      <div class="prof-ava-wrap">
+        <img class="prof-ava" id="prof-ava-img" src="">
+      </div>
+      <div style="font-family:'Syne',sans-serif; font-size:20px; font-weight:800;" id="prof-nick-display">...</div>
     </div>
+    <div class="card">
+      <div class="section-title" style="margin-top:0">Редактировать профиль</div>
+      <input id="st-n" class="inp" placeholder="Никнейм">
+      <input id="st-a" class="inp" placeholder="URL аватарки">
+      <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">Цвет акцента:</div>
+      <div class="color-row" id="color-swatches"></div>
+      <input type="color" id="st-c" class="inp" style="height:48px; padding:6px; cursor:pointer;">
+      <button class="btn btn-blue" onclick="saveProf()">СОХРАНИТЬ ИЗМЕНЕНИЯ</button>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="p-adm" class="page">
+    <div class="card">
+      <div class="section-title" style="margin-top:0">⚡ Панель администратора</div>
+      <input id="ad-u" class="inp" placeholder="Логин игрока">
+      <input id="ad-v" class="inp" type="number" placeholder="Сумма (₴)">
+      <button class="btn btn-blue" onclick="adm('give')" style="margin-bottom:8px;">💰 Выдать деньги</button>
+      <button class="btn" style="background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3);" onclick="adm('ban')">🚫 Заблокировать аккаунт</button>
+      <button class="btn btn-ghost" style="margin-top:6px;" onclick="adm('unban')">✅ Разблокировать</button>
+    </div>
+  </div>
+
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const firebaseConfig = {
-    apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
-    authDomain: "magniybank.firebaseapp.com",
-    databaseURL: "https://magniybank-default-rtdb.firebaseio.com",
-    projectId: "magniybank",
-    storageBucket: "magniybank.firebasestorage.app",
-    messagingSenderId: "1006815080708",
-    appId: "1:1006815080708:web:e9c3afd0a15d8abbe46051"
+  apiKey: "AIzaSyDmf-lcDM5hXBwBqzymGlzdoHdTGfT2pRg",
+  authDomain: "magniybank.firebaseapp.com",
+  databaseURL: "https://magniybank-default-rtdb.firebaseio.com",
+  projectId: "magniybank",
+  storageBucket: "magniybank.firebasestorage.app",
+  messagingSenderId: "1006815080708",
+  appId: "1:1006815080708:web:e9c3afd0a15d8abbe46051"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -133,147 +359,313 @@ const db = firebase.database();
 let user = localStorage.getItem('mag_active_u');
 let uData = null;
 
+const COLORS = ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#d97706'];
 const SHOP_DB = {
-    car: [{n:"Zaporozhets", p:1000}, {n:"Lada", p:5000}, {n:"BMW M5", p:150000}, {n:"Gelenvagen", p:400000}, {n:"Ferrari", p:1200000}],
-    house: [{n:"Гараж", p:8000}, {n:"Квартира", p:60000}, {n:"Дача", p:120000}, {n:"Особняк", p:800000}, {n:"Остров", p:10000000}],
-    biz: [{n:"Ларек", p:25000, i:1000}, {n:"Мойка", p:100000, i:4000}, {n:"ТЦ", p:2000000, i:50000}]
+  car: [
+    {n:"Запорожец", e:"🚗", p:1000},
+    {n:"Лада", e:"🚙", p:5000},
+    {n:"BMW M5", e:"🏎", p:150000},
+    {n:"Гелендваген", e:"🚐", p:400000},
+    {n:"Ferrari", e:"🏁", p:1200000}
+  ],
+  house: [
+    {n:"Гараж", e:"🏚", p:8000},
+    {n:"Квартира", e:"🏢", p:60000},
+    {n:"Дача", e:"🏡", p:120000},
+    {n:"Особняк", e:"🏰", p:800000},
+    {n:"Остров", e:"🏝", p:10000000}
+  ],
+  biz: [
+    {n:"Ларёк", e:"🏪", p:25000, i:1000},
+    {n:"Автомойка", e:"🚿", p:100000, i:4000},
+    {n:"ТЦ", e:"🏬", p:2000000, i:50000}
+  ]
 };
 
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+// AUTH
 function auth() {
-    let l = document.getElementById('l-in').value.toLowerCase().trim();
-    let p = document.getElementById('p-in').value;
-    let code = document.getElementById('a-code').value;
-    if(!l || !p) return;
-    db.ref('users/'+l).once('value', s => {
-        if(!s.exists()) {
-            db.ref('users/'+l).set({login:l, pass:p, bal:5000, nick:l, ava:'', theme:'#007AFF', inv:[], isAdmin:(code==='MAG777')});
-        }
-        let accs = JSON.parse(localStorage.getItem('mag_accs') || '[]');
-        if(!accs.includes(l)) accs.push(l);
-        localStorage.setItem('mag_accs', JSON.stringify(accs));
-        localStorage.setItem('mag_active_u', l);
-        location.reload();
-    });
+  let l = document.getElementById('l-in').value.toLowerCase().trim();
+  let p = document.getElementById('p-in').value;
+  let code = document.getElementById('a-code').value;
+  if(!l || !p) { toast('Введите логин и пароль', 'error'); return; }
+  db.ref('users/'+l).once('value', s => {
+    if(!s.exists()) {
+      db.ref('users/'+l).set({
+        login:l, pass:p, bal:5000, nick:l, ava:'', theme:'#2563eb',
+        inv:{}, isAdmin:(code==='MAG777'), isBanned:false
+      });
+    } else {
+      let d = s.val();
+      if(d.pass !== p) { toast('Неверный пароль', 'error'); return; }
+    }
+    let accs = JSON.parse(localStorage.getItem('mag_accs')||'[]');
+    if(!accs.includes(l)) accs.push(l);
+    localStorage.setItem('mag_accs', JSON.stringify(accs));
+    localStorage.setItem('mag_active_u', l);
+    location.reload();
+  });
 }
 
 function renderAccs() {
-    let list = document.getElementById('acc-list');
-    let accs = JSON.parse(localStorage.getItem('mag_accs') || '[]');
-    if(accs.length > 0) list.innerHTML = '<p style="color:gray; font-size:12px;">Ваши аккаунты:</p>';
-    accs.forEach(a => {
-        list.innerHTML += `<div class="acc-chip" onclick="switchAcc('${a}')">${a}</div>`;
-    });
+  let list = document.getElementById('acc-list');
+  let accs = JSON.parse(localStorage.getItem('mag_accs')||'[]');
+  if(!accs.length) return;
+  list.innerHTML = '<p style="color:var(--muted);font-size:11px;margin-bottom:8px;">СОХРАНЁННЫЕ АККАУНТЫ</p>';
+  accs.forEach(a => {
+    list.innerHTML += `<div class="acc-chip" onclick="switchAcc('${a}')"><div class="acc-dot"></div>${a}</div>`;
+  });
 }
 renderAccs();
 
 function switchAcc(a) { localStorage.setItem('mag_active_u', a); location.reload(); }
 function exitAcc() { localStorage.removeItem('mag_active_u'); location.reload(); }
 
+// INIT COLOR SWATCHES
+function initSwatches() {
+  let wrap = document.getElementById('color-swatches');
+  wrap.innerHTML = '';
+  COLORS.forEach(c => {
+    let d = document.createElement('div');
+    d.className = 'color-swatch' + (uData.theme === c ? ' active' : '');
+    d.style.background = c;
+    d.onclick = () => {
+      document.getElementById('st-c').value = c;
+      updateTheme(c);
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+      d.classList.add('active');
+    };
+    wrap.appendChild(d);
+  });
+  document.getElementById('st-c').value = uData.theme || '#2563eb';
+}
+
+// MAIN LOAD
 if(user) {
-    db.ref('users/'+user).on('value', s => {
-        uData = s.val(); if(!uData) return;
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('u-nick').innerText = uData.nick;
-        document.getElementById('u-bal').innerText = uData.bal.toLocaleString() + " ₴";
-        document.getElementById('u-ava').src = uData.ava || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-        updateTheme(uData.theme || '#007AFF');
-        if(uData.isAdmin) document.getElementById('adm-nav').style.display = 'block';
+  db.ref('users/'+user).on('value', s => {
+    uData = s.val();
+    if(!uData) return;
 
-        let sel = document.getElementById('tr-obj'); sel.innerHTML = '';
-        let inv = document.getElementById('inv-container'); inv.innerHTML = '';
-        (uData.inv || []).forEach((item, i) => {
-            sel.innerHTML += `<option value="${i}">${item.n}</option>`;
-            inv.innerHTML += `<div class="card">📦 ${item.n}</div>`;
-        });
-    });
+    // Check ban
+    if(uData.isBanned) {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('banned-screen').style.display = 'flex';
+      return;
+    }
 
-    db.ref('global_trade').on('value', s => {
-        let board = document.getElementById('trade-board'); board.innerHTML = '<h3 style="margin-top:15px">Рынок игроков</h3>';
-        s.forEach(child => {
-            let d = child.val();
-            board.innerHTML += `<div class="card"><b>${d.n}</b><br><small>Продавец: ${d.sn}</small><br><b>${d.p} ₴</b>
-            <button class="btn btn-accent" onclick="buyTrade('${child.key}')">КУПИТЬ</button></div>`;
-        });
-    });
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('u-nick').textContent = uData.nick;
+    document.getElementById('u-bal').textContent = Number(uData.bal).toLocaleString('ru') + ' ₴';
+    let ava = uData.ava || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    document.getElementById('u-ava').src = ava;
+    document.getElementById('prof-ava-img').src = ava;
+    document.getElementById('prof-nick-display').textContent = uData.nick;
+    document.getElementById('st-n').value = uData.nick;
+    document.getElementById('st-a').value = uData.ava || '';
+    updateTheme(uData.theme || '#2563eb');
+    if(uData.isAdmin) document.getElementById('adm-nav').style.display = 'flex';
+    initSwatches();
+    renderInv();
+    renderTradeSelect();
+  });
 
-    db.ref('chat').limitToLast(20).on('value', s => {
-        let box = document.getElementById('chat-list'); box.innerHTML = '';
-        s.forEach(m => {
-            let d = m.val();
-            box.innerHTML += `<div class="msg ${d.f===uData.nick?'msg-m':'msg-o'}"><b>${d.f}:</b><br>${d.t}</div>`;
-        });
-        box.scrollTop = box.scrollHeight;
+  db.ref('global_trade').on('value', s => {
+    let board = document.getElementById('trade-board');
+    board.innerHTML = '';
+    let count = 0;
+    s.forEach(child => {
+      let d = child.val();
+      count++;
+      board.innerHTML += `
+        <div class="trade-item">
+          <div class="trade-info">
+            <div class="trade-name">${d.e || '📦'} ${d.n}</div>
+            <div class="trade-seller">Продавец: ${d.sn}</div>
+          </div>
+          <div class="trade-price">${Number(d.p).toLocaleString('ru')}₴</div>
+          <button class="trade-buy-btn" onclick="buyTrade('${child.key}')">КУПИТЬ</button>
+        </div>`;
     });
+    if(!count) board.innerHTML = '<div class="card" style="text-align:center; color:var(--muted);">Рынок пуст</div>';
+  });
+
+  db.ref('chat').limitToLast(30).on('value', s => {
+    if(!uData) return;
+    let box = document.getElementById('chat-list');
+    box.innerHTML = '';
+    s.forEach(m => {
+      let d = m.val();
+      let isMe = d.f === uData.nick;
+      box.innerHTML += `<div class="msg ${isMe?'msg-m':'msg-o'}"><b>${d.f}</b>${d.t}</div>`;
+    });
+    box.scrollTop = box.scrollHeight;
+  });
 }
 
 function updateTheme(color) {
-    document.documentElement.style.setProperty('--accent', color);
-    document.getElementById('logo-c').style.color = color;
+  document.documentElement.style.setProperty('--accent', color);
+  document.documentElement.style.setProperty('--accent2', color);
+  // Lighten slightly for accent2
+  localStorage.setItem('mag_theme_'+user, color);
+}
+
+// Apply saved theme immediately (before Firebase loads)
+(function() {
+  if(user) {
+    let t = localStorage.getItem('mag_theme_'+user);
+    if(t) updateTheme(t);
+  }
+})();
+
+function renderInv() {
+  let inv = document.getElementById('inv-container');
+  let sel = document.getElementById('tr-obj');
+  inv.innerHTML = '';
+  if(!uData) return;
+  let items = uData.inv || {};
+  let keys = Object.keys(items);
+  document.getElementById('inv-count').textContent = keys.length;
+  let bizIncome = 0;
+  if(!keys.length) {
+    inv.innerHTML = '<div class="card" style="text-align:center; color:var(--muted);">Имущества нет</div>';
+    return;
+  }
+  keys.forEach(k => {
+    let item = items[k];
+    if(item.i) bizIncome += item.i;
+    inv.innerHTML += `<div class="inv-item"><span class="inv-icon">${item.e||'📦'}</span><span class="inv-name">${item.n}</span></div>`;
+  });
+  document.getElementById('biz-income').textContent = bizIncome.toLocaleString('ru') + ' ₴';
+}
+
+function renderTradeSelect() {
+  let sel = document.getElementById('tr-obj');
+  sel.innerHTML = '';
+  let items = (uData && uData.inv) ? uData.inv : {};
+  let keys = Object.keys(items);
+  if(!keys.length) {
+    sel.innerHTML = '<option disabled>— Нет имущества —</option>';
+    return;
+  }
+  keys.forEach(k => {
+    let item = items[k];
+    sel.innerHTML += `<option value="${k}">${item.e||'📦'} ${item.n}</option>`;
+  });
 }
 
 function saveProf() {
-    let n = document.getElementById('st-n').value || uData.nick;
-    let a = document.getElementById('st-a').value || uData.ava;
-    let c = document.getElementById('st-c').value;
-    db.ref('users/'+user).update({nick: n, ava: a, theme: c});
-    alert("Сохранено!");
+  let n = document.getElementById('st-n').value.trim() || uData.nick;
+  let a = document.getElementById('st-a').value.trim();
+  let c = document.getElementById('st-c').value;
+  db.ref('users/'+user).update({nick:n, ava:a, theme:c}).then(() => {
+    updateTheme(c);
+    localStorage.setItem('mag_theme_'+user, c);
+    document.getElementById('prof-ava-img').src = a || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    toast('Профиль сохранён ✓');
+  });
 }
 
 function buyShop(t, i) {
-    let item = SHOP_DB[t][i];
-    if(uData.bal < item.p) return alert("Мало денег!");
-    let inv = uData.inv || []; inv.push(item);
-    db.ref('users/'+user).update({ bal: uData.bal - item.p, inv: inv });
+  let item = SHOP_DB[t][i];
+  if(!uData) return;
+  if(uData.bal < item.p) { toast('Недостаточно средств', 'error'); return; }
+  let inv = uData.inv || {};
+  let key = Date.now().toString();
+  inv[key] = {...item};
+  db.ref('users/'+user).update({bal: uData.bal - item.p, inv: inv}).then(() => {
+    toast(`${item.e} ${item.n} куплен!`);
+  });
 }
 
 function postToTrade() {
-    let idx = document.getElementById('tr-obj').value;
-    let price = parseInt(document.getElementById('tr-pr').value);
-    if(idx==="" || !price) return;
-    let item = uData.inv[idx];
-    let newInv = [...uData.inv]; newInv.splice(idx, 1);
-    db.ref('users/'+user).update({ inv: newInv });
-    db.ref('global_trade').push({ n: item.n, p: price, s: user, sn: uData.nick, raw: item });
+  let key = document.getElementById('tr-obj').value;
+  let price = parseInt(document.getElementById('tr-pr').value);
+  if(!key || !price || price <= 0) { toast('Выберите объект и укажите цену', 'error'); return; }
+  let inv = uData.inv || {};
+  let item = inv[key];
+  if(!item) { toast('Объект не найден', 'error'); return; }
+  let newInv = {...inv};
+  delete newInv[key];
+  db.ref('users/'+user).update({inv: newInv}).then(() => {
+    db.ref('global_trade').push({n:item.n, e:item.e||'📦', p:price, s:user, sn:uData.nick, raw:item}).then(() => {
+      document.getElementById('tr-pr').value = '';
+      toast('Лот выставлен на рынок ✓');
+    });
+  });
 }
 
 function buyTrade(id) {
-    db.ref('global_trade/'+id).once('value', s => {
-        let d = s.val();
-        if(uData.bal < d.p) return alert("Мало денег!");
-        let inv = uData.inv || []; inv.push(d.raw);
-        db.ref('users/'+user).update({ bal: uData.bal - d.p, inv: inv });
-        db.ref('users/'+d.s+'/bal').transaction(c => (c||0) + d.p);
-        db.ref('global_trade/'+id).remove();
+  db.ref('global_trade/'+id).once('value', s => {
+    let d = s.val();
+    if(!d) { toast('Лот уже куплен', 'error'); return; }
+    if(uData.bal < d.p) { toast('Недостаточно средств', 'error'); return; }
+    if(d.s === user) { toast('Нельзя купить своё', 'error'); return; }
+    let inv = uData.inv || {};
+    let newKey = Date.now().toString();
+    inv[newKey] = d.raw;
+    db.ref('users/'+user).update({bal: uData.bal - d.p, inv: inv}).then(() => {
+      db.ref('users/'+d.s+'/bal').transaction(c => (c||0) + d.p);
+      db.ref('global_trade/'+id).remove();
+      toast(`${d.e||'📦'} ${d.n} куплен!`);
     });
+  });
 }
 
 function sw(id, el) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('p-'+id).classList.add('active'); el.classList.add('active');
-    if(id === 'shop') renderShop();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id === 'shop') renderShop();
+  if(id === 'trade') renderTradeSelect();
 }
 
 function renderShop() {
-    ['car','house','biz'].forEach(t => {
-        let container = document.getElementById('s-'+t); container.innerHTML = '';
-        SHOP_DB[t].forEach((item, i) => {
-            container.innerHTML += `<div class="card" style="font-size:12px; padding:10px;"><b>${item.n}</b><br>${item.p}₴<button class="btn btn-accent" style="padding:4px;" onclick="buyShop('${t}', ${i})">Купить</button></div>`;
-        });
+  ['car','house','biz'].forEach(t => {
+    let c = document.getElementById('s-'+t); c.innerHTML = '';
+    SHOP_DB[t].forEach((item, i) => {
+      c.innerHTML += `
+        <div class="shop-item">
+          <span class="shop-emoji">${item.e}</span>
+          <div class="shop-name">${item.n}</div>
+          ${item.i ? `<div class="shop-income">+${item.i.toLocaleString('ru')} ₴/ч</div>` : ''}
+          <div class="shop-price">${item.p.toLocaleString('ru')} ₴</div>
+          <button class="shop-buy" onclick="buyShop('${t}',${i})">КУПИТЬ</button>
+        </div>`;
     });
+  });
 }
 
-function work() { db.ref('users/'+user+'/bal').transaction(c => (c||0) + 100); }
-function sendMsg() {
-    let t = document.getElementById('m-in').value; if(!t) return;
-    db.ref('chat').push({f: uData.nick, t: t}); document.getElementById('m-in').value = '';
+function work() {
+  db.ref('users/'+user+'/bal').transaction(c => (c||0) + 100).then(() => toast('+100 ₴ получено'));
 }
+
+function sendMsg() {
+  let t = document.getElementById('m-in').value.trim();
+  if(!t || !uData) return;
+  db.ref('chat').push({f: uData.nick, t: t}).then(() => {
+    document.getElementById('m-in').value = '';
+  });
+}
+
+document.getElementById('m-in').addEventListener('keydown', e => { if(e.key === 'Enter') sendMsg(); });
+
 function adm(type) {
-    let t = document.getElementById('ad-u').value.toLowerCase();
-    let v = parseInt(document.getElementById('ad-v').value);
-    if(type === 'give') db.ref('users/'+t+'/bal').transaction(c => (c||0) + v);
-    if(type === 'ban') db.ref('users/'+t).update({isBanned: true});
-    alert("Выполнено!");
+  if(!uData || !uData.isAdmin) { toast('Нет прав', 'error'); return; }
+  let t = document.getElementById('ad-u').value.toLowerCase().trim();
+  let v = parseInt(document.getElementById('ad-v').value);
+  if(!t) { toast('Введите логин', 'error'); return; }
+  if(type === 'give') {
+    if(!v) { toast('Введите сумму', 'error'); return; }
+    db.ref('users/'+t+'/bal').transaction(c => (c||0)+v).then(() => toast(`+${v} ₴ выдано ${t}`));
+  }
+  if(type === 'ban') db.ref('users/'+t).update({isBanned:true}).then(() => toast(`${t} заблокирован`));
+  if(type === 'unban') db.ref('users/'+t).update({isBanned:false}).then(() => toast(`${t} разблокирован`));
 }
 </script>
 </body>
