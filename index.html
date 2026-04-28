@@ -3,118 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magniy OS v12 Social</title>
+    <title>Magniy OS v13 Network</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #000; --card: #121212; --accent: #007AFF; --text: #fff; --sec: #888; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; }
-        
-        .nav { display: flex; background: #080808; border-bottom: 1px solid #222; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
-        .nav-item { padding: 15px; cursor: pointer; color: var(--sec); white-space: nowrap; font-weight: 600; font-size: 13px; }
+        :root { --bg: #000; --card: #151517; --accent: #007AFF; --text: #fff; --sec: #8e8e93; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Navigation */
+        .nav { display: flex; background: #0a0a0a; border-bottom: 1px solid #222; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+        .nav-item { padding: 15px 20px; cursor: pointer; color: var(--sec); white-space: nowrap; font-weight: 600; font-size: 13px; }
         .nav-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
         .main { flex-grow: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
-        .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; border: 1px solid #222; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #222; }
         
-        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 5px; }
+        /* UI Elements */
+        .btn { border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 5px; transition: 0.2s; }
         .btn-accent { background: var(--accent); color: #fff; }
-        .input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 8px; outline: none; }
+        .input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 12px; color: #fff; margin-bottom: 8px; outline: none; }
 
-        /* Чат */
-        #chat-box { height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding: 10px; background: #080808; border-radius: 10px; }
-        .msg { padding: 8px 12px; background: #222; border-radius: 12px; max-width: 80%; width: fit-content; }
-        .msg b { color: var(--accent); font-size: 12px; display: block; }
+        /* Telegram-style Chat */
+        #chat-list { height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #000; border-radius: 15px; border: 1px solid #222; }
+        .message { max-width: 85%; padding: 10px 14px; border-radius: 18px; position: relative; font-size: 14px; line-height: 1.4; }
+        .msg-other { background: #262628; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg-mine { background: var(--accent); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-name { display: block; font-size: 11px; font-weight: 800; margin-bottom: 3px; opacity: 0.8; cursor: pointer; }
 
-        .avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
         .page { display: none; } .page.active { display: block; }
+        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
-<body id="b-root">
+<body>
 
-<div id="auth-screen" style="position:fixed; inset:0; background:#000; z-index:10000; display:flex; align-items:center; justify-content:center;">
-    <div style="width: 280px; text-align: center;">
-        <h1>MAGNIY <span style="color:var(--accent)">OS</span></h1><br>
+<div id="auth-screen">
+    <div style="width: 300px; text-align: center;">
+        <h1 style="margin-bottom: 20px;">MAGNIY <span style="color:var(--accent)">OS</span></h1>
         <input id="l-in" class="input" placeholder="Логин">
         <input id="p-in" class="input" type="password" placeholder="Пароль">
-        <button class="btn btn-accent" onclick="auth()">ВОЙТИ</button>
+        <input id="a-code" class="input" placeholder="Код админа (если есть)">
+        <button class="btn btn-accent" onclick="auth()">ВОЙТИ / СОЗДАТЬ</button>
     </div>
 </div>
 
 <div class="nav">
-    <div class="nav-item active" onclick="sw('dash', this)">🏠 Главная</div>
-    <div class="nav-item" onclick="sw('shop', this)">🛒 Гос</div>
+    <div class="nav-item active" onclick="sw('dash', this)">🏠</div>
+    <div class="nav-item" onclick="sw('shop', this)">🛒 Магазин</div>
     <div class="nav-item" onclick="sw('trade', this)">🤝 Трейд</div>
-    <div class="nav-item" onclick="sw('crypto', this)">🪙 Крипта</div>
-    <div class="nav-item" onclick="sw('social', this)">💬 Чаты</div>
+    <div class="nav-item" onclick="sw('chat', this)">💬 Чат</div>
     <div class="nav-item" onclick="sw('prof', this)">⚙️ Профиль</div>
+    <div id="adm-nav" class="nav-item" style="color:red; display:none;" onclick="sw('adm', this)">🛠 Админ</div>
 </div>
 
-<div class="main">
+<div class="main" id="main-content">
+    
     <div id="p-dash" class="page active">
         <div class="card" style="display:flex; align-items:center; gap:15px;">
-            <img id="u-ava" src="https://via.placeholder.com/60" class="avatar">
+            <img id="u-ava" src="" style="width:60px; height:60px; border-radius:50%; background:#333;">
             <div>
-                <h2 id="u-nick">Загрузка...</h2>
-                <p id="u-bal" style="color:#34C759">0 ₴</p>
+                <h2 id="u-nick">...</h2>
+                <p id="u-bal" style="color:var(--accent)">0 ₴</p>
             </div>
         </div>
-        <h3>Мои активы:</h3>
-        <div id="u-inv" style="margin-top:10px"></div>
+        <h3>Мои вещи:</h3>
+        <div id="my-inv" style="margin-top:10px;"></div>
     </div>
 
     <div id="p-shop" class="page">
-        <h3>🚗 Транспорт</h3><div class="grid" id="s-cars"></div><br>
-        <h3>🏠 Жилье</h3><div class="grid" id="s-houses"></div><br>
-        <h3>💼 Бизнес</h3><div class="grid" id="s-biz"></div>
+        <div id="shop-items"></div>
     </div>
 
     <div id="p-trade" class="page">
         <div class="card">
-            <h3>Продать вещь</h3>
+            <h3>Выставить на продажу</h3>
             <select id="tr-select" class="input"></select>
             <input id="tr-price" class="input" type="number" placeholder="Цена">
-            <button class="btn btn-accent" onclick="postToTrade()">Выставить</button>
+            <button class="btn btn-accent" onclick="postTrade()">Выставить</button>
         </div>
-        <div id="tr-board"></div>
+        <div id="trade-list"></div>
     </div>
 
-    <div id="p-crypto" class="page">
-        <div class="card">
-            <p>Bitcoin: <b id="p-btc" style="color:orange">0</b> $</p>
-            <p>Ethereum: <b id="p-eth" style="color:cyan">0</b> $</p>
-            <p>TON: <b id="p-ton" style="color:dodgerblue">0</b> $</p>
-            <hr style="margin:10px 0; opacity:0.1">
-            <p>Ваши: <span id="my-btc">0</span> BTC | <span id="my-ton">0</span> TON</p>
-            <button class="btn btn-accent" onclick="buyCrypto('btc')">Купить 1 BTC</button>
-            <button class="btn btn-accent" onclick="buyCrypto('ton')">Купить 10 TON</button>
-        </div>
-    </div>
-
-    <div id="p-social" class="page">
-        <div id="chat-box"></div>
-        <div style="display:flex; gap:5px">
-            <input id="m-in" class="input" placeholder="Сообщение...">
-            <button class="btn btn-accent" style="width:80px" onclick="sendMsg()">Отпр.</button>
+    <div id="p-chat" class="page">
+        <div id="chat-list"></div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+            <input id="m-in" class="input" style="margin:0" placeholder="Сообщение...">
+            <button class="btn btn-accent" style="width:70px; margin:0" onclick="sendMsg()">></button>
         </div>
     </div>
 
     <div id="p-prof" class="page">
         <div class="card">
-            <h3>Настройки</h3><br>
-            <input id="set-nick" class="input" placeholder="Новый ник">
-            <input id="set-ava" class="input" placeholder="Ссылка на аватарку">
-            <select id="set-theme" class="input" onchange="changeTheme(this.value)">
-                <option value="#007AFF">Синий (Стандарт)</option>
-                <option value="#FF3B30">Красный</option>
-                <option value="#FFD700">Золотой</option>
-                <option value="#34C759">Зеленый</option>
-            </select>
+            <h3>Настройки аккаунта</h3><br>
+            <input id="st-nick" class="input" placeholder="Новый ник">
+            <input id="st-ava" class="input" placeholder="URL аватарки">
+            <label>Цвет интерфейса:</label>
+            <input type="color" id="st-color" class="input" style="height:50px">
             <button class="btn btn-accent" onclick="saveProf()">Сохранить</button>
         </div>
     </div>
+
+    <div id="p-adm" class="page">
+        <div class="card">
+            <h3>Админ-панель</h3><br>
+            <input id="ad-user" class="input" placeholder="Логин игрока">
+            <input id="ad-val" class="input" type="number" placeholder="Сумма">
+            <button class="btn btn-accent" onclick="admAction('give')">Дать денег</button>
+            <button class="btn btn-accent" style="background:red" onclick="admAction('ban')">БАН</button>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -129,22 +127,28 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-let user = localStorage.getItem('mag12_u');
+let user = localStorage.getItem('mag13_u');
 let uData = null;
 
-const CATALOG = {
-    cars: [{n:"Велосипед", p:1000}, {n:"BMW M5", p:150000}, {n:"Bugatti", p:3000000}],
-    houses: [{n:"Комната", p:20000}, {n:"Дом", p:500000}, {n:"Небоскреб", p:10000000}],
-    biz: [{n:"Киоск", p:50000, i:300}, {n:"АЗС", p:400000, i:2000}, {n:"Отель", p:2000000, i:15000}]
-};
+const SHOP_DATA = [
+    {n:"Велосипед", p:2000, t:"car"}, {n:"BMW M5", p:200000, t:"car"},
+    {n:"Квартира", p:100000, t:"house"}, {n:"Вилла", p:1500000, t:"house"},
+    {n:"Кафе", p:50000, t:"biz", i:1000}, {n:"Завод", p:2000000, t:"biz", i:20000}
+];
 
 function auth() {
     let l = document.getElementById('l-in').value.toLowerCase().trim();
     let p = document.getElementById('p-in').value;
-    if(!l) return;
+    let code = document.getElementById('a-code').value;
+    if(!l || !p) return;
     db.ref('users/'+l).once('value', s => {
-        if(!s.exists()) db.ref('users/'+l).set({login:l, pass:p, bal:5000, usd:100000, inv:[], btc:0, ton:0, nick:l, ava:'https://via.placeholder.com/60', theme:'#007AFF'});
-        localStorage.setItem('mag12_u', l); location.reload();
+        if(!s.exists()) {
+            db.ref('users/'+l).set({
+                login:l, pass:p, bal:10000, nick:l, ava:'', theme:'#007AFF',
+                inv:[], isAdmin: (code === 'MAG777')
+            });
+        }
+        localStorage.setItem('mag13_u', l); location.reload();
     });
 }
 
@@ -153,65 +157,67 @@ if(user) {
         uData = s.val(); if(!uData) return;
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('u-nick').innerText = uData.nick;
-        document.getElementById('u-bal').innerText = (uData.bal||0).toLocaleString() + " ₴";
-        document.getElementById('u-ava').src = uData.ava;
-        document.getElementById('my-btc').innerText = uData.btc || 0;
-        document.getElementById('my-ton').innerText = uData.ton || 0;
+        document.getElementById('u-bal').innerText = uData.bal.toLocaleString() + " ₴";
+        document.getElementById('u-ava').src = uData.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+        
+        // Тема
         document.documentElement.style.setProperty('--accent', uData.theme);
+        if(uData.isAdmin) document.getElementById('adm-nav').style.display = 'block';
 
-        // Обновление инвентаря
-        let invEl = document.getElementById('u-inv'); invEl.innerHTML = '';
+        // Инвентарь для трейда
         let sel = document.getElementById('tr-select'); sel.innerHTML = '';
-        (uData.inv || []).forEach((item, index) => {
-            invEl.innerHTML += `<div class="card">📦 ${item.n}</div>`;
-            sel.innerHTML += `<option value="${index}">${item.n}</option>`;
+        let inv = document.getElementById('my-inv'); inv.innerHTML = '';
+        (uData.inv || []).forEach((item, i) => {
+            sel.innerHTML += `<option value="${i}">${item.n}</option>`;
+            inv.innerHTML += `<div class="card">📦 ${item.n}</div>`;
         });
     });
 
-    // Чат
-    db.ref('chat').limitToLast(20).on('value', s => {
-        let box = document.getElementById('chat-box'); box.innerHTML = '';
+    // Слушатель Трейда
+    db.ref('global_trade').on('value', s => {
+        let list = document.getElementById('trade-list'); list.innerHTML = '<h3 style="margin:10px 0">Рынок игроков</h3>';
+        s.forEach(child => {
+            let d = child.val();
+            list.innerHTML += `<div class="card"><b>${d.n}</b><br>Продавец: ${d.seller_nick}<br>Цена: ${d.p}₴<br>
+            <button class="btn btn-accent" onclick="buyTrade('${child.key}')">Купить</button></div>`;
+        });
+    });
+
+    // Слушатель Чата
+    db.ref('chat').limitToLast(30).on('value', s => {
+        let box = document.getElementById('chat-list'); box.innerHTML = '';
         s.forEach(m => {
-            box.innerHTML += `<div class="msg"><b>${m.val().from}</b>${m.val().text}</div>`;
+            let d = m.val();
+            let isMine = d.from === uData.nick;
+            box.innerHTML += `<div class="message ${isMine?'msg-mine':'msg-other'}">
+                <span class="msg-name" onclick="alert('Игрок: ${d.from}')">${d.from}</span>${d.text}</div>`;
         });
         box.scrollTop = box.scrollHeight;
     });
-
-    // Трейд-борд
-    db.ref('global_trade').on('value', s => {
-        let board = document.getElementById('tr-board'); board.innerHTML = '<h3>Рынок игроков</h3><br>';
-        s.forEach(item => {
-            let d = item.val();
-            board.innerHTML += `<div class="card"><b>${d.n}</b><br>Продавец: ${d.owner_nick}<br>Цена: ${d.p}₴<br><button class="btn btn-accent" onclick="buyFromTrade('${item.key}')">Купить</button></div>`;
-        });
-    });
 }
 
-function buyShop(type, idx) {
-    let item = CATALOG[type][idx];
-    if(uData.bal < item.p) return alert("Мало денег");
-    let newInv = uData.inv || []; newInv.push(item);
-    db.ref('users/'+user).update({ bal: uData.bal - item.p, inv: newInv });
-}
-
-function postToTrade() {
+function postTrade() {
     let idx = document.getElementById('tr-select').value;
     let price = parseInt(document.getElementById('tr-price').value);
     if(idx === "" || !price) return;
+    
     let item = uData.inv[idx];
     let newInv = [...uData.inv];
-    newInv.splice(idx, 1); // Удаляем у себя
+    newInv.splice(idx, 1);
+    
     db.ref('users/'+user).update({ inv: newInv });
-    db.ref('global_trade').push({ n: item.n, p: price, owner: user, owner_nick: uData.nick, raw: item });
+    db.ref('global_trade').push({
+        n: item.n, p: price, seller: user, seller_nick: uData.nick, raw: item
+    });
 }
 
-function buyFromTrade(id) {
+function buyTrade(id) {
     db.ref('global_trade/'+id).once('value', s => {
         let d = s.val();
         if(uData.bal < d.p) return alert("Мало денег");
         let newInv = uData.inv || []; newInv.push(d.raw);
         db.ref('users/'+user).update({ bal: uData.bal - d.p, inv: newInv });
-        db.ref('users/'+d.owner+'/bal').transaction(c => (c||0) + d.p); // Деньги продавцу
+        db.ref('users/'+d.seller+'/bal').transaction(c => (c||0) + d.p);
         db.ref('global_trade/'+id).remove();
     });
 }
@@ -224,11 +230,18 @@ function sendMsg() {
 }
 
 function saveProf() {
-    let n = document.getElementById('set-nick').value || uData.nick;
-    let a = document.getElementById('set-ava').value || uData.ava;
-    let t = document.getElementById('set-theme').value;
-    db.ref('users/'+user).update({nick: n, ava: a, theme: t});
-    alert("Сохранено!");
+    let n = document.getElementById('st-nick').value || uData.nick;
+    let a = document.getElementById('st-ava').value || uData.ava;
+    let c = document.getElementById('st-color').value;
+    db.ref('users/'+user).update({nick: n, ava: a, theme: c});
+    alert("Настройки обновлены!");
+}
+
+function admAction(type) {
+    let target = document.getElementById('ad-user').value.toLowerCase();
+    let val = parseInt(document.getElementById('ad-val').value);
+    if(type === 'give') db.ref('users/'+target+'/bal').transaction(c => (c||0) + val);
+    alert("Готово");
 }
 
 function sw(id, el) {
@@ -239,25 +252,18 @@ function sw(id, el) {
 }
 
 function renderShop() {
-    ['cars','houses','biz'].forEach(t => {
-        let el = document.getElementById('s-'+t); el.innerHTML = '';
-        CATALOG[t].forEach((i, idx) => {
-            el.innerHTML += `<div class="card" style="font-size:12px"><b>${i.n}</b><br>${i.p}₴<button class="btn btn-accent" style="padding:5px" onclick="buyShop('${t}', ${idx})">Купить</button></div>`;
-        });
+    let container = document.getElementById('shop-items'); container.innerHTML = '<h3>Гос. Магазин</h3><br>';
+    SHOP_DATA.forEach((i, idx) => {
+        container.innerHTML += `<div class="card"><b>${i.n}</b> - ${i.p}₴<button class="btn btn-accent" onclick="buyShop(${idx})">Купить</button></div>`;
     });
 }
 
-function buyCrypto(coin) {
-    let cost = coin === 'btc' ? 60000 : 70;
-    if(uData.usd < cost) return alert("Нужно больше $");
-    db.ref('users/'+user).update({ usd: uData.usd - cost, [coin]: (uData[coin]||0) + (coin==='btc'?1:10) });
+function buyShop(idx) {
+    let i = SHOP_DATA[idx];
+    if(uData.bal < i.p) return alert("Мало денег");
+    let inv = uData.inv || []; inv.push(i);
+    db.ref('users/'+user).update({ bal: uData.bal - i.p, inv: inv });
 }
-
-setInterval(() => {
-    document.getElementById('p-btc').innerText = (60000 + Math.random()*500).toFixed(0);
-    document.getElementById('p-eth').innerText = (3500 + Math.random()*100).toFixed(0);
-    document.getElementById('p-ton').innerText = (7 + Math.random()*1).toFixed(2);
-}, 2000);
 </script>
 </body>
-</html>
+    </html>
